@@ -1,0 +1,73 @@
+/* ══════════════════════════════════════════════════════════════
+   Boticário LMS · SKIN "THEUS" — camada de override.
+   Base: Pencil (design system, Apache 2.0) — tipografia Figtree,
+   primário índigo #163bf3, paleta cinza-fria, cantos bem arredondados
+   (botões pill). Remapeia os tokens --lms-* e ajusta componentes por
+   cima do lms.css. Mesmas classes/marcação.
+   ══════════════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap');
+
+:root {
+  --th-indigo:#163bf3; --th-indigo-deep:#133191; --th-focus:#6d83f3;
+  --th-blue:#0089e3;
+  --th-gray-70:#323c45; --th-gray-60:#46535f; --th-gray-50:#687b8c;
+  --th-gray-40:#c3d1dd; --th-gray-30:#e1eaf1; --th-gray-20:#ebf2f7; --th-gray-10:#f5f8fa;
+  --th-font:'Figtree', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  --lms-primary:        var(--th-indigo);
+  --lms-primary-ink:    #ffffff;
+  --lms-primary-deep:   var(--th-indigo-deep);
+  --lms-heading:        var(--th-gray-70);
+  --lms-accent:         var(--th-indigo-deep);
+
+  --lms-bg:             var(--th-gray-10);
+  --lms-surface:        #ffffff;
+  --lms-surface-2:      var(--th-gray-20);
+  --lms-border:         var(--th-gray-30);
+  --lms-ink:            var(--th-gray-70);
+  --lms-ink-soft:       var(--th-gray-50);
+  --lms-ink-faint:      #9fb0bd;
+  --lms-line:           var(--th-gray-40);
+  --lms-white:          #ffffff;
+
+  --lms-sky:#edf8ff; --lms-sand:#fff3d6; --lms-lilac:#ebeeff; --lms-rose:#ffe8e5; --lms-mint:#e3f7ed;
+  --lms-success:#00672e; --lms-success-soft:#e3f7ed;
+  --lms-error:#cf1d00;   --lms-error-soft:#ffe8e5;
+  --lms-warning:#935000; --lms-warning-soft:#fff3d6;
+  --lms-xp:#c98600; --lms-locked:var(--th-gray-40); --lms-locked-ink:var(--th-gray-50);
+
+  --lms-radius-sm:8px; --lms-radius-md:12px; --lms-radius-lg:20px; --lms-radius-xl:28px; --lms-radius-pill:999px;
+  --lms-border-game:1px solid var(--th-gray-30);
+  --lms-shadow-crisp:0 6px 16px rgba(50,60,69,.12);
+  --lms-shadow-crisp-sm:0 3px 10px rgba(50,60,69,.10);
+  --lms-shadow-soft:0 18px 40px rgba(50,60,69,.16);
+  --lms-font-ui:var(--th-font); --lms-font-body:var(--th-font); --lms-font-display:var(--th-font);
+}
+
+/* botões pill, bold — assinatura Pencil */
+.lms-btn { border-radius: 999px; font-weight: 700; }
+.lms-btn-primary { background: var(--th-indigo); color: #fff; }
+.lms-btn-primary:hover { background: var(--th-indigo-deep); color: #fff; }
+.lms-btn-outline, .lms-btn-game {
+  background: #fff; color: var(--th-gray-70); border: 1px solid var(--th-gray-40); box-shadow: none;
+}
+.lms-btn-outline:hover, .lms-btn-game:hover { background: var(--th-gray-10); color: var(--th-gray-70); transform: none; box-shadow: none; }
+.lms-btn-game:active { transform: none; box-shadow: none; }
+.lms-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--th-focus); }
+
+.lms-card, .lms-card-game, .lms-card-pastel { border-radius: var(--lms-radius-lg); }
+.lms-card-game { border: 1px solid var(--th-gray-30); box-shadow: var(--lms-shadow-crisp); }
+
+.lms-pill { border-radius: 999px; font-weight: 600; }
+
+.lms-input, .lms-select, .lms-textarea {
+  border-width: 1px; border-color: var(--th-gray-40); border-radius: var(--lms-radius-md); padding: 10px 14px;
+}
+.lms-input:focus, .lms-select:focus, .lms-textarea:focus { border-color: var(--th-indigo); box-shadow: 0 0 0 3px var(--th-focus); }
+
+.lms-progress > .lms-progress-fill { background: var(--th-indigo); }
+.lms-topbar { background: #fff; border-bottom: 1px solid var(--th-gray-30); }
+.lms-table th { color: var(--th-gray-50); border-bottom: 1px solid var(--th-gray-30); }
+.lms-table tbody tr:hover td { background: var(--th-gray-10); }
+
+:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--th-focus); }

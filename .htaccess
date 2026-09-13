@@ -1,0 +1,25 @@
+# ──────────────────────────────────────────────────────────────
+# Boticário LMS · URLs limpas (sem .php exposto)
+#   /boticario/mapa  → serve mapa.php internamente (invisível)
+#   /boticario/mapa.php (GET) → 301 para /boticario/mapa (legado)
+# POSTs nunca são redirecionados — APIs e formulários intactos.
+# ──────────────────────────────────────────────────────────────
+RewriteEngine On
+RewriteBase /boticario/
+
+# HTTPS sempre (RewriteEngine próprio não herda a regra da raiz)
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# 1) legado: pedido EXTERNO de .php vira a URL limpa (301, só GET).
+#    THE_REQUEST só muda em pedidos reais do navegador — reescritas
+#    internas não disparam esta regra (sem loop).
+RewriteCond %{REQUEST_METHOD} =GET
+RewriteCond %{THE_REQUEST} \s/boticario/([^\s?]+)\.php[\s?]
+RewriteRule ^ /boticario/%1 [R=301,L]
+
+# 2) interno: URL limpa → arquivo .php correspondente, se existir.
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.+?)/?$ $1.php [L]

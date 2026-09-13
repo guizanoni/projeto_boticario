@@ -1,0 +1,114 @@
+/* ══════════════════════════════════════════════════════════════
+   Boticário LMS · SKIN "GARDEN" — camada de override.
+   Aplica o Zendesk Garden Design System (v9, Apache 2.0) por cima do
+   lms.css SEM duplicar o sistema: remapeia os tokens --lms-* para a
+   paleta/tipografia/raios Garden e ajusta a anatomia de alguns
+   componentes. A marcação (HTML/classes) e o layout continuam do lms.css.
+   Ligue/desligue no perfil do admin → Aparência.
+   ══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ---- Paleta Garden ---- */
+  --grey-100:#f8f9f9; --grey-200:#e8eaec; --grey-300:#d8dcde; --grey-400:#b0b8be;
+  --grey-500:#919ca5; --grey-600:#848f99; --grey-700:#5c6970; --grey-800:#39434b;
+  --grey-900:#293239; --grey-1000:#1c2227;
+  --blue-100:#edf7ff; --blue-200:#ddecf8; --blue-300:#cce0f1; --blue-600:#2694d6;
+  --blue-700:#1f73b7; --blue-800:#13456d; --blue-900:#0f3655;
+  --red-100:#fff2f3; --red-300:#f5d5d8; --red-600:#eb5c69; --red-700:#cd3642; --red-800:#7e1d25;
+  --yellow-100:#fff3e4; --yellow-300:#fed6a9; --yellow-500:#e38215; --yellow-700:#ac5918;
+  --green-100:#eef8f4; --green-300:#cae3d9; --green-600:#26a178; --green-700:#037f52; --green-800:#104b35;
+  --kale-200:#daeded; --kale-700:#40787a; --kale-900:#063940;
+  --garden-focus:0 0 0 3px rgba(31,115,183,.35);
+
+  /* ---- Remapeamento dos tokens do LMS para o Garden ---- */
+  --lms-primary:        var(--blue-700);
+  --lms-primary-ink:    #ffffff;
+  --lms-primary-deep:   var(--blue-800);
+  --lms-heading:        var(--grey-900);
+  --lms-accent:         var(--blue-800);
+
+  --lms-bg:             var(--grey-100);
+  --lms-surface:        #ffffff;
+  --lms-surface-2:      var(--grey-200);
+  --lms-border:         var(--grey-300);
+  --lms-ink:            var(--grey-900);
+  --lms-ink-soft:       var(--grey-700);
+  --lms-ink-faint:      var(--grey-500);
+  --lms-line:           var(--grey-300);
+  --lms-white:          #ffffff;
+
+  --lms-sky:            var(--blue-100);
+  --lms-sand:           var(--yellow-100);
+  --lms-lilac:          var(--kale-200);
+  --lms-rose:           var(--red-100);
+  --lms-mint:           var(--green-100);
+
+  --lms-success:        var(--green-700);
+  --lms-success-soft:   var(--green-100);
+  --lms-error:          var(--red-700);
+  --lms-error-soft:     var(--red-100);
+  --lms-warning:        var(--yellow-700);
+  --lms-warning-soft:   var(--yellow-100);
+  --lms-xp:             var(--yellow-500);
+  --lms-locked:         var(--grey-300);
+  --lms-locked-ink:     var(--grey-600);
+
+  --lms-radius-sm:      2px;
+  --lms-radius-md:      4px;
+  --lms-radius-lg:      8px;
+  --lms-radius-xl:      8px;
+  --lms-radius-pill:    100px;
+
+  --lms-border-game:    1px solid var(--grey-300);
+  --lms-shadow-crisp:   0 1px 2px rgba(4,68,77,.10);
+  --lms-shadow-crisp-sm:0 1px 2px rgba(4,68,77,.06);
+  --lms-shadow-soft:    0 20px 28px 0 rgba(4,68,77,.15);
+
+  --lms-font-ui:        system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --lms-font-body:      system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --lms-font-display:   system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+
+/* ── Botões ─────────────────────────────────────────────────── */
+.lms-btn { border-radius: var(--lms-radius-md); font-weight: 400; padding: 9px 20px; }
+.lms-btn-primary { background: var(--blue-700); color: #fff; }
+.lms-btn-primary:hover { background: var(--blue-800); color: #fff; }
+.lms-btn-outline {
+  background: transparent; color: var(--blue-700);
+  border: 1px solid var(--blue-700); border-radius: var(--lms-radius-md);
+}
+.lms-btn-outline:hover { background: var(--blue-100); color: var(--blue-800); border-color: var(--blue-800); }
+/* botão "lúdico" perde o shadow crisp e vira botão Garden neutro */
+.lms-btn-game {
+  background: #fff; color: var(--grey-900);
+  border: 1px solid var(--grey-300); border-radius: var(--lms-radius-md); box-shadow: none;
+}
+.lms-btn-game:hover  { background: var(--grey-100); box-shadow: none; transform: none; color: var(--grey-900); }
+.lms-btn-game:active { transform: none; box-shadow: none; }
+.lms-btn:focus-visible { outline: none; box-shadow: var(--garden-focus); }
+
+/* ── Cards ──────────────────────────────────────────────────── */
+.lms-card, .lms-card-game, .lms-card-pastel { border-radius: var(--lms-radius-lg); }
+.lms-card-game { border: 1px solid var(--grey-200); box-shadow: 0 1px 2px rgba(4,68,77,.06); }
+
+/* ── Pílulas / tags ─────────────────────────────────────────── */
+.lms-pill { border-radius: var(--lms-radius-md); font-weight: 600; }
+
+/* ── Formulários ────────────────────────────────────────────── */
+.lms-input, .lms-select, .lms-textarea { border-width: 1px; border-radius: var(--lms-radius-md); padding: 9px 12px; }
+.lms-input:hover, .lms-select:hover, .lms-textarea:hover { border-color: var(--blue-600); }
+.lms-input:focus, .lms-select:focus, .lms-textarea:focus { border-color: var(--blue-600); box-shadow: var(--garden-focus); }
+
+/* ── Progresso (barra verde Garden) ─────────────────────────── */
+.lms-progress { border: 1px solid var(--grey-300); background: var(--grey-200); height: 10px; }
+.lms-progress > .lms-progress-fill { background: var(--green-600); }
+
+/* ── Topbar / chrome ────────────────────────────────────────── */
+.lms-topbar { background: #fff; border-bottom: 1px solid var(--grey-200); }
+
+/* ── Tabela ─────────────────────────────────────────────────── */
+.lms-table th { color: var(--grey-900); border-bottom: 1px solid var(--grey-300); }
+.lms-table tbody tr:hover td { background: var(--grey-100); }
+
+/* ── Foco acessível global (padrão Garden) ──────────────────── */
+:focus-visible { outline: none; box-shadow: var(--garden-focus); }

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Design System · Skope LMS</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="stylesheet" href="../assets/css/lms.css">
+<style>
+  /* estilos só desta página de documentação */
+  .ds-section { padding: 56px 0; border-bottom: 1px solid var(--lms-border); }
+  .ds-kicker { font-family: var(--lms-font-ui); font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--lms-primary); margin-bottom: 8px; }
+  .ds-grid { display: grid; gap: 16px; }
+  .ds-grid-4 { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+  .ds-grid-3 { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .ds-swatch { border-radius: var(--lms-radius-md); overflow: hidden; border: 1px solid var(--lms-border); background: var(--lms-white); }
+  .ds-swatch .ds-color { height: 84px; }
+  .ds-swatch .ds-meta { padding: 10px 14px; font-size: 13px; font-family: var(--lms-font-ui); }
+  .ds-swatch .ds-meta code { color: var(--lms-ink-soft); font-size: 12px; }
+  .ds-note { font-size: 14px; color: var(--lms-ink-soft); margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<header class="lms-topbar">
+  <span class="lms-logo">Skope <span style="color:var(--lms-primary)">LMS</span></span>
+  <span class="lms-pill is-primary">Design System v1.0</span>
+</header>
+
+<main class="lms-container">
+
+  <!-- INTRO -->
+  <section class="ds-section">
+    <p class="ds-kicker">Fundação</p>
+    <h1>Design System do LMS</h1>
+    <p class="lms-muted" style="max-width:640px; margin-top:12px">
+      Linguagem visual do produto: base creme, títulos navy em Syne, ação em ciano,
+      e o lado lúdico em pastéis com borda preta e sombra crisp — extraída da referência
+      applause.team. Todo componente deriva de variáveis CSS, então o white-label por
+      cliente é só sobrescrever tokens.
+    </p>
+  </section>
+
+  <!-- CORES -->
+  <section class="ds-section">
+    <p class="ds-kicker">Tokens</p>
+    <h2>Cores</h2>
+
+    <h3 style="margin:28px 0 12px">Tema do cliente (white-label)</h3>
+    <div class="ds-grid ds-grid-4">
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-primary)"></div><div class="ds-meta"><strong>Primary</strong><br><code>--lms-primary · #00A859</code></div></div>
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-primary-deep)"></div><div class="ds-meta"><strong>Primary deep</strong><br><code>--lms-primary-deep</code></div></div>
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-heading)"></div><div class="ds-meta"><strong>Heading</strong><br><code>--lms-heading · #0B3B2A</code></div></div>
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-accent)"></div><div class="ds-meta"><strong>Accent</strong><br><code>--lms-accent · #052B1F</code></div></div>
+    </div>
+
+    <h3 style="margin:28px 0 12px">Neutros (creme)</h3>
+    <div class="ds-grid ds-grid-4">
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-bg)"></div><div class="ds-meta"><strong>Background</strong><br><code>--lms-bg · #FEFFEF</code></div></div>
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-surface)"></div><div class="ds-meta"><strong>Surface</strong><br><code>--lms-surface · #F5F6E2</code></div></div>
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-border)"></div><div class="ds-meta"><strong>Border</strong><br><code>--lms-border · #E5E6CD</code></div></div>
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-ink)"></div><div class="ds-meta"><strong>Ink</strong><br><code>--lms-ink · #272C30</code></div></div>
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-ink-soft)"></div><div class="ds-meta"><strong>Ink soft</strong><br><code>--lms-ink-soft · #69727D</code></div></div>
+    </div>
+
+    <h3 style="margin:28px 0 12px">Pastéis (cards e minigames)</h3>
+    <div class="ds-grid ds-grid-4">
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-sky)"></div><div class="ds-meta"><strong>Sky</strong><br><code>--lms-sky · #D3ECF9</code></div></div>
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-sand)"></div><div class="ds-meta"><strong>Sand</strong><br><code>--lms-sand · #F6D8A7</code></div></div>
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-lilac)"></div><div class="ds-meta"><strong>Lilac</strong><br><code>--lms-lilac · #E5D1FA</code></div></div>
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-rose)"></div><div class="ds-meta"><strong>Rose</strong><br><code>--lms-rose · #E8CBEE</code></div></div>
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-mint)"></div><div class="ds-meta"><strong>Mint</strong><br><code>--lms-mint · #CDEBD8</code></div></div>
+    </div>
+
+    <h3 style="margin:28px 0 12px">Feedback e gamificação</h3>
+    <div class="ds-grid ds-grid-4">
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-success)"></div><div class="ds-meta"><strong>Success</strong><br><code>--lms-success</code></div></div>
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-error)"></div><div class="ds-meta"><strong>Error</strong><br><code>--lms-error</code></div></div>
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-warning)"></div><div class="ds-meta"><strong>Warning</strong><br><code>--lms-warning</code></div></div>
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-xp)"></div><div class="ds-meta"><strong>XP / dourado</strong><br><code>--lms-xp</code></div></div>
+      <div class="ds-swatch"><div class="ds-color" style="background:var(--lms-locked)"></div><div class="ds-meta"><strong>Locked (fog)</strong><br><code>--lms-locked</code></div></div>
+    </div>
+  </section>
+
+  <!-- TIPOGRAFIA -->
+  <section class="ds-section">
+    <p class="ds-kicker">Tokens</p>
+    <h2>Tipografia</h2>
+    <div class="lms-stack-6" style="margin-top:28px">
+      <div>
+        <p class="ds-note">Syne 600 · display · títulos de tela</p>
+        <h1>A jornada começa aqui</h1>
+      </div>
+      <div>
+        <p class="ds-note">Syne 500 · h2 · títulos de seção</p>
+        <h2>Fase 3 · Atendimento na loja</h2>
+      </div>
+      <div>
+        <p class="ds-note">Poppins 600 · h3 · títulos de card e UI</p>
+        <h3>Treinamento: Permissão de Trabalho</h3>
+      </div>
+      <div>
+        <p class="ds-note">Public Sans 400 · 18px · corpo de texto</p>
+        <p style="max-width:560px">Antes de iniciar qualquer atividade a quente, o operador deve verificar a validade da permissão de trabalho e confirmar o isolamento da área.</p>
+      </div>
+      <div>
+        <p class="ds-note">Public Sans · 14px · texto secundário</p>
+        <p class="lms-muted lms-small">Última atividade em 12/07/2026 · 4 de 6 etapas concluídas</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTÕES -->
+  <section class="ds-section">
+    <p class="ds-kicker">Componentes</p>
+    <h2>Botões</h2>
+    <div class="lms-row" style="margin-top:28px">
+      <button class="lms-btn lms-btn-primary">Continuar jornada</button>
+      <button class="lms-btn lms-btn-outline">Fale conosco</button>
+      <button class="lms-btn lms-btn-primary lms-btn-lg">Agende uma demo</button>
+      <button class="lms-btn lms-btn-primary lms-btn-sm">Ver detalhe</button>
+      <button class="lms-btn lms-btn-primary" disabled>Bloqueado</button>
+    </div>
+    <h3 style="margin:32px 0 4px">Botões de jogo</h3>
+    <p class="ds-note">Pastel + borda preta + sombra crisp. O hover "pressiona" o botão — usar dentro de minigames e no mapa.</p>
+    <div class="lms-row" style="margin-top:16px">
+      <button class="lms-btn lms-btn-game">Jogar agora</button>
+      <button class="lms-btn lms-btn-game is-sand">Mito ou verdade</button>
+      <button class="lms-btn lms-btn-game is-lilac">Jogo da memória</button>
+      <button class="lms-btn lms-btn-game is-rose">Ligue os pontos</button>
+      <button class="lms-btn lms-btn-game is-mint">Quiz</button>
+    </div>
+  </section>
+
+  <!-- CARDS -->
+  <section class="ds-section">
+    <p class="ds-kicker">Componentes</p>
+    <h2>Cards</h2>
+    <div class="ds-grid ds-grid-3" style="margin-top:28px">
+      <div class="lms-card-pastel is-sand">
+        <h3>Card pastel</h3>
+        <p class="lms-small" style="margin-top:8px">Destaques, features e blocos de marketing interno. Radius 24, sem borda — o estilo Applause.</p>
+      </div>
+      <div class="lms-card">
+        <h3>Card surface</h3>
+        <p class="lms-small" style="margin-top:8px">Conteúdo neutro, listas e agrupamentos padrão da interface.</p>
+      </div>
+      <div class="lms-card-game">
+        <h3>Card game</h3>
+        <p class="lms-small" style="margin-top:8px">Minigames e elementos interativos: branco, borda preta e sombra crisp.</p>
+      </div>
+    </div>
+
+    <h3 style="margin:32px 0 4px">Fases do mapa</h3>
+    <p class="ds-note">Os três estados de progressão: concluída, atual (destacada) e bloqueada pelo fog.</p>
+    <div class="ds-grid ds-grid-3" style="margin-top:16px">
+      <div class="lms-fase is-done">
+        <div class="lms-row" style="justify-content:space-between">
+          <h3>Fase 1 · Integração</h3><span>✅</span>
+        </div>
+        <p class="lms-small" style="margin-top:6px">Concluída · 5 de 5 etapas</p>
+      </div>
+      <div class="lms-fase is-current">
+        <div class="lms-row" style="justify-content:space-between">
+          <h3>Fase 2 · Produtos</h3><span>▶️</span>
+        </div>
+        <p class="lms-small" style="margin-top:6px">Em andamento · 2 de 5 etapas</p>
+      </div>
+      <div class="lms-fase is-locked">
+        <div class="lms-row" style="justify-content:space-between">
+          <h3>Fase 3 · Comando</h3><span>🔒</span>
+        </div>
+        <p class="lms-small" style="margin-top:6px">Conclua a Fase 2 para desbloquear</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAMIFICAÇÃO -->
+  <section class="ds-section">
+    <p class="ds-kicker">Componentes</p>
+    <h2>Gamificação</h2>
+
+    <h3 style="margin:28px 0 12px">XP e avatar</h3>
+    <div class="lms-row">
+      <span class="lms-avatar is-lg">G</span>
+      <span class="lms-xp"><span class="lms-xp-coin"></span> 1.250 XP</span>
+    </div>
+
+    <h3 style="margin:32px 0 12px">Conquistas</h3>
+    <div class="lms-row">
+      <span class="lms-badge">🏆</span>
+      <span class="lms-badge" style="background:var(--lms-sky)">⚡</span>
+      <span class="lms-badge" style="background:var(--lms-sand)">🎯</span>
+      <span class="lms-badge" style="background:var(--lms-mint)">🧭</span>
+      <span class="lms-badge is-locked">🔒</span>
+      <span class="lms-badge is-locked">🔒</span>
+    </div>
+
+    <h3 style="margin:32px 0 12px">Progresso</h3>
+    <div class="lms-stack-4" style="max-width:480px">
+      <div>
+        <div class="lms-row" style="justify-content:space-between; margin-bottom:6px">
+          <span class="lms-small lms-muted">Trilha do operador</span>
+          <span class="lms-small" style="font-weight:600">40%</span>
+        </div>
+        <div class="lms-progress"><div class="lms-progress-fill" style="width:40%"></div></div>
+      </div>
+      <div>
+        <div class="lms-row" style="justify-content:space-between; margin-bottom:6px">
+          <span class="lms-small lms-muted">Treinamento concluído</span>
+          <span class="lms-small" style="font-weight:600">100%</span>
+        </div>
+        <div class="lms-progress is-success"><div class="lms-progress-fill" style="width:100%"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MINIGAME UI -->
+  <section class="ds-section">
+    <p class="ds-kicker">Componentes</p>
+    <h2>Minigames</h2>
+
+    <h3 style="margin:28px 0 12px">Alternativas de quiz</h3>
+    <div class="lms-stack-2" style="max-width:560px">
+      <button class="lms-answer">Acionar o supervisor e interromper a atividade</button>
+      <button class="lms-answer is-correct">✔ Verificar a validade da permissão de trabalho</button>
+      <button class="lms-answer is-wrong">✘ Continuar a operação e reportar depois</button>
+    </div>
+
+    <h3 style="margin:32px 0 12px">Confirmação de leitura (ponto crítico)</h3>
+    <div class="lms-stack-2" style="max-width:560px">
+      <label class="lms-check is-checked"><input type="checkbox" checked> Entendi que todo cliente deve ser recebido em até um minuto.</label>
+      <label class="lms-check"><input type="checkbox"> Entendi que toda troca deve ser registrada no sistema no mesmo dia.</label>
+    </div>
+
+    <h3 style="margin:32px 0 12px">Alertas</h3>
+    <div class="lms-stack-2" style="max-width:560px">
+      <div class="lms-alert is-success">🎉 <div><strong>Mandou bem!</strong> Você concluiu a etapa com 100% de acerto.</div></div>
+      <div class="lms-alert is-error">⚠️ <div><strong>Quase!</strong> Revise o ponto sobre isolamento de área e tente de novo.</div></div>
+      <div class="lms-alert is-info">💡 <div>Dica: você pode rever o procedimento antes de responder.</div></div>
+    </div>
+  </section>
+
+  <!-- FORMULÁRIOS -->
+  <section class="ds-section">
+    <p class="ds-kicker">Componentes</p>
+    <h2>Formulários</h2>
+    <div class="lms-stack-4" style="max-width:420px; margin-top:28px">
+      <div>
+        <label class="lms-label" for="ds-email">E-mail</label>
+        <input class="lms-input" id="ds-email" type="email" placeholder="voce@empresa.com">
+      </div>
+      <div>
+        <label class="lms-label" for="ds-pass">Senha</label>
+        <input class="lms-input is-error" id="ds-pass" type="password" value="123">
+        <p class="lms-field-error">A senha precisa ter ao menos 6 caracteres.</p>
+      </div>
+      <div>
+        <label class="lms-label" for="ds-sel">Papel</label>
+        <select class="lms-select" id="ds-sel"><option>Aluno</option><option>Gestor</option><option>Admin</option></select>
+      </div>
+      <button class="lms-btn lms-btn-primary" style="width:100%">Entrar</button>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section class="ds-section">
+    <p class="ds-kicker">Componentes</p>
+    <h2>Dashboard do gestor</h2>
+
+    <div class="ds-grid ds-grid-4" style="margin-top:28px">
+      <div class="lms-stat"><div class="lms-stat-value">128</div><div class="lms-stat-label">Colaboradores</div></div>
+      <div class="lms-stat"><div class="lms-stat-value">96</div><div class="lms-stat-label">Acessaram</div></div>
+      <div class="lms-stat"><div class="lms-stat-value">71</div><div class="lms-stat-label">Concluíram</div></div>
+      <div class="lms-stat"><div class="lms-stat-value" style="color:var(--lms-error)">32</div><div class="lms-stat-label">Nunca logaram</div></div>
+    </div>
+
+    <div class="lms-table-wrap" style="margin-top:24px">
+      <table class="lms-table">
+        <thead><tr><th>Colaborador</th><th>Status</th><th>Progresso</th><th>Acertos</th><th>Tempo</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><div class="lms-row" style="gap:10px"><span class="lms-avatar" style="width:34px;height:34px;font-size:14px">M</span> Marina Costa</div></td>
+            <td><span class="lms-pill is-success">Concluído</span></td>
+            <td style="min-width:140px"><div class="lms-progress is-success" style="height:12px"><div class="lms-progress-fill" style="width:100%"></div></div></td>
+            <td>94%</td><td>18 min</td>
+          </tr>
+          <tr>
+            <td><div class="lms-row" style="gap:10px"><span class="lms-avatar" style="width:34px;height:34px;font-size:14px;background:var(--lms-sand)">J</span> João Pereira</div></td>
+            <td><span class="lms-pill is-warning">Em andamento</span></td>
+            <td><div class="lms-progress" style="height:12px"><div class="lms-progress-fill" style="width:55%"></div></div></td>
+            <td>81%</td><td>11 min</td>
+          </tr>
+          <tr>
+            <td><div class="lms-row" style="gap:10px"><span class="lms-avatar" style="width:34px;height:34px;font-size:14px;background:var(--lms-lilac)">R</span> Rafael Lima</div></td>
+            <td><span class="lms-pill is-error">Nunca logou</span></td>
+            <td><div class="lms-progress" style="height:12px"><div class="lms-progress-fill" style="width:0%"></div></div></td>
+            <td>—</td><td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- WHITE LABEL -->
+  <section class="ds-section" style="border-bottom:0">
+    <p class="ds-kicker">Arquitetura</p>
+    <h2>White-label por cliente</h2>
+    <p class="lms-muted" style="max-width:640px; margin:12px 0 20px">
+      Para trocar o tema de um tenant, sobrescreva só as variáveis do cliente.
+      Exemplo de um cliente com identidade laranja:
+    </p>
+    <div class="lms-card-game" style="max-width:640px">
+<pre style="font-size:14px; overflow-x:auto; font-family:ui-monospace,Consolas,monospace; line-height:1.7">&lt;style&gt;
+:root {
+  --lms-primary:      #E8641B;
+  --lms-primary-deep: #C24F10;
+  --lms-heading:      #2B1A0E;
+  --lms-accent:       #5A2E00;
+}
+&lt;/style&gt;</pre>
+    </div>
+  </section>
+
+</main>
+
+<footer style="padding:32px 0 56px; text-align:center">
+  <p class="lms-small lms-muted">Skope LMS · Design System v1.0 · base visual: applause.team</p>
+</footer>
+
+</body>
+</html>

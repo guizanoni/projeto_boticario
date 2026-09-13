@@ -1,0 +1,115 @@
+/* ══════════════════════════════════════════════════════════════
+   Boticário LMS · SKIN "MINT" (Tema 2) — camada de override.
+   Base: Atlassian Design System (tokens @atlaskit/tokens 16, light).
+   Remapeia os tokens --lms-* para a paleta/tipografia/raios/sombras
+   por cima do lms.css, sem duplicar o sistema. Mesmas classes/marcação.
+   Liga/desliga no perfil do admin → Aparência.
+   ══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ---- Atlassian: azul de marca, neutros, feedback ---- */
+  --at-brand:#1868DB; --at-brand-hover:#1558BC; --at-brand-press:#123263;
+  --at-text:#292A2E; --at-text-subtle:#505258; --at-text-subtlest:#6B6E76;
+  --at-surface:#ffffff; --at-sunken:#F8F8F8; --at-hovered:#F0F1F2;
+  --at-border:#DDDEE1; --at-border-input:#8C8F97; --at-focus:#4688EC;
+  --at-neutral:#F1F2F4; --at-neutral-hover:#DCDFE4;
+  --at-danger:#C9372C; --at-danger-text:#AE2E24; --at-danger-soft:#FFECEB; --at-danger-border:#E2483D;
+  --at-warning-text:#9E4C00; --at-warning-soft:#FFF5DB;
+  --at-success-text:#216E4E; --at-success-soft:#DCFFF1; --at-success-icon:#22A06B;
+  --at-shadow-raised:0 1px 1px rgba(30,31,33,.25), 0 0 1px rgba(30,31,33,.31);
+  --at-shadow-overlay:0 8px 12px rgba(30,31,33,.15), 0 0 1px rgba(30,31,33,.31);
+  --at-focus-ring:0 0 0 2px var(--at-focus);
+  --at-font:"Atlassian Sans", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+
+  /* ---- Remapeamento dos tokens do LMS ---- */
+  --lms-primary:        var(--at-brand);
+  --lms-primary-ink:    #ffffff;
+  --lms-primary-deep:   var(--at-brand-hover);
+  --lms-heading:        var(--at-text);
+  --lms-accent:         var(--at-brand-press);
+
+  --lms-bg:             var(--at-sunken);
+  --lms-surface:        #ffffff;
+  --lms-surface-2:      var(--at-hovered);
+  --lms-border:         var(--at-border);
+  --lms-ink:            var(--at-text);
+  --lms-ink-soft:       var(--at-text-subtle);
+  --lms-ink-faint:      var(--at-text-subtlest);
+  --lms-line:           var(--at-border);
+  --lms-white:          #ffffff;
+
+  --lms-sky:            #E9F2FE;
+  --lms-sand:           #FFF5DB;
+  --lms-lilac:          #F8EEFE;
+  --lms-rose:           #FFECEB;
+  --lms-mint:           #DCFFF1;
+
+  --lms-success:        var(--at-success-text);
+  --lms-success-soft:   var(--at-success-soft);
+  --lms-error:          var(--at-danger-text);
+  --lms-error-soft:     var(--at-danger-soft);
+  --lms-warning:        var(--at-warning-text);
+  --lms-warning-soft:   var(--at-warning-soft);
+  --lms-xp:             #B38600;
+  --lms-locked:         #B7B9BE;
+  --lms-locked-ink:     var(--at-text-subtlest);
+
+  --lms-radius-sm:      2px;
+  --lms-radius-md:      6px;
+  --lms-radius-lg:      8px;
+  --lms-radius-xl:      12px;
+  --lms-radius-pill:    9999px;
+
+  --lms-border-game:    1px solid var(--at-border);
+  --lms-shadow-crisp:   var(--at-shadow-raised);
+  --lms-shadow-crisp-sm:var(--at-shadow-raised);
+  --lms-shadow-soft:    var(--at-shadow-overlay);
+
+  --lms-font-ui:        var(--at-font);
+  --lms-font-body:      var(--at-font);
+  --lms-font-display:   var(--at-font);
+}
+
+/* ── Botões ─────────────────────────────────────────────────── */
+.lms-btn { border-radius: var(--lms-radius-md); font-weight: 500; padding: 8px 16px; }
+.lms-btn-primary { background: var(--at-brand); color: #fff; }
+.lms-btn-primary:hover { background: var(--at-brand-hover); color: #fff; }
+/* neutro Atlassian: cinza suave preenchido, sem borda dura */
+.lms-btn-outline, .lms-btn-game {
+  background: var(--at-neutral); color: var(--at-text);
+  border: 1px solid transparent; border-radius: var(--lms-radius-md); box-shadow: none;
+}
+.lms-btn-outline:hover, .lms-btn-game:hover { background: var(--at-neutral-hover); color: var(--at-text); transform: none; box-shadow: none; }
+.lms-btn-game:active { transform: none; box-shadow: none; }
+.lms-btn:focus-visible { outline: 2px solid var(--at-focus); outline-offset: 2px; box-shadow: none; }
+
+/* ── Cards ──────────────────────────────────────────────────── */
+.lms-card, .lms-card-game, .lms-card-pastel { border-radius: var(--lms-radius-lg); }
+.lms-card-game { border: 1px solid #EBECF0; box-shadow: var(--at-shadow-raised); }
+
+/* ── Pílulas / lozenges ─────────────────────────────────────── */
+.lms-pill { border-radius: var(--lms-radius-pill); font-weight: 600; }
+
+/* ── Formulários ────────────────────────────────────────────── */
+.lms-input, .lms-select, .lms-textarea {
+  border-width: 1px; border-color: var(--at-border-input);
+  border-radius: var(--lms-radius-md); padding: 9px 12px;
+}
+.lms-input:hover, .lms-select:hover, .lms-textarea:hover { background: #F8F8F8; }
+.lms-input:focus, .lms-select:focus, .lms-textarea:focus {
+  border-color: var(--at-focus); box-shadow: inset 0 0 0 1px var(--at-focus);
+}
+
+/* ── Progresso (azul de marca Atlassian) ────────────────────── */
+.lms-progress { border: 1px solid var(--at-border); background: #E8EAEC; height: 10px; }
+.lms-progress > .lms-progress-fill { background: var(--at-brand); }
+
+/* ── Topbar / chrome ────────────────────────────────────────── */
+.lms-topbar { background: #fff; border-bottom: 1px solid var(--at-border); }
+
+/* ── Tabela ─────────────────────────────────────────────────── */
+.lms-table th { color: var(--at-text-subtlest); border-bottom: 1px solid var(--at-border); }
+.lms-table tbody tr:hover td { background: var(--at-sunken); }
+
+/* ── Foco acessível global (padrão Atlassian) ───────────────── */
+:focus-visible { outline: 2px solid var(--at-focus); outline-offset: 2px; }

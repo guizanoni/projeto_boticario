@@ -1,0 +1,74 @@
+/* ══════════════════════════════════════════════════════════════
+   Boticário LMS · SKIN "CAR" — camada de override.
+   Base: Audi UI (audi-ui, Apache 2.0) — tema ESCURO minimalista,
+   canvas grafite, texto claro, sem cor de marca saturada (botões
+   claros sobre o escuro), cantos suaves. Remapeia os tokens --lms-*
+   e ajusta componentes por cima do lms.css. Mesmas classes/marcação.
+   ══════════════════════════════════════════════════════════════ */
+
+:root {
+  --car-canvas:#181d25; --car-soft:#222a34; --car-softer:#2c343f; --car-deep:#101319;
+  --car-ink:#fcfcfd; --car-ink-2:#eef0f3; --car-ink-soft:#9aa3b0; --car-ink-faint:#657081;
+  --car-line:rgba(252,252,253,.16); --car-line-2:rgba(252,252,253,.28);
+  --car-font:'AudiType','AudiTypeVar',ui-sans-serif,system-ui,'Segoe UI',Helvetica,Arial,sans-serif;
+
+  --lms-primary:        #fcfcfd;          /* Audi: ação clara sobre o escuro */
+  --lms-primary-ink:    #181d25;
+  --lms-primary-deep:   #dbdfe6;
+  --lms-heading:        #fcfcfd;
+  --lms-accent:         #dbdfe6;
+
+  --lms-bg:             var(--car-canvas);
+  --lms-surface:        var(--car-soft);
+  --lms-surface-2:      var(--car-softer);
+  --lms-border:         var(--car-line);
+  --lms-ink:            var(--car-ink-2);
+  --lms-ink-soft:       var(--car-ink-soft);
+  --lms-ink-faint:      var(--car-ink-faint);
+  --lms-line:           var(--car-line-2);
+  --lms-white:          var(--car-soft);   /* "branco" vira card escuro */
+
+  --lms-sky:#22303a; --lms-sand:#332f27; --lms-lilac:#2a2a3a; --lms-rose:#33232a; --lms-mint:#1f3029;
+  --lms-success:#4ecb83; --lms-success-soft:#173026;
+  --lms-error:#ff6b78;   --lms-error-soft:#361d21;
+  --lms-warning:#e0a83c; --lms-warning-soft:#332a19;
+  --lms-xp:#e8c869; --lms-locked:#3a424d; --lms-locked-ink:#8b93a0;
+
+  --lms-flutua-bg:rgba(16,20,28,.86);   /* painéis do mapa em vidro escuro */
+  --lms-radius-sm:6px; --lms-radius-md:10px; --lms-radius-lg:16px; --lms-radius-xl:20px; --lms-radius-pill:999px;
+  --lms-border-game:1px solid var(--car-line);
+  --lms-shadow-crisp:0 10px 30px rgba(2,2,3,.45);
+  --lms-shadow-crisp-sm:0 6px 18px rgba(2,2,3,.4);
+  --lms-shadow-soft:0 24px 64px rgba(2,2,3,.5);
+  --lms-font-ui:var(--car-font); --lms-font-body:var(--car-font); --lms-font-display:var(--car-font);
+}
+
+body { background: var(--car-canvas); color: var(--car-ink-2); }
+a { color: var(--car-ink); }
+
+.lms-btn-primary { background: var(--car-ink); color: var(--car-canvas); }
+.lms-btn-primary:hover { background: #dbdfe6; color: var(--car-canvas); }
+.lms-btn-outline, .lms-btn-game {
+  background: transparent; color: var(--car-ink); border: 1px solid var(--car-line-2); box-shadow: none;
+}
+.lms-btn-outline:hover, .lms-btn-game:hover { background: rgba(252,252,253,.08); color: var(--car-ink); transform: none; box-shadow: none; }
+.lms-btn-game:active { transform: none; box-shadow: none; }
+
+.lms-topbar { background: var(--car-deep); border-bottom: 1px solid var(--car-line); }
+.lms-card, .lms-card-game { background: var(--car-soft); border: 1px solid var(--car-line); }
+.lms-card-game { box-shadow: 0 10px 30px rgba(2,2,3,.4); }
+
+.lms-input, .lms-select, .lms-textarea {
+  background: var(--car-soft); color: var(--car-ink-2);
+  border: 1px solid var(--car-line-2); border-radius: var(--lms-radius-md);
+}
+.lms-input::placeholder, .lms-textarea::placeholder { color: var(--car-ink-faint); }
+.lms-input:focus, .lms-select:focus, .lms-textarea:focus { border-color: var(--car-ink); box-shadow: 0 0 0 3px rgba(252,252,253,.15); }
+
+.lms-progress { background: var(--car-softer); border: 1px solid var(--car-line); }
+.lms-progress > .lms-progress-fill { background: var(--car-ink); }
+
+.lms-table th { color: var(--car-ink-soft); border-bottom: 1px solid var(--car-line); }
+.lms-table tbody tr:hover td { background: rgba(252,252,253,.05); }
+
+:focus-visible { outline: 1px solid var(--car-ink); outline-offset: 3px; box-shadow: none; }
