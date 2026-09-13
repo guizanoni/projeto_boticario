@@ -21,6 +21,10 @@ engine. Fonte: `boticario/materiais/` (fora do repo).
 - ✅ Design system do O Boticário aplicado (2026-09-13, fim do dia): DM Sans (fonte do site),
   verde `#007A54` nas ações, `#00B77D` como verde-marca, quase-preto `#1F2A25` nos títulos,
   neutros claros. Wordmark e ânfora oficiais em vetor (vindos do site). Mapa refeito nos verdes.
+- ✅ Massa de demonstração: `admin/massa-demo.php?go=DEMO2026&confirmar=1` (só admin) cria 14
+  alunos fictícios (`@demo.boticario.com.br`) com progresso nos últimos 14 dias, 2 gestores com
+  times, comentários e conquistas; `&acao=limpar` remove. Contas reais de teste: sara@, gui@,
+  erica@boticario.com.br (zeradas) e rh@boticario.com.br (admin). Senha 1234.
 - ⏳ Imagens em alta: aguardando o cliente.
 
 
