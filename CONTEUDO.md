@@ -1,8 +1,8 @@
 # Boticário LMS · De-para do conteúdo "Da Base ao Look Completo"
 
 Análise do material entregue pelo cliente (2026-09-13) e mapeamento para o
-engine. Fonte: `conteudo do cliente para transformacao/` (mover para
-`boticario/materiais/` — ver "Passo 0").
+engine. Fonte: `boticario/materiais/` (fora do repo).
+
 
 ## O que veio
 
