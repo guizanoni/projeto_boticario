@@ -3,6 +3,21 @@
 Análise do material entregue pelo cliente (2026-09-13) e mapeamento para o
 engine. Fonte: `boticario/materiais/` (fora do repo).
 
+## Status (2026-09-13, fim do dia)
+
+- ✅ Passo 0: material movido para `materiais/`.
+- ✅ Engine: E1 (sequência com imagem + função revelada), E2 (explicação no quiz),
+  E3 (áudio por carta + modo domínio na investigação), vídeo em pé e MP4 pelo
+  editor (`api/midia` + `.user.ini`). Só em `boticario/` — portar pro Atlântica
+  quando fizer sentido.
+- ✅ Mídia: `assets/make/` (imagens do cliente renomeadas, stories em WebP, 4 MP3).
+  Vídeo comprimido em `materiais/video-make-720p.mp4` (35 MB, 720×1280), já
+  enviado pra produção pelo editor (`data/midia`) e gravado na etapa 3.
+- ✅ Carga: `_lib/conteudo/servico-make.php` + migração v32 — trilha, treinamento,
+  5 fases e 11 etapas entraram em produção no primeiro acesso após o deploy.
+- ✅ Mapa provisório `assets/make/mapa-loja.webp` (SVG em `materiais/mapa-loja.svg`).
+- ⏳ Imagens em alta e marca oficial: aguardando o cliente.
+
 
 ## O que veio
 
