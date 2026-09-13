@@ -1056,7 +1056,10 @@ lms_topbar($u);
   .dash-entra { animation:dash-sobe .5s var(--lms-ease, ease) both; animation-delay:calc(var(--i, 0) * 70ms) }
   @keyframes dash-sobe { from { opacity:0; transform:translateY(14px) } to { opacity:1; transform:none } }
 
-  .dash-grid { display:grid; grid-template-columns:minmax(0, 1.7fr) minmax(0, 1fr); gap:18px; align-items:start }
+  /* linha 1 = altura da coluna principal; a lateral (que atravessa as 2 linhas) só
+     estica a linha 2 — sem isso o grid distribuía a altura da lateral entre as
+     linhas e abria um vão antes de "Todos os colaboradores" */
+  .dash-grid { display:grid; grid-template-columns:minmax(0, 1.7fr) minmax(0, 1fr); grid-template-rows:auto 1fr; gap:18px; align-items:start }
   /* coluna direita = trilho que ocupa a altura das duas linhas da esquerda;
      detalhe/tabela (.dash-after) sobem para a linha 2 da esquerda e preenchem
      o vão que sobrava sob os gráficos. */
@@ -1066,6 +1069,7 @@ lms_topbar($u);
   @media (max-width: 900px) {
     .dash-grid { grid-template-columns:1fr }
     .dash-grid > .dash-side { grid-column:1; grid-row:auto }
+    .dash-grid { grid-template-rows:none }
   }
 
   /* tooltips ricos no hover (funil + gráfico) */
