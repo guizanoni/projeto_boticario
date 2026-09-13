@@ -243,13 +243,6 @@ if (!$mapaUrl) {
     display:flex; flex-direction:column; gap:9px; align-items:flex-start; max-width:320px }
   .flutua-info { position:static }
 
-    width:28px; height:28px; border-radius:50%; text-decoration:none;
-    display:flex; align-items:center; justify-content:center; font-size:13px;
-    background:var(--lms-flutua-bg, rgba(255,255,253,.72)); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
-    border:1.5px solid rgba(31,42,37,.22); opacity:.9;
-    transition:transform .12s var(--lms-ease, ease), opacity .12s ease;
-  }
-
   /* ações flutuantes (ajuda + suporte) sobre o relógio */
   .flutua-acoes { position:absolute; right:16px; bottom:56px; display:flex; flex-direction:column; gap:8px; align-items:flex-end; z-index:12 }
   /* pills no padrão do dock (Manual / Reportar bug) — não mais bolinhas */
@@ -326,12 +319,12 @@ if (!$mapaUrl) {
      concluído = verde sólido com halo (ênfase); bloqueado = navy escuro. */
   .hotspot {
     position:absolute; transform:translate(-50%, -50%);
-    width:36px; height:36px; border-radius:50%;
+    width:44px; height:44px; border-radius:50%;   /* cobre o ponto verde desenhado no chão da arte */
     border:3px solid #fff;
     background:var(--lms-white, #fff); cursor:pointer; z-index:6;
     display:flex; align-items:center; justify-content:center;
     box-shadow:0 3px 10px rgba(16,24,40,.5), 0 0 0 1.5px rgba(31,42,37,.35);
-    padding:0; font-family:var(--lms-font-ui); font-weight:800; font-size:15px;
+    padding:0; font-family:var(--lms-font-ui); font-weight:800; font-size:17px;
     transition:transform var(--lms-fast, .15s) var(--lms-ease, ease);
   }
   /* hover/shake sobem o pin inteiro: o tooltip nunca fica atrás
@@ -425,7 +418,7 @@ if (!$mapaUrl) {
     .flutua-info { top:12px; left:12px; right:12px; max-width:none; padding:12px 16px }
     .flutua-info h1 { font-size:16px }
     .avatar-img { width:40px }
-    .hotspot { width:28px; height:28px; font-size:12px }
+    .hotspot { width:34px; height:34px; font-size:14px }
   }
 </style>
 
@@ -477,11 +470,12 @@ document.getElementById('nav-eu').addEventListener('click',      () => {
   const f = FASES.find(x => x.estado === 'available') || FASES[FASES.length - 1];
   if (zoom < 1.5) aplicaZoom(1.5, f ? { x: f.x / 100, y: f.y / 100 } : null); else if (f) centraEm(f);
 });
-// zoom inicial: no desktop o mapa inteiro; em tela em pé (celular) o mapa
-// nasce ampliado pra preencher a altura, centrado na fase atual
+// zoom inicial: o mapa PREENCHE a tela (cobre largura e altura, cortando o
+// mínimo nas bordas) centrado na fase atual — em vez de caber inteiro com
+// faixas dos lados. "Ver o mapa inteiro" (⤢) volta ao ajuste sem corte.
 const zoomInicial = () => {
-  const emPe = scroller.clientHeight > scroller.clientWidth;
-  const z = emPe ? Math.min(2.6, scroller.clientHeight / (scroller.clientWidth / proporcao)) : 1;
+  const cobre = scroller.clientWidth / (alturaAjustada() * proporcao);   // fator pra cobrir a largura
+  const z = Math.min(3.2, Math.max(1, cobre));
   const f = FASES.find(x => x.estado === 'available') || FASES[0];
   aplicaZoom(z, f ? { x: f.x / 100, y: f.y / 100 } : null);
 };
