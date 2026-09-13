@@ -59,15 +59,17 @@ if (!$mapaUrl) {
 <?php exit; } ?>
 
 <!-- ── O MAPA EM TELA CHEIA ─────────────────────────────── -->
-<main id="mapa-hero">
+<main id="mapa-hero" style="--mapa-bg:url('<?= e($mapaUrl) ?>')">
   <!-- canvas: cobre o viewport preservando a proporção da arte,
        cenário centralizado; pins e avatar usam % do canvas -->
+  <div id="mapa-scroll" aria-label="Arraste para navegar pelo mapa">
   <div id="mapa" class="mapa-canvas">
     <img src="<?= e($mapaUrl) ?>" alt="Mapa da trilha <?= e($u['trilha_nome']) ?>" id="mapa-img"
          draggable="false" style="display:block; width:100%; height:100%; user-select:none; -webkit-user-drag:none">
     <div class="avatar" id="avatar" aria-label="Seu avatar no mapa">
       <img src="<?= e($avatarImg) ?>" alt="Seu avatar" class="avatar-img" id="avatar-img">
     </div>
+  </div>
   </div>
 
   <!-- painel flutuante: trilha + treinamento + progresso -->
@@ -124,6 +126,14 @@ if (!$mapaUrl) {
     ⏳ <strong style="font-family:var(--lms-font-ui)">As fases deste treinamento estão sendo preparadas.</strong>
   </div>
   <?php endif; ?>
+
+  <!-- navegação do mapa: zoom e centralizar (o scroller aceita arrastar/rolar) -->
+  <div class="mapa-nav" role="group" aria-label="Navegação do mapa">
+    <button type="button" class="mapa-nav-btn" id="nav-mais" title="Aproximar">＋</button>
+    <button type="button" class="mapa-nav-btn" id="nav-menos" title="Afastar">－</button>
+    <button type="button" class="mapa-nav-btn" id="nav-ajustar" title="Ver o mapa inteiro">⤢</button>
+    <button type="button" class="mapa-nav-btn" id="nav-eu" title="Ir até você">🎯</button>
+  </div>
 
   <!-- ações flutuantes: ajuda e suporte, empilhadas sobre o relógio -->
   <div class="flutua-acoes">
@@ -197,20 +207,48 @@ if (!$mapaUrl) {
 </div>
 
 <style>
-  /* mapa ocupa tudo abaixo do topbar; sem scroll (altura exata via JS) */
+  /* mapa ocupa tudo abaixo do topbar. O hero é a moldura (painéis
+     flutuantes ficam nele); dentro, o scroller rola/arrasta e o canvas
+     tem tamanho em px — "ajustado" cabe inteiro na tela (visão geral),
+     zoom amplia e libera navegação. Sobras da moldura mostram o próprio
+     mapa desfocado, não uma cor solta. */
   html, body { height:100% }
   #mapa-hero {
     position:relative; overflow:hidden;
     height:calc(100dvh - 73px);
     height:calc(100dvh - var(--topo-alt, 73px));
-    /* céu e mar no tom da arte DO PERÍODO — cobre as sobras do crop */
     background:<?= $pdia['ceu'] ?>;
   }
-  .mapa-canvas {
-    position:absolute; left:50%; top:50%; transform:translate(-50%, -50%);
-    aspect-ratio: 1024 / 572;
-    min-width:100%; min-height:100%;
+  #mapa-hero::before {
+    content:''; position:absolute; inset:-40px; z-index:0; pointer-events:none;
+    background:var(--mapa-bg) center / cover no-repeat;
+    filter:blur(26px) saturate(.85); opacity:.55;
   }
+  #mapa-scroll {
+    position:absolute; inset:0; z-index:1; overflow:auto; display:flex;
+    cursor:grab; scrollbar-width:thin; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
+  }
+  #mapa-scroll.is-arrastando { cursor:grabbing; user-select:none }
+  .mapa-canvas {
+    position:relative; flex:none; margin:auto;   /* centra quando cabe; rola quando não cabe */
+    width:1024px; height:572px;                  /* sobrescrito via JS pelo tamanho real */
+    box-shadow:0 18px 50px rgba(16,24,40,.35);
+  }
+  .mapa-nav {
+    position:absolute; left:16px; bottom:16px; z-index:13;
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .mapa-nav-btn {
+    width:40px; height:40px; border-radius:12px; border:var(--lms-border-game);
+    background:var(--lms-flutua-bg, rgba(255,255,253,.9)); backdrop-filter:blur(8px);
+    box-shadow:var(--lms-shadow-crisp-sm); cursor:pointer; font-size:19px; line-height:1;
+    font-family:var(--lms-font-ui); font-weight:800; color:var(--lms-heading);
+    display:flex; align-items:center; justify-content:center; padding:0;
+    transition:transform .12s var(--lms-ease, ease);
+  }
+  .mapa-nav-btn:hover { transform:scale(1.08) }
+  .mapa-nav-btn:disabled { opacity:.4; cursor:default; transform:none }
+  @media (max-width: 700px) { .mapa-nav { left:10px; bottom:96px } .mapa-nav-btn { width:36px; height:36px; font-size:17px } }
 
   /* painéis flutuantes (vidro) */
   .flutua {
@@ -423,6 +461,78 @@ window.addEventListener('resize', ajustaAltura);
 const mapa = document.getElementById('mapa');
 const avatar = document.getElementById('avatar');
 let avatarBusy = false;
+
+// ── Navegação do mapa: ajustar (cabe inteiro) · zoom · arrastar · centralizar ──
+const scroller = document.getElementById('mapa-scroll');
+const mapaImg  = document.getElementById('mapa-img');
+let proporcao  = 1024 / 572;   // largura/altura da arte — atualizada quando a imagem carrega
+let zoom       = 1;            // 1 = ajustado à tela; até 3x
+const ZOOMS    = [1, 1.5, 2, 2.6, 3.2];
+const alturaAjustada = () => Math.min(scroller.clientWidth / proporcao, scroller.clientHeight);
+function aplicaZoom(novo, foco) {
+  // foco: ponto do mapa (fração 0–1) que deve continuar no mesmo lugar da tela;
+  // sem foco, mantém o centro atual
+  const wAntes = mapa.offsetWidth, hAntes = mapa.offsetHeight;
+  const fx = foco ? foco.x : (scroller.scrollLeft + scroller.clientWidth  / 2) / Math.max(1, wAntes);
+  const fy = foco ? foco.y : (scroller.scrollTop  + scroller.clientHeight / 2) / Math.max(1, hAntes);
+  zoom = Math.max(1, Math.min(ZOOMS[ZOOMS.length - 1], novo));
+  const h = Math.round(alturaAjustada() * zoom), w = Math.round(h * proporcao);
+  mapa.style.width = w + 'px'; mapa.style.height = h + 'px';
+  scroller.scrollLeft = fx * w - scroller.clientWidth  / 2;
+  scroller.scrollTop  = fy * h - scroller.clientHeight / 2;
+  document.getElementById('nav-menos').disabled = zoom <= 1;
+  document.getElementById('nav-mais').disabled  = zoom >= ZOOMS[ZOOMS.length - 1];
+}
+const proximoZoom = (dir) => {
+  const i = ZOOMS.findIndex(z => Math.abs(z - zoom) < .01);
+  const alvo = i < 0 ? (dir > 0 ? ZOOMS.find(z => z > zoom) : [...ZOOMS].reverse().find(z => z < zoom)) : ZOOMS[Math.max(0, Math.min(ZOOMS.length - 1, i + dir))];
+  return alvo ?? zoom;
+};
+const centraEm = (f) => aplicaZoom(zoom, { x: f.x / 100, y: f.y / 100 });
+document.getElementById('nav-mais').addEventListener('click',    () => aplicaZoom(proximoZoom(+1)));
+document.getElementById('nav-menos').addEventListener('click',   () => aplicaZoom(proximoZoom(-1)));
+document.getElementById('nav-ajustar').addEventListener('click', () => aplicaZoom(1));
+document.getElementById('nav-eu').addEventListener('click',      () => {
+  const f = FASES.find(x => x.estado === 'available') || FASES[FASES.length - 1];
+  if (zoom < 1.5) aplicaZoom(1.5, f ? { x: f.x / 100, y: f.y / 100 } : null); else if (f) centraEm(f);
+});
+// zoom inicial: no desktop o mapa inteiro; em tela em pé (celular) o mapa
+// nasce ampliado pra preencher a altura, centrado na fase atual
+const zoomInicial = () => {
+  const emPe = scroller.clientHeight > scroller.clientWidth;
+  const z = emPe ? Math.min(2.6, scroller.clientHeight / (scroller.clientWidth / proporcao)) : 1;
+  const f = FASES.find(x => x.estado === 'available') || FASES[0];
+  aplicaZoom(z, f ? { x: f.x / 100, y: f.y / 100 } : null);
+};
+const aoCarregarArte = () => {
+  if (mapaImg.naturalWidth && mapaImg.naturalHeight) proporcao = mapaImg.naturalWidth / mapaImg.naturalHeight;
+  zoomInicial();
+};
+if (mapaImg.complete && mapaImg.naturalWidth) aoCarregarArte(); else mapaImg.addEventListener('load', aoCarregarArte, { once: true });
+mapaImg.addEventListener('error', zoomInicial, { once: true });
+window.addEventListener('resize', () => aplicaZoom(zoom));
+// arrastar com o mouse (toque já rola nativamente)
+let arrasto = null;
+scroller.addEventListener('mousedown', (ev) => {
+  if (ev.button !== 0 || ev.target.closest('button, a')) return;
+  arrasto = { x: ev.clientX, y: ev.clientY, sl: scroller.scrollLeft, st: scroller.scrollTop, moveu: false };
+  scroller.classList.add('is-arrastando');
+});
+window.addEventListener('mousemove', (ev) => {
+  if (!arrasto) return;
+  const dx = ev.clientX - arrasto.x, dy = ev.clientY - arrasto.y;
+  if (Math.abs(dx) + Math.abs(dy) > 3) arrasto.moveu = true;
+  scroller.scrollLeft = arrasto.sl - dx; scroller.scrollTop = arrasto.st - dy;
+});
+window.addEventListener('mouseup', () => { arrasto = null; scroller.classList.remove('is-arrastando'); });
+// ctrl/⌘ + roda do mouse = zoom no ponto (em vez de zoom da página)
+scroller.addEventListener('wheel', (ev) => {
+  if (!ev.ctrlKey && !ev.metaKey) return;
+  ev.preventDefault();
+  const r = mapa.getBoundingClientRect();
+  const foco = { x: (ev.clientX - r.left) / r.width, y: (ev.clientY - r.top) / r.height };
+  aplicaZoom(zoom * (ev.deltaY < 0 ? 1.15 : 1 / 1.15), foco);
+}, { passive: false });
 
 // posição inicial do avatar: primeira fase disponível (ou primeira, ou centro)
 const inicial = FASES.find(f => f.estado === 'available') || FASES[0] || { x: 50, y: 60 };

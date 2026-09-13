@@ -86,6 +86,17 @@ document.head.appendChild(el(`<style>
     justify-content:center; background:var(--lms-success, #2E7D32); color:#fff; font-family:var(--lms-font-ui);
     font-weight:700; font-size:12px; margin-right:8px }
 
+  .mg-hq-cena { display:flex; flex-direction:column; gap:14px }
+  /* imagem em pé (story 9:16): fica ao lado do texto em vez de virar um
+     scroll gigante; no celular volta a empilhar, limitada à altura da tela */
+  .mg-hq-cena.is-retrato { flex-direction:row; align-items:stretch }
+  .mg-hq-cena.is-retrato .mg-hq-img { width:min(300px, 42%); height:auto; max-height:480px; object-fit:cover; flex:none }
+  .mg-hq-cena.is-retrato .mg-quadro { flex:1; align-self:center }
+  @media (max-width: 640px) {
+    .mg-hq-cena.is-retrato { flex-direction:column }
+    .mg-hq-cena.is-retrato .mg-hq-img { width:auto; max-width:100%; max-height:55vh; align-self:center }
+  }
+  .is-travado .lms-answer { opacity:.5; cursor:not-allowed; filter:grayscale(.4) }
   .mg-passo-grid { display:flex; flex-wrap:wrap; gap:10px; justify-content:center }
   .mg-passo.is-card { width:150px; display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 8px 12px; gap:8px; font-size:14px; font-weight:600; font-family:var(--lms-font-ui); color:var(--lms-heading, #2A4971); line-height:1.2 }
   .mg-passo.is-card:hover:not(:disabled) { transform:translateY(-3px) }
@@ -1360,16 +1371,24 @@ const Minigames = {
         <div class="lms-stack-4 mg-slide">
           <div class="mg-dots">${cfg.cenas.map((_, i) =>
             `<span class="mg-dot ${i < idx ? 'is-done' : (i === idx ? 'is-active' : '')}"></span>`).join('')}</div>
-          ${sc.imagem ? `<img class="mg-hq-img" src="${sc.imagem}" alt="${sc.titulo || 'Cena ' + (idx + 1)}">` : ''}
-          <div class="mg-quadro">
-            <div class="mg-quadro-icone">${sc.icone || '📖'}</div>
-            <div>
-              ${sc.titulo ? `<p class="mg-quadro-titulo">${sc.titulo}</p>` : ''}
-              <div class="mg-quadro-texto">${sc.texto}</div>
+          <div class="mg-hq-cena">
+            ${sc.imagem ? `<img class="mg-hq-img" src="${sc.imagem}" alt="${sc.titulo || 'Cena ' + (idx + 1)}">` : ''}
+            <div class="mg-quadro">
+              <div class="mg-quadro-icone">${sc.icone || '📖'}</div>
+              <div>
+                ${sc.titulo ? `<p class="mg-quadro-titulo">${sc.titulo}</p>` : ''}
+                <div class="mg-quadro-texto">${sc.texto}</div>
+              </div>
             </div>
           </div>
           ${revisao && idx + 1 === total ? '' : `<button class="lms-btn lms-btn-game lms-btn-lg" style="width:100%">${idx + 1 === total ? 'Concluir' : 'Próxima cena'} →</button>`}
         </div>`));
+      // imagem em pé → layout lado a lado (decidido pelo tamanho real da imagem)
+      const img = host.querySelector('.mg-hq-img');
+      if (img) {
+        const marca = () => { if (img.naturalHeight > img.naturalWidth * 1.15) img.closest('.mg-hq-cena').classList.add('is-retrato'); };
+        img.complete && img.naturalWidth ? marca() : img.addEventListener('load', marca, { once: true });
+      }
       host.querySelector('button')?.addEventListener('click', () => { idx++; proxima(); });
     };
     proxima();
@@ -2017,6 +2036,19 @@ const Minigames = {
       const ops = host.querySelector('#inv-ops');
       let travado = false, errou = false;
       total++;
+      // com áudio na carta, as opções ficam travadas até a fala terminar —
+      // decidir sem ouvir esvazia a simulação (a pista está no áudio)
+      const audioEl = host.querySelector('audio');
+      if (audioEl) {
+        const quem = carta.audio_quem ? carta.audio_quem.charAt(0) + carta.audio_quem.slice(1).toLowerCase() : 'a cena';
+        const trava = el(`<div class="lms-alert is-info" id="inv-trava">🎧 <div>Ouça ${quem} até o fim para liberar as opções.</div></div>`);
+        ops.before(trava);
+        ops.classList.add('is-travado');
+        const libera = () => { trava.remove(); ops.classList.remove('is-travado'); [...ops.children].forEach(b => { b.disabled = false; }); };
+        audioEl.addEventListener('ended', libera, { once: true });
+        audioEl.addEventListener('error', libera, { once: true });
+        queueMicrotask(() => [...ops.children].forEach(b => { b.disabled = true; }));
+      }
       carta.opcoes.forEach(o => {
         const b = el(`<button class="lms-answer">${o.texto}</button>`);
         b.addEventListener('click', () => {
