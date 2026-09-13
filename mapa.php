@@ -208,8 +208,9 @@ if (!$mapaUrl) {
   }
   #mapa-scroll {
     position:absolute; inset:0; z-index:1; overflow:auto; display:flex;
-    cursor:grab; scrollbar-width:thin; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
+    cursor:grab; scrollbar-width:none; -ms-overflow-style:none; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
   }
+  #mapa-scroll::-webkit-scrollbar { display:none }   /* tela cheia: nada de barra */
   #mapa-scroll.is-arrastando { cursor:grabbing; user-select:none }
   .mapa-canvas {
     position:relative; flex:none; margin:auto;   /* centra quando cabe; rola quando não cabe */
@@ -440,7 +441,8 @@ let avatarBusy = false;
 const scroller = document.getElementById('mapa-scroll');
 const mapaImg  = document.getElementById('mapa-img');
 let proporcao  = 1024 / 572;   // largura/altura da arte — atualizada quando a imagem carrega
-let zoom       = 1;            // 1 = ajustado à tela; até 3x
+let zoom       = 1;            // 1 = ajustado (cabe inteiro); até 3.2x
+let zBase      = 1;            // zoom que COBRE a tela (padrão) — recalculado no resize
 const ZOOMS    = [1, 1.5, 2, 2.6, 3.2];
 const alturaAjustada = () => Math.min(scroller.clientWidth / proporcao, scroller.clientHeight);
 function aplicaZoom(novo, foco) {
@@ -473,11 +475,14 @@ document.getElementById('nav-eu').addEventListener('click',      () => {
 // zoom inicial: o mapa PREENCHE a tela (cobre largura e altura, cortando o
 // mínimo nas bordas) centrado na fase atual — em vez de caber inteiro com
 // faixas dos lados. "Ver o mapa inteiro" (⤢) volta ao ajuste sem corte.
+const zoomBase = () => {
+  const hA = alturaAjustada();
+  return Math.min(3.2, Math.max(scroller.clientWidth / (hA * proporcao), scroller.clientHeight / hA));
+};
 const zoomInicial = () => {
-  const cobre = scroller.clientWidth / (alturaAjustada() * proporcao);   // fator pra cobrir a largura
-  const z = Math.min(3.2, Math.max(1, cobre));
+  zBase = zoomBase();
   const f = FASES.find(x => x.estado === 'available') || FASES[0];
-  aplicaZoom(z, f ? { x: f.x / 100, y: f.y / 100 } : null);
+  aplicaZoom(zBase, f ? { x: f.x / 100, y: f.y / 100 } : null);
 };
 const aoCarregarArte = () => {
   if (mapaImg.naturalWidth && mapaImg.naturalHeight) proporcao = mapaImg.naturalWidth / mapaImg.naturalHeight;
@@ -485,7 +490,12 @@ const aoCarregarArte = () => {
 };
 if (mapaImg.complete && mapaImg.naturalWidth) aoCarregarArte(); else mapaImg.addEventListener('load', aoCarregarArte, { once: true });
 mapaImg.addEventListener('error', zoomInicial, { once: true });
-window.addEventListener('resize', () => aplicaZoom(zoom));
+window.addEventListener('resize', () => {
+  // no padrão (tela cheia) a janela mudou → recobre; com zoom do usuário, mantém
+  const noPadrao = Math.abs(zoom - zBase) < .01;
+  zBase = zoomBase();
+  aplicaZoom(noPadrao ? zBase : zoom);
+});
 // arrastar com o mouse (toque já rola nativamente)
 let arrasto = null;
 scroller.addEventListener('mousedown', (ev) => {
@@ -502,7 +512,8 @@ window.addEventListener('mousemove', (ev) => {
 window.addEventListener('mouseup', () => { arrasto = null; scroller.classList.remove('is-arrastando'); });
 // ctrl/⌘ + roda do mouse = zoom no ponto (em vez de zoom da página)
 scroller.addEventListener('wheel', (ev) => {
-  if (!ev.ctrlKey && !ev.metaKey) return;
+  // roda simples no padrão (tela cheia): não rola nada — só com zoom aplicado
+  if (!ev.ctrlKey && !ev.metaKey) { if (zoom <= zBase + .01) ev.preventDefault(); return; }
   ev.preventDefault();
   const r = mapa.getBoundingClientRect();
   const foco = { x: (ev.clientX - r.left) / r.width, y: (ev.clientY - r.top) / r.height };
