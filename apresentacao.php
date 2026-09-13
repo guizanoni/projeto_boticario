@@ -94,7 +94,7 @@ lms_head('Apresentação', $u);
   .apr-hero {
     position: relative; border-radius: var(--lms-radius-xl); overflow: hidden;
     min-height: 240px; display: flex; align-items: flex-end;
-    background: var(--bg, linear-gradient(135deg, var(--lms-primary), var(--lms-accent, #0B3B2A))) center/cover;
+    background: var(--bg, linear-gradient(135deg, var(--lms-primary), var(--lms-accent, #2A4971))) center/cover;
     border: var(--lms-border-game); box-shadow: var(--lms-shadow-crisp);
   }
   .apr-hero-tint { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,12,24,.30) 0%, rgba(8,12,24,.55) 55%, rgba(8,12,24,.88) 100%); }

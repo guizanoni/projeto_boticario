@@ -69,17 +69,31 @@ function lms_db(): PDO {
 // (o seed só roda em banco novo). Parte da 31 pra ficar alinhada ao
 // engine de origem (/atlantica): uma correção de schema feita lá pode
 // ser replicada aqui com o mesmo número.
-const LMS_SCHEMA_VERSAO = 31;
+const LMS_SCHEMA_VERSAO = 32;
 
 function lms_migrar(PDO $db): void {
     $v = (int) $db->query('PRAGMA user_version')->fetchColumn();
     if ($v >= LMS_SCHEMA_VERSAO) return;
 
-    // Migrações futuras entram aqui, no padrão do engine — cada bloco
-    // idempotente e aditivo, sem perder dado:
-    //   if ($v < 32) { $cols = …; if (!in_array('x', $cols, true)) $db->exec('ALTER TABLE … ADD COLUMN x …'); }
-    // Antes de renomear/recriar tabela no SQLite, ler o MEMORY.md da raiz:
-    // as FKs do Atlântica quebraram exatamente nesse movimento.
+    // Cada bloco é idempotente e aditivo, sem perder dado. Antes de
+    // renomear/recriar tabela no SQLite, ler o MEMORY.md da raiz: as FKs
+    // do Atlântica quebraram exatamente nesse movimento.
+
+    if ($v < 32) {
+        // v32 · Conteúdo real: trilha "Universo da Maquiagem" com o
+        // treinamento "Da Base ao Look Completo" (as 11 etapas do HTML do
+        // cliente). Entra só se a trilha não existir. Quem está sem
+        // treinamento ativo (o admin do seed anterior) passa a apontar pra
+        // ele — a "Visão do aluno" passa a mostrar o conteúdo.
+        require_once __DIR__ . '/conteudo/servico-make.php';
+        $cli = (int) $db->query("SELECT id FROM cliente WHERE slug = 'boticario'")->fetchColumn();
+        if ($cli) {
+            $tid = conteudo_servico_make_inserir($db, $cli);
+            $db->exec("UPDATE usuario SET treinamento_id = {$tid} WHERE cliente_id = {$cli} AND treinamento_id IS NULL");
+            // paleta do treinamento do cliente substitui o verde provisório
+            $db->exec("UPDATE cliente SET cor_primaria = '#1CAE8D', cor_secundaria = '#2A4971' WHERE id = {$cli} AND cor_primaria = '#00A859'");
+        }
+    }
 
     $db->exec('PRAGMA user_version = ' . LMS_SCHEMA_VERSAO);
 }

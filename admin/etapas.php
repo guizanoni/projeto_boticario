@@ -21,7 +21,7 @@ if (!$fase || (int) $fase['cliente_id'] !== (int) $u['cliente_id']) { header('Lo
 // Tipos de dinâmica disponíveis (catálogo do player).
 $tipos = [
     'leitura'       => ['🧾', 'Leitura com confirmação', 'Texto do procedimento + pontos críticos que o aluno confirma um a um.'],
-    'quiz'          => ['❓', 'Quiz', 'Perguntas com uma ou várias respostas corretas, feedback imediato e introdução opcional.'],
+    'quiz'          => ['❓', 'Quiz', 'Perguntas com uma ou várias respostas corretas, feedback imediato, explicação e introdução opcionais.'],
     'mito_verdade'  => ['🐉', 'Verdadeiro ou Falso', 'Afirmações para julgar (mito ou verdade), com explicação a cada resposta.'],
     'ligue_pontos'  => ['🔗', 'Ligue os pontos', 'Conectar termos da coluna esquerda às definições da direita.'],
     'classificacao' => ['🗂️', 'Classificação', 'Classificar itens entre 2 a 4 categorias, um por vez (ex.: pode / não pode).'],
@@ -31,13 +31,13 @@ $tipos = [
     'historia'      => ['📖', 'História / HQ em cenas', 'Cenas sequenciais com imagem (quadrinhos), título e texto — para conteúdo narrativo.'],
     'caca'          => ['🎯', 'Caça no grid', 'Grid de células para varrer e revelar as ações corretas, uma a uma.'],
     'podcast'       => ['🎧', 'Podcast ilustrativo', 'Transcrição narrada por vozes/papéis, com player cenográfico (sem arquivo de áudio).'],
-    'sequencia'     => ['🔢', 'Ordenação', 'Tocar nos passos na ordem em que acontecem no processo.'],
-    'video'         => ['🎞️', 'Vídeo', 'Vídeo do YouTube, Vimeo ou arquivo direto, com confirmação de assistido.'],
+    'sequencia'     => ['🔢', 'Ordenação', 'Tocar nos passos na ordem em que acontecem — cada passo pode ter imagem e uma função revelada ao acertar.'],
+    'video'         => ['🎞️', 'Vídeo', 'Vídeo do YouTube, Vimeo ou arquivo MP4 enviado pelo editor, com confirmação de assistido.'],
     'audio'         => ['🔊', 'Áudio real', 'Arquivo de áudio (MP3/M4A/OGG) com player nativo e transcrição opcional.'],
     'caca_palavras' => ['🔤', 'Caça-palavras', 'Grade de letras gerada automaticamente — o aluno encontra as palavras do tema.'],
     'cruzadinha'    => ['✏️', 'Cruzadinha', 'Palavras cruzadas geradas das suas palavras + dicas.'],
     'sete_erros'    => ['🔎', 'Jogo dos erros', 'Imagem com pontos escondidos para o aluno clicar e encontrar.'],
-    'investigacao'  => ['🕵️', 'Investigação', 'Narrativa ramificada: cada escolha abre um caminho diferente de pistas.'],
+    'investigacao'  => ['🕵️', 'Investigação', 'Narrativa em cartas com áudio opcional por cena: ramificada (cada escolha abre um caminho) ou em modo domínio (errou? feedback e tenta de novo).'],
     'tabuleiro'     => ['🎲', 'Tabuleiro', 'Jogo de tabuleiro: jogue o dado, avance e responda a pergunta da casa.'],
 ];
 
@@ -118,7 +118,7 @@ function etapa_valida(string $tipo, $cfg): ?string {
             return null;
         case 'sequencia':
             if (count($cfg['passos'] ?? []) < 3) return 'A ordenação precisa de ao menos 3 passos.';
-            foreach ($cfg['passos'] as $p) if (!$temTexto($p)) return 'Todo passo precisa de texto.';
+            foreach ($cfg['passos'] as $p) if (!$temTexto(is_array($p) ? ($p['texto'] ?? '') : $p)) return 'Todo passo precisa de texto.';
             return null;
         case 'video':
             if (!$temTexto($cfg['url'] ?? '')) return 'Informe a URL do vídeo (YouTube, Vimeo ou arquivo direto).';
@@ -363,7 +363,7 @@ let STATE = null, tipoAtual = null, modoJson = false;
 
 const VAZIOS = {
   leitura:       () => ({ texto: [''], pontos_confirmacao: [{ id: 'p1', label: '' }] }),
-  quiz:          () => ({ intro: '', perguntas: [{ enunciado: '', alternativas: ['', ''], corretas: [] }] }),
+  quiz:          () => ({ intro: '', perguntas: [{ enunciado: '', alternativas: ['', ''], corretas: [], explicacao: '' }] }),
   mito_verdade:  () => ({ itens: [{ afirmacao: '', resposta: true, explicacao: '' }] }),
   ligue_pontos:  () => ({ instrucao: 'Conecte cada termo à sua definição.', pares: [{ esquerda: '', direita: '' }, { esquerda: '', direita: '' }] }),
   classificacao: () => ({ instrucao: '', categorias: ['', ''], itens: [{ item: '', categoria_correta: 0 }] }),
@@ -373,15 +373,15 @@ const VAZIOS = {
   historia:      () => ({ cenas: [{ icone: '📖', titulo: '', texto: '', imagem: '' }] }),
   caca:          () => ({ instrucao: '', celulas: [{ titulo: '', descricao: '' }, { titulo: '', descricao: '' }, { titulo: '', descricao: '' }] }),
   podcast:       () => ({ titulo: '', subtitulo: '', linhas: [{ quem: '', texto: '' }] }),
-  sequencia:     () => ({ instrucao: 'Toque nos passos na ordem correta.', passos: ['', '', ''] }),
+  sequencia:     () => ({ instrucao: 'Toque nos passos na ordem correta.', so_imagem: false, passos: [{ texto: '', imagem: '', descricao: '' }, { texto: '', imagem: '', descricao: '' }, { texto: '', imagem: '', descricao: '' }] }),
   video:         () => ({ url: '', descricao: '' }),
   audio:         () => ({ url: '', titulo: '', subtitulo: '', transcricao: [] }),
   caca_palavras: () => ({ instrucao: 'Encontre as palavras na grade — clique na primeira e na última letra.', palavras: ['', '', ''] }),
   cruzadinha:    () => ({ instrucao: 'Preencha a cruzadinha com as dicas.', itens: [{ palavra: '', dica: '' }, { palavra: '', dica: '' }] }),
   sete_erros:    () => ({ instrucao: 'Clique nos pontos escondidos na imagem.', imagem: '', raio: 6, pontos: [] }),
-  investigacao:  () => ({ cartas: [
-    { icone: '🕵️', pista: '', opcoes: [{ texto: '', correta: true, vai: 1, feedback: '' }, { texto: '', correta: false, vai: null, feedback: '' }] },
-    { icone: '🔎', pista: '', opcoes: [{ texto: '', correta: true, vai: null, feedback: '' }, { texto: '', correta: false, vai: null, feedback: '' }] },
+  investigacao:  () => ({ modo: 'ramificada', rotulo_seguir: '', rotulo_fim: '', cartas: [
+    { icone: '🕵️', titulo: '', pista: '', pergunta: '', audio: '', audio_quem: '', opcoes: [{ texto: '', correta: true, vai: 1, feedback: '' }, { texto: '', correta: false, vai: null, feedback: '' }] },
+    { icone: '🔎', titulo: '', pista: '', pergunta: '', audio: '', audio_quem: '', opcoes: [{ texto: '', correta: true, vai: null, feedback: '' }, { texto: '', correta: false, vai: null, feedback: '' }] },
   ] }),
   tabuleiro:     () => ({ instrucao: '', casas: Array.from({ length: 4 }, () => ({ pergunta: '', alternativas: ['', ''], corretas: [0] })) }),
 };
@@ -390,6 +390,7 @@ const CORES_ZONA = { mint: '🟢 Verde', sand: '🟡 Âmbar', rose: '🔴 Vermel
 /* caça-palavras e cruzadinha são GERADOS: o admin edita palavras/dicas e,
    no salvar, o construtor calcula a grade. Ao reeditar, volta ao editável. */
 const NORMALIZA = {
+  sequencia:     cfg => ({ ...cfg, passos: (cfg.passos || []).map(p => typeof p === 'string' ? { texto: p, imagem: '', descricao: '' } : p) }),
   caca_palavras: cfg => cfg.grade ? ({ instrucao: cfg.instrucao || '', palavras: cfg.palavras.map(p => p.palavra) }) : cfg,
   cruzadinha:    cfg => cfg.linhas ? ({ instrucao: cfg.instrucao || '', itens: cfg.palavras.map(p => ({ palavra: p.palavra, dica: p.dica })) }) : cfg,
 };
@@ -589,9 +590,11 @@ const RENDERS = {
         bl.appendChild(linha);
       });
       bl.appendChild(btnAdd('alternativa', () => { q.alternativas.push(''); render(); }));
+      bl.appendChild(h('<label class="lms-label" style="margin-top:10px; display:block">Explicação (opcional — aparece depois da resposta, certa ou errada)</label>'));
+      bl.appendChild(campo(q.explicacao || '', 'Por que essa é a resposta certa…', v => q.explicacao = v, 'textarea'));
       box.appendChild(bl);
     });
-    box.appendChild(btnAdd('pergunta', () => { s.perguntas.push({ enunciado: '', alternativas: ['', ''], corretas: [] }); render(); }));
+    box.appendChild(btnAdd('pergunta', () => { s.perguntas.push({ enunciado: '', alternativas: ['', ''], corretas: [], explicacao: '' }); render(); }));
     return box;
   },
 
@@ -796,6 +799,8 @@ const RENDERS = {
     const box = h('<div class="b-bloco"></div>');
     box.appendChild(h('<label class="lms-label">URL do vídeo (YouTube, Vimeo ou arquivo .mp4)</label>'));
     box.appendChild(campo(s.url || '', 'https://www.youtube.com/watch?v=…', v => s.url = v));
+    box.appendChild(h('<label class="lms-label" style="margin-top:12px; display:block">…ou envie o arquivo (MP4 — até 120 MB; fica em data/midia, só para quem está logado)</label>'));
+    box.appendChild(campoMidia(s.url && s.url.includes('/midia?f=') ? s.url : '', '.mp4,video/mp4', url => { s.url = url; render(); }));
     box.appendChild(h('<label class="lms-label" style="margin-top:12px; display:block">Descrição (opcional — aparece acima do vídeo)</label>'));
     box.appendChild(campo(s.descricao || '', 'Contexto do vídeo…', v => s.descricao = v));
     return box;
@@ -909,6 +914,16 @@ const RENDERS = {
   investigacao(s) {
     const box = h('<div></div>');
     const destinos = (atual) => s.cartas.map((_, i) => i).filter(i => i !== atual);
+    const bl0 = h('<div class="b-bloco"></div>');
+    bl0.appendChild(h('<label class="lms-label">Modo de jogo</label>'));
+    const selModo = h(`<select class="lms-select"><option value="ramificada" ${s.modo !== 'dominio' ? 'selected' : ''}>Ramificada — cada escolha leva a um caminho (errar também avança)</option><option value="dominio" ${s.modo === 'dominio' ? 'selected' : ''}>Domínio — errou? feedback e escolhe de novo; só avança acertando (conta acerto só de primeira)</option></select>`);
+    selModo.addEventListener('change', ev => s.modo = ev.target.value);
+    bl0.appendChild(selModo);
+    const lr = h('<div class="b-linha" style="margin-top:8px"></div>');
+    lr.appendChild(campo(s.rotulo_seguir || '', 'Botão de seguir (ex.: Continuar atendimento)', v => s.rotulo_seguir = v));
+    lr.appendChild(campo(s.rotulo_fim || '', 'Botão final (ex.: Concluir simulação)', v => s.rotulo_fim = v));
+    bl0.appendChild(lr);
+    box.appendChild(bl0);
     s.cartas.forEach((c, ci) => {
       const bl = h('<div class="b-bloco"></div>');
       const cab = h(`<div class="lms-row" style="justify-content:space-between"><label class="lms-label">🃏 Carta ${ci + 1}</label></div>`);
@@ -927,6 +942,18 @@ const RENDERS = {
       linha1.appendChild(ico);
       linha1.appendChild(campo(c.pista, 'Texto da pista/cena…', v => c.pista = v, 'textarea'));
       bl.appendChild(linha1);
+      const lt = h('<div class="b-linha" style="margin-top:6px"></div>');
+      lt.appendChild(campo(c.titulo || '', 'Título da carta (opcional — ex.: ETAPA: ACOLHA)', v => c.titulo = v));
+      lt.appendChild(campo(c.pergunta || '', 'Pergunta (opcional — ex.: O que você faz agora?)', v => c.pergunta = v));
+      bl.appendChild(lt);
+      bl.appendChild(h('<label class="lms-label" style="margin-top:8px; display:block">🔊 Áudio da cena (opcional — MP3/M4A/OGG, fala de um personagem)</label>'));
+      const la = h('<div class="b-linha" style="flex-wrap:wrap"></div>');
+      const quem = campo(c.audio_quem || '', 'QUEM FALA', v => c.audio_quem = v);
+      quem.style.maxWidth = '160px';
+      la.appendChild(quem);
+      la.appendChild(campoMidia(c.audio || '', '.mp3,.m4a,.ogg,audio/*', url => { c.audio = url; render(); }));
+      bl.appendChild(la);
+      bl.appendChild(campo(c.audio || '', '…ou URL do áudio', v => c.audio = v));
       bl.appendChild(h('<label class="lms-label" style="margin-top:10px; display:block">Opções — para onde cada escolha leva</label>'));
       c.opcoes.forEach((o, oi) => {
         const linha = h('<div class="b-linha" style="flex-wrap:wrap"></div>');
@@ -1023,18 +1050,30 @@ const RENDERS = {
   },
 
   sequencia(s) {
-    const box = h('<div class="b-bloco"></div>');
-    box.appendChild(h('<label class="lms-label">Instrução</label>'));
-    box.appendChild(campo(s.instrucao || '', 'Ex.: Toque nos passos na ordem correta.', v => s.instrucao = v));
-    box.appendChild(h('<label class="lms-label" style="margin-top:12px; display:block">Passos, já na ordem correta (o player embaralha)</label>'));
+    const box = h('<div></div>');
+    const bl0 = h('<div class="b-bloco"></div>');
+    bl0.appendChild(h('<label class="lms-label">Instrução</label>'));
+    bl0.appendChild(campo(s.instrucao || '', 'Ex.: Toque nos passos na ordem correta.', v => s.instrucao = v));
+    const chk = h(`<label class="b-corr" style="margin-top:10px; display:inline-flex"><input type="checkbox" ${s.so_imagem ? 'checked' : ''}> nas cartas embaralhadas, mostrar só a imagem (o nome aparece ao acertar)</label>`);
+    chk.querySelector('input').addEventListener('change', ev => s.so_imagem = ev.target.checked);
+    bl0.appendChild(chk);
+    box.appendChild(bl0);
+    s.passos = s.passos.map(p => typeof p === 'string' ? { texto: p, imagem: '', descricao: '' } : p);
     s.passos.forEach((p, i) => {
-      const linha = h('<div class="b-linha"></div>');
-      linha.appendChild(h(`<span class="lms-pill" style="flex:none">${i + 1}</span>`));
-      linha.appendChild(campo(p, `Passo ${i + 1}…`, v => s.passos[i] = v));
-      if (s.passos.length > 3) linha.appendChild(btnRm(() => { s.passos.splice(i, 1); render(); }));
-      box.appendChild(linha);
+      const bl = h('<div class="b-bloco"></div>');
+      const cab = h(`<div class="lms-row" style="justify-content:space-between"><label class="lms-label">Passo ${i + 1} — já na ordem correta (o player embaralha)</label></div>`);
+      if (s.passos.length > 3) cab.appendChild(btnRm(() => { s.passos.splice(i, 1); render(); }, 'Remover passo'));
+      bl.appendChild(cab);
+      bl.appendChild(campo(p.texto || '', `Nome do passo ${i + 1}…`, v => p.texto = v));
+      bl.appendChild(h('<label class="lms-label" style="margin-top:8px; display:block">Imagem (opcional)</label>'));
+      if (p.imagem) bl.appendChild(h(`<img src="${esc(p.imagem)}" alt="" style="height:64px; border-radius:8px; display:block; margin:4px 0; background:var(--lms-surface)">`));
+      bl.appendChild(campoMidia(p.imagem || '', '.webp,.png,.jpg,.jpeg,.gif,image/*', url => { p.imagem = url; render(); }));
+      bl.appendChild(campo(p.imagem || '', '…ou URL da imagem', v => p.imagem = v));
+      bl.appendChild(h('<label class="lms-label" style="margin-top:8px; display:block">O que este passo faz (opcional — revelado ao acertar)</label>'));
+      bl.appendChild(campo(p.descricao || '', 'Ex.: Uniformiza a textura da pele e fixa a maquiagem.', v => p.descricao = v));
+      box.appendChild(bl);
     });
-    box.appendChild(btnAdd('passo', () => { s.passos.push(''); render(); }));
+    box.appendChild(btnAdd('passo', () => { s.passos.push({ texto: '', imagem: '', descricao: '' }); render(); }));
     return box;
   },
 };

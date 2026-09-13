@@ -1,6 +1,6 @@
 <?php
 // ──────────────────────────────────────────────────────────────
-// Boticário LMS (V3) · Schema + seed base — SEM CONTEÚDO E SEM DADOS.
+// Boticário LMS (V3) · Schema + seed base + conteúdo real do cliente.
 // Roda uma única vez, quando boticario/data/lms.sqlite não existe.
 //
 // Whitelabel do engine Skope LMS (/atlantica). Mesma hierarquia:
@@ -11,12 +11,13 @@
 //                 mapa e desbloqueio configurável: sequência | data | xp.
 //   · Cada aluno tem 1 treinamento ativo (usuario.treinamento_id).
 //
-// O que este seed cria, e só isso:
+// O que este seed cria:
 //   1. o tenant (linha em `cliente`) com a identidade visual;
 //   2. o catálogo de badges — gamificação do engine, independe do conteúdo;
-//   3. UM usuário admin, pra dar o primeiro acesso ao /boticario/admin.
-// Nenhuma trilha, treinamento, fase, gestor ou aluno: tudo entra pelo
-// admin, a partir do feedback do cliente.
+//   3. o conteúdo real: trilha "Universo da Maquiagem" com o treinamento
+//      "Da Base ao Look Completo" (_lib/conteudo/servico-make.php);
+//   4. UM usuário admin, já apontando pro treinamento (Visão do aluno).
+// Gestores e alunos entram pelo admin.
 // ──────────────────────────────────────────────────────────────
 
 function lms_seed(PDO $db): void {
@@ -139,10 +140,10 @@ SQL);
     $j = fn($a) => json_encode($a, JSON_UNESCAPED_UNICODE);
 
     // ── Tenant ──────────────────────────────────────────────
-    // Cores PROVISÓRIAS (verde institucional) até o brandbook chegar:
+    // Cores da paleta do treinamento do cliente (teal + navy) até o brandbook:
     // cor_primaria vira --lms-primary em toda tela (ver lms_head).
     $db->prepare('INSERT INTO cliente (slug, nome, logo_url, cor_primaria, cor_secundaria) VALUES (?,?,?,?,?)')
-       ->execute(['boticario', 'Grupo Boticário', '/admin/logos/boticario.svg', '#00A859', '#0B3B2A']);
+       ->execute(['boticario', 'Grupo Boticário', '/admin/logos/boticario.svg', '#1CAE8D', '#2A4971']);
     $cli = (int) $db->lastInsertId();
 
     // ── Badges (gamificação do engine — independem do conteúdo) ──
@@ -155,10 +156,14 @@ SQL);
     $stB->execute([$cli, 'Trilha Completa', 'Concluiu todos os treinamentos de uma trilha', '🏆', 'conclusao', $j(['gatilho' => 'trilha'])]);
     $stB->execute([$cli, 'Voz da Equipe', 'Participou da discussão de uma fase', '🗣️', 'estendida', $j(['gatilho' => 'comentario'])]);
 
+    // ── Conteúdo real (Serviço Completo de Make) ────────────
+    require_once __DIR__ . '/conteudo/servico-make.php';
+    $trein = conteudo_servico_make_inserir($db, $cli);
+
     // ── Acesso inicial ──────────────────────────────────────
-    // Um único admin, sem treinamento ativo (não há nenhum). Senha
+    // Um único admin, já no treinamento (pra Visão do aluno). Senha
     // provisória "1234" — trocar em /boticario/senha no primeiro acesso.
     // Gestores e alunos são criados pelo admin em /boticario/admin.
-    $db->prepare('INSERT INTO usuario (cliente_id, nome, email, senha_hash, papel, avatar_genero, avatar_cor_pele) VALUES (?,?,?,?,?,?,?)')
-       ->execute([$cli, 'Admin Boticário', 'admin@boticario.com.br', password_hash('1234', PASSWORD_DEFAULT), 'admin', 'm', '3']);
+    $db->prepare('INSERT INTO usuario (cliente_id, nome, email, senha_hash, papel, avatar_genero, avatar_cor_pele, treinamento_id) VALUES (?,?,?,?,?,?,?,?)')
+       ->execute([$cli, 'Admin Boticário', 'admin@boticario.com.br', password_hash('1234', PASSWORD_DEFAULT), 'admin', 'm', '3', $trein]);
 }

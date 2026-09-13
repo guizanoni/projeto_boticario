@@ -163,7 +163,7 @@ if ($foco) {
 
 /* ── peça do relatório: HTML compatível com e-mail ──────────── */
 // cores fixas (e-mail não lê CSS vars): navy, azul, verde, areia, rosa
-function rel_bar(int $pct, string $cor = '#00A859'): string {
+function rel_bar(int $pct, string $cor = '#1CAE8D'): string {
     $pct = max(0, min(100, $pct));
     return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
       <td style="background:#EDEAE0;border-radius:6px"><div style="width:' . $pct . '%;max-width:100%;background:' . $cor . ';height:10px;border-radius:6px;font-size:0;line-height:0">&nbsp;</div></td></tr></table>';
@@ -174,13 +174,13 @@ function rel_kpi(string $valor, string $rotulo, string $cor): string {
       <div style="font-family:Arial,sans-serif;font-size:11px;color:#69727D;margin-top:2px">' . $rotulo . '</div></td>';
 }
 function rel_secao(string $titulo): string {
-    return '<h2 style="font-family:Arial,sans-serif;font-size:16px;color:#0B3B2A;margin:26px 0 10px">' . $titulo . '</h2>';
+    return '<h2 style="font-family:Arial,sans-serif;font-size:16px;color:#2A4971;margin:26px 0 10px">' . $titulo . '</h2>';
 }
 
 $hoje = date('d/m/Y H:i');
 $corpo = '<div style="max-width:680px;margin:0 auto;background:#FDFBEF;padding:26px;border-radius:14px">';
 $corpo .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-  <td><div style="font-family:Arial,sans-serif;font-size:21px;font-weight:800;color:#0B3B2A">💧 ' . e($u['cliente_nome']) . '</div>
+  <td><div style="font-family:Arial,sans-serif;font-size:21px;font-weight:800;color:#2A4971">💧 ' . e($u['cliente_nome']) . '</div>
       <div style="font-family:Arial,sans-serif;font-size:13px;color:#69727D;margin-top:2px">'
       . ($foco ? 'Relatório individual — <strong>' . e($foco['nome']) . '</strong>' : 'Relatório de treinamento — visão da equipe')
       . ' · ' . count($treinos) . ' treinamento' . (count($treinos) === 1 ? '' : 's') . ' ativo' . (count($treinos) === 1 ? '' : 's') . '</div></td>
@@ -191,10 +191,10 @@ if (!$foco) {
     $corpo .= rel_secao('📊 Indicadores gerais');
     $corpo .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="6"><tr>'
         . rel_kpi($conformidade . '%', 'Conformidade média', $conformidade >= 70 ? '#27A567' : '#D9534F')
-        . rel_kpi((string) $ativos7d, 'Ativos nos últimos 7 dias', '#00A859')
+        . rel_kpi((string) $ativos7d, 'Ativos nos últimos 7 dias', '#1CAE8D')
         . rel_kpi((string) $nuncaLogaram, 'Nunca acessaram', $nuncaLogaram ? '#D9534F' : '#27A567')
-        . rel_kpi($aproveitamento . '%', 'Aproveitamento médio', '#0B3B2A')
-        . rel_kpi(number_format($horasCap, 1, ',', '.') . 'h', 'Horas de capacitação', '#0B3B2A')
+        . rel_kpi($aproveitamento . '%', 'Aproveitamento médio', '#2A4971')
+        . rel_kpi(number_format($horasCap, 1, ',', '.') . 'h', 'Horas de capacitação', '#2A4971')
         . '</tr></table>';
 
     // ── engajamento da equipe (alto/médio/baixo)
@@ -203,9 +203,9 @@ if (!$foco) {
     $totE = max(1, count($alunos));
     foreach (['alto' => ['🟢 Alto', '#27A567'], 'medio' => ['🟡 Médio', '#E0A200'], 'baixo' => ['🔴 Baixo', '#D9534F']] as $niv => [$lbl, $cor]) {
         $q = $engDist[$niv]; $pc = (int) round($q / $totE * 100);
-        $corpo .= '<tr><td width="150" style="font-family:Arial,sans-serif;font-size:13px;color:#0B3B2A;padding:7px 12px;font-weight:700">' . $lbl . '</td>
+        $corpo .= '<tr><td width="150" style="font-family:Arial,sans-serif;font-size:13px;color:#2A4971;padding:7px 12px;font-weight:700">' . $lbl . '</td>
           <td style="padding:7px 6px">' . rel_bar($pc, $cor) . '</td>
-          <td width="96" align="right" style="font-family:Arial,sans-serif;font-size:13px;font-weight:800;color:#0B3B2A;padding:7px 12px">' . $q . ' (' . $pc . '%)</td></tr>';
+          <td width="96" align="right" style="font-family:Arial,sans-serif;font-size:13px;font-weight:800;color:#2A4971;padding:7px 12px">' . $q . ' (' . $pc . '%)</td></tr>';
     }
     $corpo .= '</table>';
 
@@ -214,10 +214,10 @@ if (!$foco) {
     $corpo .= '<table role="presentation" width="100%" cellpadding="4" cellspacing="0" style="background:#FFFFFD;border:1.5px solid #E3E0D3;border-radius:10px">';
     foreach ($porTreinamento as $pt) {
         $t = $pt['t'];
-        $corpo .= '<tr><td width="260" style="font-family:Arial,sans-serif;font-size:13px;color:#0B3B2A;padding:7px 12px"><strong>' . e($t['nome']) . '</strong>
+        $corpo .= '<tr><td width="260" style="font-family:Arial,sans-serif;font-size:13px;color:#2A4971;padding:7px 12px"><strong>' . e($t['nome']) . '</strong>
             <span style="color:#69727D">· ' . e($t['trilha_nome']) . ' · ' . $pt['n'] . ' colaborador' . ($pt['n'] === 1 ? '' : 'es') . '</span></td>
           <td style="padding:7px 6px">' . rel_bar($pt['pct']) . '</td>
-          <td width="46" align="right" style="font-family:Arial,sans-serif;font-size:14px;font-weight:800;color:#0B3B2A;padding:7px 12px">' . $pt['pct'] . '%</td></tr>';
+          <td width="46" align="right" style="font-family:Arial,sans-serif;font-size:14px;font-weight:800;color:#2A4971;padding:7px 12px">' . $pt['pct'] . '%</td></tr>';
     }
     if (!$porTreinamento) $corpo .= '<tr><td style="font-family:Arial,sans-serif;font-size:13px;color:#69727D;padding:8px 14px">Nenhum colaborador com treinamento ativo ainda.</td></tr>';
     $corpo .= '</table>';
@@ -230,7 +230,7 @@ if (!$foco) {
     foreach ($heat as $h) {
         $f = $h['f'];
         $cor = $h['pct'] >= 70 ? '#27A567' : ($h['pct'] >= 40 ? '#E8A13B' : '#D9534F');
-        $corpo .= '<tr><td width="300" style="font-family:Arial,sans-serif;font-size:12.5px;color:#0B3B2A;padding:5px 12px">F' . (int) $f['ordem'] . ' · ' . e($f['nome'])
+        $corpo .= '<tr><td width="300" style="font-family:Arial,sans-serif;font-size:12.5px;color:#2A4971;padding:5px 12px">F' . (int) $f['ordem'] . ' · ' . e($f['nome'])
             . ' <span style="color:#9AA0AA">(' . e($nomesTrein[(int) $f['treinamento_id']] ?? '') . ')</span></td>
           <td style="padding:5px 6px">' . rel_bar($h['pct'], $cor) . '</td>
           <td width="44" align="right" style="font-family:Arial,sans-serif;font-size:12.5px;font-weight:800;color:' . $cor . ';padding:5px 12px">' . $h['pct'] . '%</td></tr>';
@@ -241,11 +241,11 @@ if (!$foco) {
     // ── radar de risco
     $corpo .= rel_secao('🚨 Radar de risco (' . count($risco) . ')');
     if (!$risco) {
-        $corpo .= '<p style="font-family:Arial,sans-serif;font-size:13px;color:#27A567;background:#DCF2E6;padding:10px 14px;border-radius:10px">Nenhum colaborador em risco. 👏</p>';
+        $corpo .= '<p style="font-family:Arial,sans-serif;font-size:13px;color:#27A567;background:#E7F9F3;padding:10px 14px;border-radius:10px">Nenhum colaborador em risco. 👏</p>';
     } else {
         $corpo .= '<table role="presentation" width="100%" cellpadding="4" cellspacing="0" style="background:#F7E6EA;border-radius:10px">';
         foreach ($risco as [$nome, $msg]) {
-            $corpo .= '<tr><td style="font-family:Arial,sans-serif;font-size:13px;padding:6px 14px"><strong style="color:#0B3B2A">' . e($nome) . '</strong>
+            $corpo .= '<tr><td style="font-family:Arial,sans-serif;font-size:13px;padding:6px 14px"><strong style="color:#2A4971">' . e($nome) . '</strong>
               <span style="color:#B04352"> — ' . e($msg) . '</span></td></tr>';
         }
         $corpo .= '</table>';
@@ -257,7 +257,7 @@ if (!$foco) {
     $medalha = ['🥇', '🥈', '🥉', '4º', '5º'];
     foreach ($top5 as $i => $r) {
         $corpo .= '<tr><td width="34" align="center" style="font-family:Arial,sans-serif;font-size:15px;padding:5px 0 5px 10px">' . $medalha[$i] . '</td>
-          <td style="font-family:Arial,sans-serif;font-size:13px;color:#0B3B2A;padding:5px 4px"><strong>' . e($r['nome']) . '</strong>
+          <td style="font-family:Arial,sans-serif;font-size:13px;color:#2A4971;padding:5px 4px"><strong>' . e($r['nome']) . '</strong>
 </td>
           <td align="right" style="font-family:Arial,sans-serif;font-size:13px;font-weight:800;color:#8A6D1B;padding:5px 14px">' . number_format((int) $r['xp'], 0, ',', '.') . ' XP</td></tr>';
     }
@@ -266,7 +266,7 @@ if (!$foco) {
 
     // ── comunidade
     $corpo .= rel_secao('💬 Comunidade');
-    $corpo .= '<p style="font-family:Arial,sans-serif;font-size:13px;color:#0B3B2A;background:#D8EEF7;padding:10px 14px;border-radius:10px">'
+    $corpo .= '<p style="font-family:Arial,sans-serif;font-size:13px;color:#2A4971;background:#D8EEF7;padding:10px 14px;border-radius:10px">'
         . (int) ($com['pub'] ?? 0) . ' mensagens publicadas · ' . (int) ($com['pend'] ?? 0) . ' aguardando moderação · ' . $semResp . ' sem resposta</p>';
 
 } else {
@@ -274,10 +274,10 @@ if (!$foco) {
     $corpo .= rel_secao('📊 Indicadores de ' . e(explode(' ', $foco['nome'])[0]));
     $corpo .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="6"><tr>'
         . rel_kpi($F['trilha'] . '%', 'Treinamento concluído', $F['trilha'] >= 70 ? '#27A567' : '#D9534F')
-        . rel_kpi($F['aprov'] . '%', 'Aproveitamento', $F['aprov'] >= 80 ? '#27A567' : '#0B3B2A')
-        . rel_kpi($F['minutos'] . 'min', 'Tempo de capacitação', '#0B3B2A')
-        . rel_kpi($F['pos'] . 'º/' . $F['total'], 'Posição no ranking', '#00A859')
-        . rel_kpi($foco['ultimo_login'] ? date('d/m', strtotime($foco['ultimo_login'])) : 'nunca', 'Último acesso', $foco['ultimo_login'] ? '#0B3B2A' : '#D9534F')
+        . rel_kpi($F['aprov'] . '%', 'Aproveitamento', $F['aprov'] >= 80 ? '#27A567' : '#2A4971')
+        . rel_kpi($F['minutos'] . 'min', 'Tempo de capacitação', '#2A4971')
+        . rel_kpi($F['pos'] . 'º/' . $F['total'], 'Posição no ranking', '#1CAE8D')
+        . rel_kpi($foco['ultimo_login'] ? date('d/m', strtotime($foco['ultimo_login'])) : 'nunca', 'Último acesso', $foco['ultimo_login'] ? '#2A4971' : '#D9534F')
         . '</tr></table>';
 
     $focoEng = $engajDe[(int) $foco['id']] ?? null;
@@ -292,12 +292,12 @@ if (!$foco) {
     if ($F['risco']) {
         $corpo .= '<p style="font-family:Arial,sans-serif;font-size:13px;color:#B04352;background:#F7E6EA;padding:10px 14px;border-radius:10px;margin-top:10px"><strong>🚨 Atenção:</strong> ' . e($F['risco']) . '</p>';
     } else {
-        $corpo .= '<p style="font-family:Arial,sans-serif;font-size:13px;color:#27A567;background:#DCF2E6;padding:10px 14px;border-radius:10px;margin-top:10px">✅ Em dia — sem sinais de risco.</p>';
+        $corpo .= '<p style="font-family:Arial,sans-serif;font-size:13px;color:#27A567;background:#E7F9F3;padding:10px 14px;border-radius:10px;margin-top:10px">✅ Em dia — sem sinais de risco.</p>';
     }
 
     // ── fases do treinamento ativo
     $corpo .= rel_secao('📚 Fases do treinamento');
-    $corpo .= '<table role="presentation" width="100%" cellpadding="6" cellspacing="0" style="background:#FFFFFD;border:1.5px solid #E3E0D3;border-radius:10px;font-family:Arial,sans-serif;font-size:12.5px;color:#0B3B2A">';
+    $corpo .= '<table role="presentation" width="100%" cellpadding="6" cellspacing="0" style="background:#FFFFFD;border:1.5px solid #E3E0D3;border-radius:10px;font-family:Arial,sans-serif;font-size:12.5px;color:#2A4971">';
     $corpo .= '<tr style="color:#69727D;font-size:11px"><td style="padding:8px 12px">FASE</td><td align="center">ETAPAS</td><td align="center">ACERTO</td><td align="center">TEMPO</td><td align="right" style="padding-right:12px">STATUS</td></tr>';
     foreach ($focoFases as $t) {
         $pctT = (int) $t['questoes'] > 0 ? round($t['acertos'] / $t['questoes'] * 100) . '%' : '—';

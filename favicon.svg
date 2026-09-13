@@ -1,6 +1,5 @@
 <svg viewBox="0 0 88 88" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Grupo Boticário">
-  <!-- marca PROVISÓRIA do whitelabel (folha sobre disco) — trocar pela oficial -->
-  <circle cx="44" cy="44" r="40" fill="#0B3B2A"/>
-  <path d="M62 24 C44 24 30 36 28 58 C50 60 64 46 62 24 Z" fill="#00A859"/>
-  <path d="M30 58 C40 48 50 40 58 30" stroke="#DCF2E6" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <!-- marca PROVISÓRIA do whitelabel (disco magenta + B) — trocar pela oficial -->
+  <circle cx="44" cy="44" r="40" fill="#A84E84"/>
+  <text x="44" y="61" text-anchor="middle" font-family="Poppins, Avenir Next, Arial, sans-serif" font-size="48" font-weight="800" fill="#FFFFFF">B</text>
 </svg>

@@ -569,7 +569,7 @@ lms_topbar($u);
   .man-capa { display:flex; gap:18px; align-items:center; padding:28px 30px; border-radius:var(--lms-radius-lg, 16px);
     border:var(--lms-border-game); box-shadow:var(--lms-shadow-crisp); position:relative; overflow:hidden;
     background:radial-gradient(600px 200px at 90% -20%, rgba(41,173,220,.3), transparent 60%),
-               linear-gradient(140deg, #0B3B2A, #2B3558) }
+               linear-gradient(140deg, #2A4971, #2B3558) }
   .man-capa-ico { font-size:48px; flex:none; filter:drop-shadow(0 3px 6px rgba(0,0,0,.4)) }
   .man-capa h1 { color:#fff; font-size:var(--lms-title-md); margin:0 }
   .man-capa p { color:rgba(255,255,255,.82); font-size:14px; margin:6px 0 0; line-height:1.5 }

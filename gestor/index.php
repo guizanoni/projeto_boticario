@@ -104,10 +104,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'lembret
             fn($p) => '<p>' . nl2br(e(trim($p))) . '</p>',
             array_filter(preg_split("/\n{2,}/", $corpo), fn($p) => trim($p) !== '')
         ));
-        $html = '<div style="font-family:Arial,sans-serif;font-size:15px;color:#0B3B2A;max-width:560px;line-height:1.6">'
+        $html = '<div style="font-family:Arial,sans-serif;font-size:15px;color:#2A4971;max-width:560px;line-height:1.6">'
           . $ps . '
           <p style="margin:24px 0">
-            <a href="https://skope.cc/boticario/" style="background:#00A859;color:#fff;font-weight:bold;padding:12px 26px;border-radius:8px;text-decoration:none">Voltar para a plataforma ▶</a>
+            <a href="https://skope.cc/boticario/" style="background:#1CAE8D;color:#fff;font-weight:bold;padding:12px 26px;border-radius:8px;text-decoration:none">Voltar para a plataforma ▶</a>
           </p>
           <p style="color:#69727D">— ' . e($u['nome']) . ' · ' . e($u['cliente_nome']) . '</p>
         </div>';
@@ -473,7 +473,7 @@ lms_topbar($u);
   <?php else: ?>
   <div class="dash-kpis">
     <div class="lms-stat dash-entra" style="--i:0" data-tip="Total de alunos cadastrados na plataforma — tenham acessado ou não.">
-      <div class="lms-stat-value kpi-num" data-val="<?= count($alunos) ?>" style="color:var(--lms-heading, #0B3B2A)">0</div>
+      <div class="lms-stat-value kpi-num" data-val="<?= count($alunos) ?>" style="color:var(--lms-heading, #2A4971)">0</div>
       <div class="lms-stat-label">Alunos cadastrados</div>
     </div>
     <div class="lms-stat dash-entra" style="--i:1" data-tip="Média do avanço de cada aluno no próprio treinamento ativo (etapas concluídas ÷ total de etapas).">
@@ -975,14 +975,14 @@ lms_topbar($u);
   [data-tip]:hover::after {
     content:attr(data-tip);
     position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%);
-    background:var(--lms-heading, #0B3B2A); color:#fff;
+    background:var(--lms-heading, #2A4971); color:#fff;
     font-family:var(--lms-font-ui); font-size:12px; font-weight:600;
     white-space:nowrap; padding:6px 12px; border-radius:8px; z-index:30;
     box-shadow:0 4px 12px rgba(16,24,40,.35); pointer-events:none;
   }
   [data-tip]:hover::before {
     content:''; position:absolute; bottom:calc(100% + 2px); left:50%; transform:translateX(-50%);
-    border:6px solid transparent; border-top-color:var(--lms-heading, #0B3B2A); z-index:30;
+    border:6px solid transparent; border-top-color:var(--lms-heading, #2A4971); z-index:30;
   }
   /* nas bordas, o balão encosta no lado em vez de centralizar (não corta) */
   .dash-funil-col:first-child:hover::after, .dash-chart-col:first-child:hover::after,
@@ -1004,7 +1004,7 @@ lms_topbar($u);
   }
   .dash-media.is-funil { bottom:auto; top:calc(110px - var(--alt)) }
   /* duas linhas no funil do aluno: a dele (azul, sólida) vs a geral (cinza, tracejada) */
-  .dash-media.is-aluno { border-top:2px solid var(--lms-primary, #00A859) }
+  .dash-media.is-aluno { border-top:2px solid var(--lms-primary, #1CAE8D) }
   .dash-media.is-geral { border-top:2px dashed rgba(30,37,67,.4) }
   .dash-media-tag {
     position:absolute; right:0; bottom:3px;
@@ -1032,8 +1032,8 @@ lms_topbar($u);
   .dash-funil-fill {
     position:relative; z-index:1;
     width:min(46px, 72%); border-radius:6px; min-height:8px; box-sizing:border-box;
-    background:var(--lms-primary, #00A859);
-    border:2px solid var(--lms-heading, #0B3B2A);
+    background:var(--lms-primary, #1CAE8D);
+    border:2px solid var(--lms-heading, #2A4971);
     transition:filter .15s ease;
   }
   .dash-funil-fill.is-ok { background:var(--lms-success, #27A567); }
@@ -1061,8 +1061,8 @@ lms_topbar($u);
   .dash-chart-col:hover .dash-chart-n { transform:scale(1.25) }
   .dash-chart-track { height:92px; width:100%; display:flex; align-items:flex-end; justify-content:center }
   .dash-chart-bar { width:100%; max-width:30px; height:var(--h); min-height:6px; border-radius:5px;
-    box-sizing:border-box; background:var(--lms-primary, #00A859);
-    border:1.5px solid var(--lms-heading, #0B3B2A);
+    box-sizing:border-box; background:var(--lms-primary, #1CAE8D);
+    border:1.5px solid var(--lms-heading, #2A4971);
     transform-origin:bottom; animation:chart-sobe .7s var(--lms-ease, ease) calc(var(--i) * 45ms) both;
     transition:filter .15s ease }
   @keyframes chart-sobe { from { transform:scaleY(0) } to { transform:scaleY(1) } }
@@ -1090,7 +1090,7 @@ lms_topbar($u);
   .dash-pager-info { font-family:var(--lms-font-ui); font-size:12.5px; font-weight:700; color:var(--lms-muted);
     min-width:74px; text-align:center }
   .dash-pager-btn { width:30px; height:30px; border-radius:8px; border:1px solid rgba(30,37,67,.16);
-    background:#fff; color:var(--lms-ink, #0B3B2A); font-size:16px; line-height:1; cursor:pointer;
+    background:#fff; color:var(--lms-ink, #2A4971); font-size:16px; line-height:1; cursor:pointer;
     display:flex; align-items:center; justify-content:center; transition:filter .15s, opacity .15s }
   .dash-pager-btn:hover:not(:disabled) { filter:brightness(.96) }
   .dash-pager-btn:disabled { opacity:.4; cursor:default }

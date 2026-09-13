@@ -162,7 +162,7 @@ lms_topbar($u);
   cv.width = innerWidth; cv.height = innerHeight;
   document.body.appendChild(cv);
   const ctx = cv.getContext('2d');
-  const cores = ['#00A859', '#F0B429', '#E8641B', '#2E7D32', '#0B3B2A'];
+  const cores = ['#1CAE8D', '#F0B429', '#E8641B', '#2E7D32', '#2A4971'];
   const ps = Array.from({ length: 110 }, () => ({
     x: cv.width / 2 + (Math.random() - .5) * cv.width * .6,
     y: cv.height * .3 + (Math.random() - .5) * 60,

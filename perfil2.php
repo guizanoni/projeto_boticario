@@ -68,23 +68,23 @@ lms_topbar($u);
                font-size: 19px; text-decoration: none; box-shadow: 0 2px 0 var(--lms-border, #E5E5E5); }
   .av2-lapis:hover { transform: translateY(-1px); }
 
-  .av2-nome { font-size: 30px; font-weight: 800; color: var(--lms-heading, #0B3B2A);
+  .av2-nome { font-size: 30px; font-weight: 800; color: var(--lms-heading, #2A4971);
               font-family: var(--lms-font-display, inherit); margin-top: 18px; }
   .av2-sub { color: var(--lms-ink-soft, #777); font-size: 15px; margin-top: 2px; }
 
-  .av2-h2 { font-size: 21px; font-weight: 800; color: var(--lms-heading, #0B3B2A);
+  .av2-h2 { font-size: 21px; font-weight: 800; color: var(--lms-heading, #2A4971);
             font-family: var(--lms-font-ui, inherit); margin: 30px 0 14px; }
   .av2-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .av2-stat { display: flex; gap: 12px; align-items: center; padding: 14px 16px; }
   .av2-stat .ico { font-size: 26px; line-height: 1; }
-  .av2-stat b { display: block; font-size: 19px; color: var(--lms-heading, #0B3B2A); }
+  .av2-stat b { display: block; font-size: 19px; color: var(--lms-heading, #2A4971); }
   .av2-stat span { display: block; font-size: 13px; color: var(--lms-ink-soft, #777); margin-top: 1px; }
 
   .av2-feed-item { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
   .av2-feed-item + .av2-feed-item { border-top: 2px solid var(--lms-border, #E5E5E5); }
   .av2-comemore { align-self: flex-start; border: 2px solid var(--lms-border, #E5E5E5); background: var(--lms-surface, #fff);
                   border-radius: 12px; padding: 8px 16px; font-weight: 800; font-size: 13px; letter-spacing: .4px;
-                  cursor: pointer; color: var(--lms-heading, #0B3B2A); box-shadow: 0 2px 0 var(--lms-border, #E5E5E5);
+                  cursor: pointer; color: var(--lms-heading, #2A4971); box-shadow: 0 2px 0 var(--lms-border, #E5E5E5);
                   font-family: var(--lms-font-ui, inherit); }
   .av2-comemore:active { transform: translateY(2px); box-shadow: none; }
 

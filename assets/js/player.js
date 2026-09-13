@@ -24,14 +24,14 @@ document.head.appendChild(el(`<style>
   .mg-dots { display:flex; gap:6px }
   .mg-dot { width:9px; height:9px; border-radius:50%; background:var(--lms-border, #ddd); transition:background .2s }
   .mg-dot.is-done { background: var(--lms-success, #2E7D32) }
-  .mg-dot.is-active { background: var(--lms-primary, #00A859); box-shadow:0 0 0 4px rgba(41,173,220,.18) }
+  .mg-dot.is-active { background: var(--lms-primary, #1CAE8D); box-shadow:0 0 0 4px rgba(41,173,220,.18) }
 
   .mg-quadro { display:flex; gap:16px; align-items:flex-start; border:var(--lms-border-game);
     border-radius:var(--lms-radius-lg, 16px); padding:24px; background:var(--lms-white, #fff) }
   .mg-quadro-icone { width:58px; height:58px; flex:none; border-radius:10px; background:var(--lms-sky, #D3ECF9);
     display:flex; align-items:center; justify-content:center; font-size:28px }
   .mg-quadro-titulo { font-family:var(--lms-font-ui); font-weight:700; font-size:13px; letter-spacing:.08em;
-    text-transform:uppercase; color:var(--lms-primary, #00A859); margin-bottom:6px }
+    text-transform:uppercase; color:var(--lms-primary, #1CAE8D); margin-bottom:6px }
   .mg-quadro-texto { font-size:15.5px; line-height:1.65 }
 
   .mg-pool { display:flex; flex-wrap:wrap; gap:8px; padding:14px; border:2px dashed var(--lms-border, #ddd);
@@ -51,7 +51,7 @@ document.head.appendChild(el(`<style>
   .mg-zona.is-mint { border-color:var(--lms-success, #2E7D32) } .mg-zona.is-mint .mg-zona-titulo { color:var(--lms-success, #2E7D32) }
   .mg-zona.is-sand { border-color:#C98A12 } .mg-zona.is-sand .mg-zona-titulo { color:#9A6A0D }
   .mg-zona.is-rose { border-color:var(--lms-error, #C62828) } .mg-zona.is-rose .mg-zona-titulo { color:var(--lms-error, #C62828) }
-  .mg-zona.is-sky { border-color:var(--lms-primary, #00A859) } .mg-zona.is-sky .mg-zona-titulo { color:var(--lms-primary, #00A859) }
+  .mg-zona.is-sky { border-color:var(--lms-primary, #1CAE8D) } .mg-zona.is-sky .mg-zona-titulo { color:var(--lms-primary, #1CAE8D) }
 
   .mg-caca-wrap { display:flex; gap:20px; flex-wrap:wrap }
   .mg-caca-grid { display:grid; grid-template-columns:repeat(3, 64px); gap:10px; align-content:start }
@@ -67,15 +67,15 @@ document.head.appendChild(el(`<style>
   .mg-podcast { display:flex; align-items:center; gap:14px; border:var(--lms-border-game);
     border-radius:var(--lms-radius-lg, 16px); padding:16px 20px; background:var(--lms-white, #fff) }
   .mg-play { width:46px; height:46px; flex:none; border-radius:50%; border:none; cursor:pointer;
-    background:var(--lms-primary, #00A859); color:#fff; font-size:16px }
+    background:var(--lms-primary, #1CAE8D); color:#fff; font-size:16px }
   .mg-podcast-titulo { font-family:var(--lms-font-ui); font-weight:600; font-size:14px }
   .mg-wave { display:none; gap:2px; align-items:center; height:22px }
-  .mg-wave span { width:3px; border-radius:2px; background:var(--lms-primary, #00A859); opacity:.55 }
+  .mg-wave span { width:3px; border-radius:2px; background:var(--lms-primary, #1CAE8D); opacity:.55 }
   .mg-wave.is-on { display:flex } .mg-wave.is-on span { animation: mg-eq .8s ease-in-out infinite alternate }
   .mg-wave.is-on span:nth-child(odd) { animation-duration:.6s }
   @keyframes mg-eq { from { transform:scaleY(.4) } to { transform:scaleY(1.15) } }
   .mg-quem { display:block; font-family:var(--lms-font-ui); font-weight:700; font-size:11.5px;
-    letter-spacing:.08em; color:var(--lms-primary, #00A859); margin-bottom:2px }
+    letter-spacing:.08em; color:var(--lms-primary, #1CAE8D); margin-bottom:2px }
 
   .mg-passo { display:block; width:100%; text-align:left; padding:13px 16px; font-size:14.5px;
     border:var(--lms-border-game); border-radius:var(--lms-radius-md, 12px); background:var(--lms-white, #fff);
@@ -85,6 +85,17 @@ document.head.appendChild(el(`<style>
   .mg-passo-num { display:inline-flex; width:24px; height:24px; border-radius:50%; align-items:center;
     justify-content:center; background:var(--lms-success, #2E7D32); color:#fff; font-family:var(--lms-font-ui);
     font-weight:700; font-size:12px; margin-right:8px }
+
+  .mg-passo-grid { display:flex; flex-wrap:wrap; gap:10px; justify-content:center }
+  .mg-passo.is-card { width:124px; display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 8px; gap:6px; font-size:13px }
+  .mg-passo.is-card:hover:not(:disabled) { transform:translateY(-3px) }
+  .mg-passo-img { width:92px; height:92px; object-fit:contain; border-radius:8px; background:var(--lms-surface, #F4F1EA); display:flex; align-items:center; justify-content:center; font-size:28px }
+  .mg-passo-thumb { width:40px; height:40px; object-fit:contain; border-radius:6px; background:var(--lms-surface, #F4F1EA); vertical-align:middle; margin-right:8px }
+  .mg-passo-desc { display:block; margin:6px 0 0 32px; font-size:13px; color:var(--lms-ink-soft, #69727D) }
+  .mg-inv-audio { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px }
+  .mg-inv-audio audio { flex:1; min-width:200px; height:40px }
+  .mg-vid-frame.is-vertical { aspect-ratio:9/16; max-width:min(100%, 400px); margin:0 auto }
+  .mg-video.is-palco .mg-vid-frame.is-vertical { width:auto; height:82vh; aspect-ratio:9/16 }
 
   @media (max-width: 700px) { .mg-caca-grid { grid-template-columns:repeat(3, 56px) } .mg-celula { width:56px; height:56px } }
 
@@ -96,7 +107,7 @@ document.head.appendChild(el(`<style>
   .mg-vid-play {
     position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
     width:72px; height:72px; border-radius:50%; border:3px solid #fff; cursor:pointer;
-    background:var(--lms-primary, #00A859); color:#fff; font-size:26px;
+    background:var(--lms-primary, #1CAE8D); color:#fff; font-size:26px;
     box-shadow:0 4px 16px rgba(0,0,0,.45); transition:transform .15s var(--lms-ease, ease), opacity .2s ease;
   }
   .mg-vid-play:hover { transform:translate(-50%,-50%) scale(1.1) }
@@ -115,7 +126,7 @@ document.head.appendChild(el(`<style>
   .mg-vid-ctl { border:none; background:none; cursor:pointer; font-size:17px; padding:2px 4px;
     color:var(--lms-ink); line-height:1; flex:none }
   .mg-vid-ctl:hover { color:var(--lms-primary) }
-  .mg-vid-vol-slider { width:84px; accent-color:var(--lms-primary, #00A859) }
+  .mg-vid-vol-slider { width:84px; accent-color:var(--lms-primary, #1CAE8D) }
   .mg-vid-vel { border:1px solid var(--lms-border); border-radius:6px; padding:4px 6px;
     font-size:12.5px; font-family:var(--lms-font-ui); color:var(--lms-ink); background:var(--lms-white); cursor:pointer }
   .mg-vid-spacer { flex:1 }
@@ -236,14 +247,14 @@ document.head.appendChild(el(`<style>
     background:
       radial-gradient(360px 180px at 15% -8%, rgba(41,173,220,.25), transparent 60%),
       radial-gradient(300px 160px at 95% 108%, rgba(240,180,41,.18), transparent 60%),
-      linear-gradient(160deg, #0B3B2A, #2B3558);
+      linear-gradient(160deg, #2A4971, #2B3558);
   }
   .mg-cz-tabua::before { content:'✏️'; position:absolute; right:-8px; top:-14px; font-size:74px; opacity:.12; transform:rotate(18deg) }
   .mg-cz-grade { display:grid; gap:6px; user-select:none; justify-content:center }
   .mg-cz-cel { position:relative; width:40px; height:40px }
   .mg-cz-cel input { width:100%; height:100%; text-align:center; text-transform:uppercase;
     font-family:var(--lms-font-ui); font-weight:800; font-size:17px; border-radius:9px;
-    border:none; background:var(--lms-white, #fff); padding:0; color:var(--lms-heading, #0B3B2A);
+    border:none; background:var(--lms-white, #fff); padding:0; color:var(--lms-heading, #2A4971);
     box-shadow:inset 0 -3px 0 rgba(30,37,67,.18), 0 2px 4px rgba(0,0,0,.3);
     transition:transform .12s var(--lms-ease, ease) }
   .mg-cz-cel input:focus { outline:3px solid var(--lms-amarelo, #F0B429); outline:3px solid #F0B429; outline-offset:-1px; transform:scale(1.08); z-index:3; position:relative }
@@ -257,18 +268,18 @@ document.head.appendChild(el(`<style>
   .mg-cz-bloco { border:var(--lms-border-game); border-radius:var(--lms-radius-md, 12px);
     background:var(--lms-white, #fff); padding:14px 16px; box-shadow:var(--lms-shadow-crisp-sm) }
   .mg-cz-bloco > p { font-family:var(--lms-font-ui); font-weight:800; font-size:12px; letter-spacing:.06em;
-    text-transform:uppercase; color:var(--lms-primary, #00A859); margin:0 0 8px }
+    text-transform:uppercase; color:var(--lms-primary, #1CAE8D); margin:0 0 8px }
   .mg-cz-dica { display:flex; gap:8px; align-items:flex-start; font-size:13.5px; line-height:1.45;
     padding:5px 0; border-bottom:1px dashed rgba(30,37,67,.1) }
   .mg-cz-dica:last-child { border-bottom:none }
   .mg-cz-dica .cz-dnum { flex:none; min-width:20px; height:20px; padding:0 4px; border-radius:6px;
-    background:var(--lms-sand, #FBEED3); color:var(--lms-heading, #0B3B2A);
+    background:var(--lms-sand, #FBEED3); color:var(--lms-heading, #2A4971);
     font-family:var(--lms-font-ui); font-weight:800; font-size:11px;
     display:flex; align-items:center; justify-content:center }
   .mg-cz-dica.is-ok { color:var(--lms-success, #2E7D32); text-decoration:line-through; opacity:.75 }
   .mg-cz-dica.is-ok .cz-dnum { background:var(--lms-success-soft, #DFF3E4); color:var(--lms-success, #2E7D32) }
   .mg-cz-timer { flex:none; display:inline-flex; align-items:center; gap:6px;
-    font-family:var(--lms-font-ui); font-weight:800; font-size:14px; color:var(--lms-heading, #0B3B2A);
+    font-family:var(--lms-font-ui); font-weight:800; font-size:14px; color:var(--lms-heading, #2A4971);
     background:var(--lms-white, #fff); border:var(--lms-border-game); border-radius:999px; padding:7px 15px;
     box-shadow:var(--lms-shadow-crisp-sm) }
   .mg-cz-timer.is-urgente { color:var(--lms-error, #C62828); animation:cz-pulsa 1s ease infinite }
@@ -291,7 +302,7 @@ document.head.appendChild(el(`<style>
   @keyframes se-some { to { opacity:0; transform:translate(-50%,-80%) } }
 
   /* ── investigação ── */
-  .mg-inv-pista { border-left:5px solid var(--lms-primary, #00A859) }
+  .mg-inv-pista { border-left:5px solid var(--lms-primary, #1CAE8D) }
 
   /* ── tabuleiro ── */
   .mg-tab-mar {
@@ -307,7 +318,7 @@ document.head.appendChild(el(`<style>
   .mg-tab-casa {
     position:relative; aspect-ratio:1; min-width:0; border-radius:16px;
     display:flex; align-items:center; justify-content:center;
-    background:var(--lms-white, #fff); border:2.5px solid var(--lms-heading, #0B3B2A);
+    background:var(--lms-white, #fff); border:2.5px solid var(--lms-heading, #2A4971);
     box-shadow:0 4px 0 rgba(30,37,67,.35);
     font-size:clamp(18px, 3.4vw, 27px); font-family:var(--lms-font-ui); font-weight:800;
     transition:transform .15s var(--lms-ease, ease), background .2s ease;
@@ -315,7 +326,7 @@ document.head.appendChild(el(`<style>
   .mg-tab-num { position:absolute; top:4px; left:8px; font-size:10px; color:var(--lms-ink-soft, #69727D); font-weight:800 }
   .mg-tab-casa.is-pergunta { background:var(--lms-sand, #FBEED3) }
   .mg-tab-casa.is-livre { border-style:dashed; border-color:rgba(30,37,67,.45); box-shadow:0 4px 0 rgba(30,37,67,.18); background:rgba(255,255,253,.72) }
-  .mg-tab-casa.is-inicio { background:var(--lms-heading, #0B3B2A) }
+  .mg-tab-casa.is-inicio { background:var(--lms-heading, #2A4971) }
   .mg-tab-casa.is-fim { background:var(--lms-success-soft, #DFF3E4) }
   .mg-tab-casa.is-atual { transform:scale(1.07); box-shadow:0 4px 0 rgba(30,37,67,.35), 0 0 0 5px rgba(41,173,220,.4) }
   .mg-tab-casa.is-feita { background:var(--lms-success-soft, #DFF3E4); border-color:var(--lms-success, #2E7D32) }
@@ -333,7 +344,7 @@ document.head.appendChild(el(`<style>
   .mg-tab-mesa { display:flex; align-items:center; justify-content:center; gap:18px; flex-wrap:wrap; margin-top:16px }
   .mg-dado {
     width:86px; height:86px; padding:15px; border-radius:20px; cursor:pointer;
-    background:var(--lms-white, #fff); border:2.5px solid var(--lms-heading, #0B3B2A);
+    background:var(--lms-white, #fff); border:2.5px solid var(--lms-heading, #2A4971);
     box-shadow:0 5px 0 rgba(30,37,67,.4);
     display:grid; grid-template-columns:repeat(3, 1fr); grid-template-rows:repeat(3, 1fr); gap:4px;
     transition:transform .15s var(--lms-ease, ease);
@@ -342,7 +353,7 @@ document.head.appendChild(el(`<style>
   .mg-dado:disabled { opacity:.45; cursor:not-allowed }
   .mg-dado.is-rolando { animation:dado-gira .55s ease }
   @keyframes dado-gira { 25% { transform:rotate(-16deg) scale(1.12) } 75% { transform:rotate(16deg) scale(1.12) } }
-  .mg-dado .pip { border-radius:50%; background:var(--lms-heading, #0B3B2A); opacity:0; transition:opacity .1s }
+  .mg-dado .pip { border-radius:50%; background:var(--lms-heading, #2A4971); opacity:0; transition:opacity .1s }
   .mg-dado .pip.on { opacity:1 }
   .mg-tab-status { font-family:var(--lms-font-ui); font-weight:700; font-size:14px; color:var(--lms-heading);
     background:var(--lms-white, #fff); border:var(--lms-border-game); border-radius:999px; padding:10px 18px;
@@ -354,7 +365,7 @@ document.head.appendChild(el(`<style>
   /* ── Ligue os Pontos (antes eram botões crus) ── */
   .mg-liga-top { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:2px }
   .mg-liga-cont { flex:none; font-family:var(--lms-font-ui); font-weight:800; font-size:12.5px;
-    color:var(--lms-primary, #00A859); background:var(--lms-sky, #D3ECF9); border-radius:999px; padding:5px 13px }
+    color:var(--lms-primary, #1CAE8D); background:var(--lms-sky, #D3ECF9); border-radius:999px; padding:5px 13px }
   .mg-liga-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px 18px }
   .mg-liga-col { display:flex; flex-direction:column; gap:10px }
   .mg-liga-item { position:relative; display:flex; align-items:center; gap:11px; width:100%; text-align:left;
@@ -363,15 +374,15 @@ document.head.appendChild(el(`<style>
     padding:14px 16px; cursor:pointer; box-shadow:var(--lms-shadow-crisp-sm);
     transition:transform .14s var(--lms-ease, ease), border-color .14s ease, background .14s ease, box-shadow .14s ease }
   .mg-liga-item.is-dir { flex-direction:row-reverse; text-align:right }
-  .mg-liga-item:hover:not(.is-par) { transform:translateY(-2px); border-color:var(--lms-primary, #00A859) }
+  .mg-liga-item:hover:not(.is-par) { transform:translateY(-2px); border-color:var(--lms-primary, #1CAE8D) }
   .mg-liga-no { flex:none; width:15px; height:15px; border-radius:50%; background:var(--lms-bg, #F4F1E9);
     border:2px solid var(--lms-ink-faint, #98A0AB); transition:all .14s ease }
-  .mg-liga-item.is-sel { border-color:var(--lms-primary, #00A859); background:var(--lms-sky, #D3ECF9);
+  .mg-liga-item.is-sel { border-color:var(--lms-primary, #1CAE8D); background:var(--lms-sky, #D3ECF9);
     box-shadow:0 0 0 3px rgba(41,173,220,.22) }
-  .mg-liga-item.is-sel .mg-liga-no { background:var(--lms-primary, #00A859); border-color:var(--lms-primary, #00A859);
+  .mg-liga-item.is-sel .mg-liga-no { background:var(--lms-primary, #1CAE8D); border-color:var(--lms-primary, #1CAE8D);
     box-shadow:0 0 0 4px rgba(41,173,220,.25) }
   .mg-liga-item.is-par { background:var(--lms-success-soft, #DFF3E4); border-color:var(--lms-success, #2E7D32);
-    color:var(--lms-heading, #0B3B2A); cursor:default; box-shadow:none }
+    color:var(--lms-heading, #2A4971); cursor:default; box-shadow:none }
   .mg-liga-item.is-par .mg-liga-no { background:var(--lms-success, #2E7D32); border-color:var(--lms-success, #2E7D32);
     box-shadow:none }
   .mg-liga-item.is-par .mg-liga-no::after { content:'✓'; color:#fff; font-size:9px; font-weight:900;
@@ -382,21 +393,21 @@ document.head.appendChild(el(`<style>
     border:var(--lms-border-game); box-shadow:var(--lms-shadow-crisp); transition:box-shadow .22s ease, border-color .22s ease;
     background:radial-gradient(300px 130px at 50% -20%, var(--lms-sky, #D3ECF9), transparent 72%), var(--lms-white, #fff) }
   .mg-cl-tag { display:inline-block; font-family:var(--lms-font-ui); font-weight:800; font-size:11px;
-    letter-spacing:.07em; text-transform:uppercase; color:var(--lms-primary, #00A859); margin-bottom:9px }
-  .mg-cl-carta h3 { font-size:23px; color:var(--lms-heading, #0B3B2A); line-height:1.25; margin:0 }
+    letter-spacing:.07em; text-transform:uppercase; color:var(--lms-primary, #1CAE8D); margin-bottom:9px }
+  .mg-cl-carta h3 { font-size:23px; color:var(--lms-heading, #2A4971); line-height:1.25; margin:0 }
   .mg-cl-carta.is-ok { border-color:var(--lms-success, #2E7D32); box-shadow:0 0 0 3px rgba(46,125,50,.3), var(--lms-shadow-crisp) }
   .mg-cl-carta.is-err { border-color:var(--lms-error, #C62828); box-shadow:0 0 0 3px rgba(198,40,40,.28), var(--lms-shadow-crisp) }
   .mg-cl-cats { display:grid; grid-template-columns:repeat(auto-fit, minmax(128px, 1fr)); gap:12px }
   .mg-cl-cat { display:flex; align-items:center; justify-content:center; min-height:74px; padding:14px 12px;
     text-align:center; cursor:pointer; font-family:var(--lms-font-ui); font-weight:800; font-size:15px;
     line-height:1.25; border-radius:var(--lms-radius-md, 12px); border:2.5px solid var(--lms-border, #ddd);
-    background:var(--lms-white, #fff); color:var(--lms-heading, #0B3B2A);
+    background:var(--lms-white, #fff); color:var(--lms-heading, #2A4971);
     box-shadow:0 3px 0 rgba(30,37,67,.14); transition:transform .14s var(--lms-ease, ease), background .14s ease }
   .mg-cl-cat:hover:not(:disabled) { transform:translateY(-3px) }
   .mg-cl-cat:disabled { cursor:default; box-shadow:none }
   .mg-cl-cat.c0 { border-color:var(--lms-success, #2E7D32) }
   .mg-cl-cat.c1 { border-color:var(--lms-error, #C62828) }
-  .mg-cl-cat.c2 { border-color:var(--lms-primary, #00A859) }
+  .mg-cl-cat.c2 { border-color:var(--lms-primary, #1CAE8D) }
   .mg-cl-cat.c3 { border-color:#C98A12 }
   .mg-cl-cat.is-right { background:var(--lms-success-soft, #DFF3E4); border-color:var(--lms-success, #2E7D32); color:var(--lms-success, #2E7D32) }
   .mg-cl-cat.is-badpick { background:var(--lms-error-soft, #FBE4E4); border-color:var(--lms-error, #C62828); color:var(--lms-error, #C62828) }
@@ -405,17 +416,17 @@ document.head.appendChild(el(`<style>
   .mg-cena { display:flex; border:var(--lms-border-game); border-radius:var(--lms-radius-lg, 16px);
     overflow:hidden; box-shadow:var(--lms-shadow-crisp) }
   .mg-cena-ico { flex:none; width:104px; display:flex; align-items:center; justify-content:center; font-size:46px;
-    background:linear-gradient(160deg, var(--lms-primary, #00A859), var(--lms-heading, #0B3B2A)) }
+    background:linear-gradient(160deg, var(--lms-primary, #1CAE8D), var(--lms-heading, #2A4971)) }
   .mg-cena-corpo { flex:1; padding:22px 24px; background:var(--lms-white, #fff) }
   .mg-cena-lbl { display:block; font-family:var(--lms-font-ui); font-weight:800; font-size:11px; letter-spacing:.08em;
-    text-transform:uppercase; color:var(--lms-primary, #00A859); margin-bottom:7px }
+    text-transform:uppercase; color:var(--lms-primary, #1CAE8D); margin-bottom:7px }
   .mg-cena-txt { font-size:16px; line-height:1.6; color:var(--lms-ink, #272C30); margin:0 }
-  .mg-cena-perg { font-family:var(--lms-font-ui); font-weight:800; font-size:14.5px; color:var(--lms-heading, #0B3B2A); margin:0 }
+  .mg-cena-perg { font-family:var(--lms-font-ui); font-weight:800; font-size:14.5px; color:var(--lms-heading, #2A4971); margin:0 }
   .mg-cen-op { display:flex; align-items:center; gap:12px; width:100%; text-align:left; font-family:inherit;
     font-size:14.5px; color:var(--lms-ink, #272C30); background:var(--lms-white, #fff); border:var(--lms-border-game);
     border-radius:var(--lms-radius-md, 12px); padding:12px 15px; cursor:pointer;
     transition:transform .14s var(--lms-ease, ease), background .14s ease, border-color .14s ease }
-  .mg-cen-op:hover:not([data-lock]) { transform:translateX(5px); border-color:var(--lms-primary, #00A859); background:var(--lms-sky, #D3ECF9) }
+  .mg-cen-op:hover:not([data-lock]) { transform:translateX(5px); border-color:var(--lms-primary, #1CAE8D); background:var(--lms-sky, #D3ECF9) }
   .mg-cen-op-badge { flex:none; width:30px; height:30px; border-radius:9px; display:flex; align-items:center;
     justify-content:center; font-family:var(--lms-font-ui); font-weight:800; font-size:14px;
     background:var(--lms-surface-2, #EDEAE0); color:var(--lms-ink-soft, #69727D) }
@@ -484,7 +495,7 @@ document.head.appendChild(el(`<style>
   .mg-carta.is-aberta .mem-flip, .mg-carta.is-par .mem-flip { transform:rotateY(180deg) }
   .mg-carta .mem-face { position:absolute; inset:0; backface-visibility:hidden; border-radius:var(--lms-radius-md, 12px);
     border:var(--lms-border-game); display:flex; align-items:center; justify-content:center; text-align:center; padding:8px }
-  .mg-carta .mem-frente { background:var(--lms-primary, #00A859); color:#fff; font-size:26px; font-family:var(--lms-font-ui) }
+  .mg-carta .mem-frente { background:var(--lms-primary, #1CAE8D); color:#fff; font-size:26px; font-family:var(--lms-font-ui) }
   .mg-carta .mem-verso { background:var(--lms-white, #fff); color:var(--lms-ink, #272C30); font-size:13px; font-weight:500;
     transform:rotateY(180deg) }
   .mg-carta.is-par .mem-verso { background:var(--lms-success-soft, #DFF3E4); border-color:var(--lms-success, #2E7D32) }
@@ -534,7 +545,7 @@ function confeteMini(x, y, qtd = 16) {
   cv.width = innerWidth; cv.height = innerHeight;
   document.body.appendChild(cv);
   const c2 = cv.getContext('2d');
-  const cores = ['#00A859', '#F0B429', '#E8641B', '#2E7D32'];
+  const cores = ['#1CAE8D', '#F0B429', '#E8641B', '#2E7D32'];
   const ps = Array.from({ length: qtd }, () => ({
     x, y, vx: (Math.random() - .5) * 7, vy: -(2 + Math.random() * 5),
     w: 4 + Math.random() * 4, h: 5 + Math.random() * 5,
@@ -584,7 +595,7 @@ function confete(qtd = 90) {
   cv.width = innerWidth; cv.height = innerHeight;
   document.body.appendChild(cv);
   const ctx = cv.getContext('2d');
-  const cores = ['#00A859', '#F0B429', '#E8641B', '#2E7D32', '#0B3B2A', '#E4572E'];
+  const cores = ['#1CAE8D', '#F0B429', '#E8641B', '#2E7D32', '#2A4971', '#E4572E'];
   const ps = Array.from({ length: qtd }, () => ({
     x: cv.width / 2 + (Math.random() - .5) * cv.width * .5,
     y: cv.height * .35 + (Math.random() - .5) * 80,
@@ -778,6 +789,7 @@ const Minigames = {
             <span class="lms-pill is-primary">Pergunta ${i + 1} de ${total}</span>
             <h3>${q.enunciado}</h3>
             <div class="lms-stack-2" id="alts"></div>
+            ${q.explicacao ? `<div class="lms-alert is-info">💡 <div>${q.explicacao}</div></div>` : ''}
             <div id="mg-acao"></div>
           </div>`));
         const alts = host.querySelector('#alts');
@@ -834,8 +846,9 @@ const Minigames = {
           if (!ok) alts.children[q.corretas[0]].classList.add('is-correct');
           else b.classList.add('lms-pop');
           if (ok) { acertos++; juiceOk(b); } else juiceErr(b);
+          if (q.explicacao) acao.appendChild(el(`<div class="lms-alert ${ok ? 'is-success' : 'is-info'} lms-pop">${ok ? '✅' : '💡'} <div>${q.explicacao}</div></div>`));
           acao.appendChild(el(`<button class="lms-btn lms-btn-primary" style="width:100%">${idx + 1 === total ? 'Finalizar' : 'Próxima'} →</button>`));
-          acao.firstElementChild.addEventListener('click', () => { idx++; proxima(); });
+          acao.lastElementChild.addEventListener('click', () => { idx++; proxima(); });  // último filho: a explicação (se houver) entra antes do botão
         });
         alts.appendChild(b);
       });
@@ -852,6 +865,7 @@ const Minigames = {
             else if (sel.has(i)) b.classList.add('is-wrong');
           });
           if (ok) { acertos++; juiceOk(conf); } else juiceErr(conf);
+          if (q.explicacao) acao.insertBefore(el(`<div class="lms-alert ${ok ? 'is-success' : 'is-info'} lms-pop">${ok ? '✅' : '💡'} <div>${q.explicacao}</div></div>`), conf);
           conf.textContent = (idx + 1 === total ? 'Finalizar' : 'Próxima') + ' →';
           conf.addEventListener('click', () => { idx++; proxima(); }, { once: true });
         }, { once: true });
@@ -1434,43 +1448,45 @@ const Minigames = {
     host.querySelector('.lms-btn-primary').addEventListener('click', () => done({ acertos: 1, total: 1 }));
   },
 
-  /* M12 · Sequência — toque nos passos na ordem correta */
+  /* M12 · Sequência — toque nos passos na ordem correta. Cada passo é
+     texto puro ou { texto, imagem, descricao }: com imagem o pool vira
+     cartas (só a imagem, se cfg.so_imagem) e o acerto revela a descrição
+     — a dinâmica de "passo a passo" com produtos. */
   sequencia(cfg, host, done, revisao) {
-    const passos = cfg.passos;
+    const passos = cfg.passos.map(p => typeof p === 'string' ? { texto: p } : p);
     const total = passos.length;
-
-    // só conclui na ordem certa — revisão mostra a ordem final direto
-    // do config (tentativa errada não sobrevive, não precisa guardar)
+    const comImg = passos.some(p => p.imagem);
+    const soImg = comImg && !!cfg.so_imagem;
+    const linha = (p, i) => `<div class="mg-passo is-ok"><span class="mg-passo-num">${i + 1}</span>${p.imagem ? `<img class="mg-passo-thumb" src="${p.imagem}" alt="">` : ''}${p.texto}${p.descricao ? `<span class="mg-passo-desc">${p.descricao}</span>` : ''}</div>`;
     if (revisao) {
       host.appendChild(el(`
         <div class="lms-stack-4">
           <p class="lms-muted lms-small">A ordem certa dos passos:</p>
-          <div class="lms-stack-2">${passos.map((p, i) => `<div class="mg-passo is-ok"><span class="mg-passo-num">${i + 1}</span> ${p}</div>`).join('')}</div>
+          <div class="lms-stack-2">${passos.map(linha).join('')}</div>
         </div>`));
       return;
     }
-
     let proximo = 0, acertos = 0;
     const errouAntes = new Set();
-    const embaralhados = shuffle(passos.map((p, i) => ({ t: p, i })));
-
+    const embaralhados = shuffle(passos.map((p, i) => ({ ...p, i })));
     host.appendChild(el(`
       <div class="lms-stack-4">
         <p class="lms-muted lms-small">${cfg.instrucao || 'Toque nos passos na ordem correta.'}</p>
         <div class="lms-stack-2" id="mg-ordenados"></div>
-        <div class="lms-stack-2" id="mg-restantes"></div>
+        <div class="${comImg ? 'mg-passo-grid' : 'lms-stack-2'}" id="mg-restantes"></div>
       </div>`));
     const ordenados = host.querySelector('#mg-ordenados'), restantes = host.querySelector('#mg-restantes');
-
     embaralhados.forEach((p) => {
-      const b = el(`<button class="mg-passo">${p.t}</button>`);
+      const b = comImg
+        ? el(`<button class="mg-passo is-card" aria-label="${p.texto}">${p.imagem ? `<img class="mg-passo-img" src="${p.imagem}" alt="${p.texto}">` : '<span class="mg-passo-img">🔹</span>'}${soImg && p.imagem ? '' : `<span>${p.texto}</span>`}</button>`)
+        : el(`<button class="mg-passo">${p.texto}</button>`);
       b.addEventListener('click', () => {
         if (p.i === proximo) {
           if (!errouAntes.has(p.i)) { acertos++; juiceOk(b, `${proximo + 1}º ✓`); } else SFX.flip();
-          b.classList.add('is-ok', 'jc-pousa');
-          b.disabled = true;
-          b.innerHTML = `<span class="mg-passo-num">${proximo + 1}</span> ${p.t}`;
-          ordenados.appendChild(b);
+          b.remove();
+          const ok = el(linha(p, proximo));
+          ok.classList.add('jc-pousa');
+          ordenados.appendChild(ok);
           proximo++;
           if (proximo === total) { SFX.win(); setTimeout(() => done({ acertos, total }), 500); }
         } else {
@@ -1642,6 +1658,8 @@ const Minigames = {
     } else {
       // arquivo direto: player próprio sem barra de progresso (sem pulos)
       const v = el(`<video src="${url}" playsinline preload="metadata"></video>`);
+      // vídeo em pé (9:16, gravado no celular): o quadro acompanha a proporção
+      v.addEventListener('loadedmetadata', () => { if (v.videoHeight > v.videoWidth) frame.classList.add('is-vertical'); }, { once: true });
       const play = el(`<button type="button" class="mg-vid-play" aria-label="Reproduzir">▶</button>`);
       frame.appendChild(v);
       frame.appendChild(play);
@@ -1968,9 +1986,15 @@ const Minigames = {
     });
   },
 
-  /* M18 · Investigação — narrativa ramificada: a escolha define o caminho */
+  /* M18 · Investigação — narrativa ramificada: a escolha define o caminho.
+     Cada carta pode ter título, pergunta e ÁUDIO (fala de um personagem).
+     Modo "dominio": errou → feedback corretivo, a opção sai do jogo e o
+     aluno escolhe de novo; só avança acertando. Conta como acerto só a
+     escolha certa de primeira (mastery learning: prática com feedback,
+     sem punição por tentar; a nota reflete o domínio real). */
   investigacao(cfg, host, done) {
     let acertos = 0, total = 0, passos = 0;
+    const dominio = cfg.modo === 'dominio';
     const abre = (idx) => {
       if (passos++ > 40) return done({ acertos, total: Math.max(1, total) });  // trava anti-loop
       const carta = cfg.cartas[idx];
@@ -1980,31 +2004,44 @@ const Minigames = {
         <div class="lms-stack-4 mg-slide">
           <div class="mg-quadro mg-inv-pista">
             <div class="mg-quadro-icone">${carta.icone || '🕵️'}</div>
-            <div>
-              <p class="mg-quadro-titulo">Pista ${idx + 1}</p>
+            <div style="flex:1; min-width:0">
+              <p class="mg-quadro-titulo">${carta.titulo || `Pista ${idx + 1}`}</p>
               <div class="mg-quadro-texto">${carta.pista}</div>
+              ${carta.audio ? `<div class="mg-inv-audio">${carta.audio_quem ? `<span class="mg-quem" style="margin:0">${carta.audio_quem}</span>` : ''}<audio class="mg-audio-el" controls preload="metadata" src="${carta.audio}"></audio></div>` : ''}
             </div>
           </div>
+          ${carta.pergunta ? `<p style="font-family:var(--lms-font-ui); font-weight:600">${carta.pergunta}</p>` : ''}
           <div class="lms-stack-2" id="inv-ops"></div>
           <div id="inv-fb"></div>
         </div>`));
       const ops = host.querySelector('#inv-ops');
-      let travado = false;
+      let travado = false, errou = false;
+      total++;
       carta.opcoes.forEach(o => {
         const b = el(`<button class="lms-answer">${o.texto}</button>`);
         b.addEventListener('click', () => {
-          if (travado) return;
-          travado = true;
-          total++;
+          if (travado || b.disabled) return;
           const ok = !!o.correta;
-          if (ok) { acertos++; juiceOk(b, '🔎 pista!'); } else juiceErr(b);
-          b.classList.add(ok ? 'is-correct' : 'is-wrong');
-          const fim = o.vai === null || o.vai === undefined || o.vai < 0;
           const fb = host.querySelector('#inv-fb');
+          fb.innerHTML = '';
+          if (dominio && !ok) {
+            errou = true;
+            juiceErr(b);
+            b.classList.add('is-wrong');
+            b.disabled = true;
+            fb.appendChild(el(`<div class="lms-alert is-error lms-pop">⚠️ <div>${o.feedback || 'Não é por aí — escolha outra opção.'}</div></div>`));
+            return;
+          }
+          travado = true;
+          if (ok && !errou) acertos++;
+          if (ok) juiceOk(b, '🔎 pista!'); else juiceErr(b);
+          b.classList.add(ok ? 'is-correct' : 'is-wrong');
+          [...ops.children].forEach(x => { x.disabled = true; });
+          const fim = o.vai === null || o.vai === undefined || o.vai < 0;
           fb.appendChild(el(`
             <div class="lms-stack-2">
               ${o.feedback ? `<div class="lms-alert ${ok ? 'is-success' : 'is-error'} lms-pop">${ok ? '🔎' : '⚠️'} <div>${o.feedback}</div></div>` : ''}
-              <button class="lms-btn lms-btn-primary" style="width:100%">${fim ? 'Encerrar investigação' : 'Seguir a pista'} →</button>
+              <button class="lms-btn lms-btn-primary" style="width:100%">${fim ? (cfg.rotulo_fim || 'Encerrar investigação') : (cfg.rotulo_seguir || 'Seguir a pista')} →</button>
             </div>`));
           fb.querySelector('.lms-btn-primary').addEventListener('click', () =>
             fim ? done({ acertos, total: Math.max(1, total) }) : abre(+o.vai));
@@ -2220,7 +2257,10 @@ const Player = {
     const host = document.getElementById('pl-etapa');
     host.innerHTML = '';
     const slug = e2.minigame || e2.tipo;
-    const dica = COMO_JOGAR[slug];
+    // investigação em modo domínio joga diferente: a dica precisa dizer isso
+    const dica = (slug === 'investigacao' && e2.config?.modo === 'dominio')
+      ? ['🎧', 'Ouça a cena e escolha. Errou? Leia o feedback e escolha de novo — só avança acertando.']
+      : COMO_JOGAR[slug];
     host.appendChild(el(`
       <div class="lms-stack-4 mg-slide">
         <div class="lms-row" style="justify-content:space-between">

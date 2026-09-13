@@ -238,7 +238,7 @@ if (!$mapaUrl) {
     transition:transform .12s var(--lms-ease, ease), opacity .12s ease;
   }
   .sim-btn:hover { transform:scale(1.18); opacity:1 }
-  .sim-btn.is-ativo { background:var(--lms-heading, #0B3B2A); border-color:var(--lms-heading, #0B3B2A); opacity:1 }
+  .sim-btn.is-ativo { background:var(--lms-heading, #2A4971); border-color:var(--lms-heading, #2A4971); opacity:1 }
 
   /* ações flutuantes (ajuda + suporte) sobre o relógio */
   .flutua-acoes { position:absolute; right:16px; bottom:56px; display:flex; flex-direction:column; gap:8px; align-items:flex-end; z-index:12 }
@@ -246,7 +246,7 @@ if (!$mapaUrl) {
   .flutua-btn {
     position:static; width:auto; padding:8px 14px; border-radius:999px;
     display:inline-flex; align-items:center; gap:6px; cursor:pointer;
-    font-family:var(--lms-font-ui); font-weight:700; font-size:12.5px; color:var(--lms-heading, #0B3B2A);
+    font-family:var(--lms-font-ui); font-weight:700; font-size:12.5px; color:var(--lms-heading, #2A4971);
     transition:transform .15s var(--lms-ease, ease);
   }
   .flutua-btn:hover { transform:scale(1.05) }
@@ -320,7 +320,7 @@ if (!$mapaUrl) {
   .hotspot:hover, .hotspot.is-shake { z-index:20; }
   .hotspot:hover { transform:translate(-50%, -50%) scale(1.18); }
 
-  .hotspot.is-available { background:var(--lms-primary, #00A859); color:#fff; animation:hs-pulsa 2s ease-in-out infinite; }
+  .hotspot.is-available { background:var(--lms-primary, #1CAE8D); color:#fff; animation:hs-pulsa 2s ease-in-out infinite; }
 
   .hotspot.is-done {
     background:var(--lms-success, #2E7D32); color:#fff;
@@ -349,7 +349,7 @@ if (!$mapaUrl) {
   /* tooltip do pin */
   .hotspot-tip {
     position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%);
-    background:var(--lms-heading, #0B3B2A); color:#fff; font-family:var(--lms-font-ui);
+    background:var(--lms-heading, #2A4971); color:#fff; font-family:var(--lms-font-ui);
     font-size:12px; font-weight:600; white-space:nowrap; padding:5px 10px;
     border-radius:6px; opacity:0; pointer-events:none; transition:opacity .18s ease; z-index:7;
   }

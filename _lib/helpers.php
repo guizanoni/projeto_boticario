@@ -236,7 +236,7 @@ function lms_avatar_mapa(?string $genero = null, ?string $pele = null, ?int $tri
 // senão o avatar SVG de gênero/pele.
 function lms_avatar_html(?string $genero, ?string $pele, int $size = 44, ?string $foto = null): string {
     if ($foto) {
-        return '<img src="' . e($foto) . '" alt="Foto de perfil" loading="lazy" style="width:' . $size . 'px; height:' . $size . 'px; border-radius:50%; object-fit:cover; border:2px solid var(--lms-heading, #0B3B2A); display:block; flex:none">';
+        return '<img src="' . e($foto) . '" alt="Foto de perfil" loading="lazy" style="width:' . $size . 'px; height:' . $size . 'px; border-radius:50%; object-fit:cover; border:2px solid var(--lms-heading, #2A4971); display:block; flex:none">';
     }
     return lms_avatar_svg($genero, $pele, $size);
 }
@@ -253,8 +253,8 @@ function lms_avatar_svg(?string $genero, ?string $pele, int $size = 64): string 
         ? '<path d="M14 34 Q12 52 18 56 L24 50 Q20 44 21 34 Z" fill="' . $cabeloCor . '"/><path d="M50 34 Q52 52 46 56 L40 50 Q44 44 43 34 Z" fill="' . $cabeloCor . '"/>'
         : '';
     return '<svg width="' . $size . '" height="' . $size . '" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Avatar">
-      <circle cx="32" cy="32" r="31" fill="#DCF2E6" stroke="#272C30" stroke-width="2"/>
-      <path d="M12 58 Q32 44 52 58 L52 64 L12 64 Z" fill="#00A859"/>
+      <circle cx="32" cy="32" r="31" fill="#E7F9F3" stroke="#272C30" stroke-width="2"/>
+      <path d="M12 58 Q32 44 52 58 L52 64 L12 64 Z" fill="#1CAE8D"/>
       <rect x="26" y="46" width="12" height="8" rx="3" fill="' . $skin . '"/>
       ' . $cabelo . '
       <circle cx="32" cy="34" r="14" fill="' . $skin . '"/>
@@ -267,14 +267,13 @@ function lms_avatar_svg(?string $genero, ?string $pele, int $size = 64): string 
 
 /* ── Chrome comum ────────────────────────────────────────── */
 
-// Ícone da marca do tenant (PROVISÓRIO do whitelabel): folha sobre disco,
-// nas cores do tema. Trocar pela marca oficial quando vier o brandbook.
-// SVG próprio — sem emoji.
+// Ícone da marca do tenant (PROVISÓRIO do whitelabel): disco magenta com B,
+// na paleta do treinamento do cliente. Trocar pela marca oficial quando vier
+// o brandbook. SVG próprio — sem emoji.
 function lms_logo_icon(int $size = 24): string {
-    return '<svg width="' . $size . '" height="' . $size . '" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;flex:none" aria-hidden="true">
-      <circle cx="32" cy="32" r="30" fill="#0B3B2A"/>
-      <path d="M46 16 C32 16 22 26 20 44 C38 46 48 34 46 16 Z" fill="#00A859"/>
-      <path d="M22 44 C29 36 36 30 43 21" stroke="#DCF2E6" stroke-width="2.6" stroke-linecap="round"/>
+    return '<svg width="' . $size . '" height="' . $size . '" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;flex:none" aria-hidden="true">
+      <circle cx="32" cy="32" r="30" fill="#A84E84"/>
+      <text x="32" y="44" text-anchor="middle" font-family="Poppins, Avenir Next, Arial, sans-serif" font-size="34" font-weight="800" fill="#FFFFFF">B</text>
     </svg>';
 }
 

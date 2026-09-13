@@ -36,7 +36,7 @@ lms_topbar($u);
   .ed-wrap { max-width: 1080px; margin: 0 auto; padding: 22px 18px 80px; }
   .ed-titulo { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
   .ed-titulo a { font-size: 24px; text-decoration: none; color: var(--lms-ink-soft, #777); }
-  .ed-titulo h1 { font-size: 22px; font-weight: 800; color: var(--lms-heading, #0B3B2A);
+  .ed-titulo h1 { font-size: 22px; font-weight: 800; color: var(--lms-heading, #2A4971);
                   font-family: var(--lms-font-ui, inherit); }
 
   .ed-grid { display: grid; grid-template-columns: minmax(280px, 460px) minmax(0, 1fr); gap: 0;
@@ -57,7 +57,7 @@ lms_topbar($u);
   .ed-aba:hover { opacity: 1; }
 
   .ed-corpo { padding: 20px 22px; overflow-y: auto; max-height: 560px; flex: 1; }
-  .ed-sec { font-size: 17px; font-weight: 800; color: var(--lms-heading, #0B3B2A);
+  .ed-sec { font-size: 17px; font-weight: 800; color: var(--lms-heading, #2A4971);
             font-family: var(--lms-font-ui, inherit); margin: 6px 0 12px; }
   .ed-sec + .ed-sec, .ed-grid-op + .ed-sec, .ed-cores + .ed-sec { margin-top: 22px; }
 

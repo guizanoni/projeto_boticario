@@ -89,7 +89,7 @@ lms_head('Escolha sua trilha', $u);
   }
   .esc-card:hover { transform: translateY(-4px); box-shadow: var(--lms-shadow-soft); }
   .esc-card-art {
-    height: 180px; background: var(--bg, linear-gradient(135deg, var(--lms-primary), var(--lms-accent, #0B3B2A)));
+    height: 180px; background: var(--bg, linear-gradient(135deg, var(--lms-primary), var(--lms-accent, #2A4971)));
     background-size: cover; background-position: center;
   }
   .esc-card-corpo { padding: 18px 20px 22px; }
