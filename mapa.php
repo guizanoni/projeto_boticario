@@ -30,10 +30,9 @@ $fasesJs = array_map(fn($f) => [
     'total' => $f['total'], 'feitas' => $f['feitas'],
 ], $fases);
 
-// ciclo do dia (horário de São Paulo) — ?periodo= força um bloco (demo)
-$periodo = $_GET['periodo'] ?? lms_periodo_atual();
-if (!isset(lms_periodos()[$periodo])) $periodo = lms_periodo_atual();
-$pdia = lms_periodos()[$periodo];
+// Este tenant não usa o ciclo do dia (arte única do mapa): período fixo em
+// "dia", sem relógio nem simulador na tela.
+$periodo = 'dia';
 
 $mapaUrl   = $temTreinamento && $u['cenario_mapa_url'] ? lms_mapa_do_periodo($u['cenario_mapa_url'], $periodo, (int) $u['trilha_id']) : null;
 $avatarImg = lms_avatar_mapa($u['avatar_genero'], $u['avatar_cor_pele'], (int) $u['trilha_id']);
@@ -85,22 +84,6 @@ if (!$mapaUrl) {
       <a class="lms-btn lms-btn-outline lms-btn-sm" href="/boticario/escolher" style="margin-top:12px; width:100%; justify-content:center">🗺️ Trocar trilha</a>
       <?php endif; ?>
     </div>
-
-    <?php
-    // simulador de período (só admin) — mostra apenas os horários que TÊM foto
-    // configurada; some se sobrar menos de 2 (não há o que simular).
-    if ($u['papel'] === 'admin'):
-      $periodosArte = array_filter(lms_periodos(), fn($k) => lms_periodo_tem_arte($u['cenario_mapa_url'] ?? '', $k, (int) ($u['trilha_id'] ?? 0)), ARRAY_FILTER_USE_KEY);
-      if (count($periodosArte) >= 2): ?>
-    <div class="flutua-simulador">
-      <?php foreach ($periodosArte as $chave => $p): $ativo = $chave === $periodo; ?>
-      <a class="sim-btn <?= $ativo ? 'is-ativo' : '' ?>"
-         href="/boticario/mapa<?= $ativo ? '' : '?periodo=' . e($chave) ?>"
-         title="Simular: <?= e($p['nome']) ?><?= $ativo ? ' (atual)' : '' ?>"><?= $p['emoji'] ?></a>
-      <?php endforeach; ?>
-    </div>
-      <?php endif; ?>
-    <?php endif; ?>
   </div>
 
   <!-- CTA flutuante: próxima ação -->
@@ -129,10 +112,10 @@ if (!$mapaUrl) {
 
   <!-- navegação do mapa: zoom e centralizar (o scroller aceita arrastar/rolar) -->
   <div class="mapa-nav" role="group" aria-label="Navegação do mapa">
-    <button type="button" class="mapa-nav-btn" id="nav-mais" title="Aproximar">＋</button>
-    <button type="button" class="mapa-nav-btn" id="nav-menos" title="Afastar">－</button>
-    <button type="button" class="mapa-nav-btn" id="nav-ajustar" title="Ver o mapa inteiro">⤢</button>
-    <button type="button" class="mapa-nav-btn" id="nav-eu" title="Ir até você">🎯</button>
+    <button type="button" class="mapa-nav-btn" id="nav-mais" title="Aproximar (zoom)" aria-label="Aproximar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button type="button" class="mapa-nav-btn" id="nav-menos" title="Afastar (zoom)" aria-label="Afastar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+    <button type="button" class="mapa-nav-btn" id="nav-ajustar" title="Ver o mapa inteiro" aria-label="Ver o mapa inteiro"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    <button type="button" class="mapa-nav-btn" id="nav-eu" title="Centralizar na sua fase atual" aria-label="Centralizar na sua fase atual"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg></button>
   </div>
 
   <!-- ações flutuantes: ajuda e suporte, empilhadas sobre o relógio -->
@@ -142,32 +125,31 @@ if (!$mapaUrl) {
   </div>
 
   <!-- detalhe: relógio de bordo (o cenário acompanha o horário de Brasília) -->
-  <div class="flutua flutua-relogio" title="<?= e($pdia['nome']) ?> — o cenário acompanha o horário de Brasília">
-    <?= $pdia['emoji'] ?> <?= e(date('H:i')) ?>
-  </div>
 
 </main>
 
 <!-- ── modal AJUDA (ponto de vista do aluno) ─────────────── -->
 <div id="ajuda-fundo" class="lms-hide modal-fundo"></div>
 <div id="ajuda-modal" class="lms-hide modal-caixa">
-  <div class="lms-row" style="justify-content:space-between; margin-bottom:6px">
-    <h3>❓ Como usar a plataforma</h3>
-    <button class="lms-btn lms-btn-outline lms-btn-sm" data-fecha="ajuda">Fechar ✕</button>
+  <div class="ajuda-topo">
+    <div>
+      <p class="ajuda-kicker">Guia rápido</p>
+      <h3>Como usar a plataforma</h3>
+    </div>
+    <button class="lms-btn lms-btn-outline lms-btn-sm" data-fecha="ajuda" aria-label="Fechar">✕</button>
   </div>
-  <div class="lms-stack-2" style="font-size:14.5px; line-height:1.55">
-    <p>🗺️ <strong>O mapa é a sua jornada.</strong> Cada pin é uma fase do seu treinamento.</p>
-    <p>🔵 <strong>Pins azuis com “!”</strong> estão liberados — clique e seu avatar caminha até lá para jogar.</p>
-    <p>🔒 <strong>Cadeados</strong> são fases futuras: abrem ao concluir a anterior, numa data marcada ou ao juntar XP.</p>
-    <p>✅ <strong>Verde</strong> significa fase concluída.</p>
-    <p>🎮 Cada fase tem <strong>etapas</strong>: leituras e minigames. Complete todas para concluir a fase.</p>
-    <p>⭐ Você ganha <strong>XP e badges</strong> a cada etapa vencida.</p>
-    <p>💾 <strong>Seu progresso salva sozinho.</strong> Feche quando quiser — você retoma exatamente de onde parou.</p>
-    <p>🌙 Repare no cenário: o mapa <strong>vive o horário real</strong> — dia, fim de tarde, noite e madrugada.</p>
+  <div class="ajuda-lista">
+    <div class="ajuda-item"><span class="ajuda-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></span><div><strong>O mapa é a sua jornada.</strong> Cada pin é uma fase do treinamento.</div></div>
+    <div class="ajuda-item"><span class="ajuda-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><path d="M12 7v4M12 14h.01"/></svg></span><div><strong>Pin verde com “!”</strong> é a fase liberada. Clique e seu avatar caminha até lá.</div></div>
+    <div class="ajuda-item"><span class="ajuda-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span><div><strong>Cadeado</strong> é fase futura: abre ao concluir a anterior, numa data marcada ou ao juntar XP.</div></div>
+    <div class="ajuda-item"><span class="ajuda-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg></span><div><strong>Selo “concluída”</strong> marca o que você já fechou. Dá para rever quando quiser.</div></div>
+    <div class="ajuda-item"><span class="ajuda-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg></span><div><strong>Dentro da fase</strong> vêm as etapas: leituras, vídeo e minigames. Complete todas para fechar a fase.</div></div>
+    <div class="ajuda-item"><span class="ajuda-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"/></svg></span><div><strong>XP e conquistas</strong> chegam a cada etapa vencida. O ranking mostra a equipe.</div></div>
+    <div class="ajuda-item"><span class="ajuda-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></span><div><strong>Seu progresso salva sozinho.</strong> Feche quando quiser e retome de onde parou.</div></div>
   </div>
-  <div class="lms-row" style="gap:10px; margin-top:18px; flex-wrap:wrap">
-    <a class="lms-btn lms-btn-outline lms-btn-lg" href="/boticario/manual" style="flex:1; min-width:150px; text-align:center">📖 Manual completo</a>
-    <button class="lms-btn lms-btn-primary lms-btn-lg" style="flex:1; min-width:150px" data-fecha="ajuda">Entendi, bora jogar ▶</button>
+  <div class="ajuda-acoes">
+    <a class="lms-btn lms-btn-outline lms-btn-lg" href="/boticario/manual">Manual completo</a>
+    <button class="lms-btn lms-btn-primary lms-btn-lg" data-fecha="ajuda">Entendi, bora jogar ▶</button>
   </div>
 </div>
 
@@ -217,7 +199,7 @@ if (!$mapaUrl) {
     position:relative; overflow:hidden;
     height:calc(100dvh - 73px);
     height:calc(100dvh - var(--topo-alt, 73px));
-    background:<?= $pdia['ceu'] ?>;
+    background:#1F4D3A;
   }
   #mapa-hero::before {
     content:''; position:absolute; inset:-40px; z-index:0; pointer-events:none;
@@ -260,23 +242,13 @@ if (!$mapaUrl) {
   .flutua-canto { position:absolute; top:18px; left:18px; z-index:12;
     display:flex; flex-direction:column; gap:9px; align-items:flex-start; max-width:320px }
   .flutua-info { position:static }
-  .flutua-relogio {
-    right:16px; bottom:16px; padding:6px 13px; border-radius:999px;
-    font-family:var(--lms-font-ui); font-weight:600; font-size:12.5px;
-    opacity:.88; cursor:default;
-  }
 
-  /* simulador de período (admin) — emojis discretos sob o painel de progresso */
-  .flutua-simulador { display:flex; gap:5px; padding-left:5px }
-  .sim-btn {
     width:28px; height:28px; border-radius:50%; text-decoration:none;
     display:flex; align-items:center; justify-content:center; font-size:13px;
     background:var(--lms-flutua-bg, rgba(255,255,253,.72)); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
     border:1.5px solid rgba(31,42,37,.22); opacity:.9;
     transition:transform .12s var(--lms-ease, ease), opacity .12s ease;
   }
-  .sim-btn:hover { transform:scale(1.18); opacity:1 }
-  .sim-btn.is-ativo { background:var(--lms-heading, #1F2A25); border-color:var(--lms-heading, #1F2A25); opacity:1 }
 
   /* ações flutuantes (ajuda + suporte) sobre o relógio */
   .flutua-acoes { position:absolute; right:16px; bottom:56px; display:flex; flex-direction:column; gap:8px; align-items:flex-end; z-index:12 }
@@ -291,6 +263,17 @@ if (!$mapaUrl) {
 
   /* modais locais (ajuda / suporte) */
   .modal-fundo { position:fixed; inset:0; background:rgba(31,42,37,.45); z-index:40 }
+  /* modal de ajuda: lista com chips de ícone, no tom do design */
+  .ajuda-topo { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:14px }
+  .ajuda-kicker { font-family:var(--lms-font-ui); font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--lms-primary); margin:0 0 2px }
+  .ajuda-topo h3 { font-size:20px; margin:0 }
+  .ajuda-lista { display:flex; flex-direction:column; gap:10px }
+  .ajuda-item { display:flex; gap:12px; align-items:flex-start; font-size:14px; line-height:1.5; color:var(--lms-ink) }
+  .ajuda-item strong { color:var(--lms-heading) }
+  .ajuda-ico { flex:none; width:34px; height:34px; border-radius:10px; background:var(--lms-surface); color:var(--lms-primary);
+    display:flex; align-items:center; justify-content:center; margin-top:1px }
+  .ajuda-acoes { display:flex; gap:10px; margin-top:18px; flex-wrap:wrap }
+  .ajuda-acoes > * { flex:1; min-width:150px; text-align:center }
   .modal-caixa {
     position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
     width:min(520px, calc(100vw - 32px)); max-height:86vh; overflow:auto; z-index:41;
@@ -328,8 +311,6 @@ if (!$mapaUrl) {
     .flutua-acoes { right:10px; bottom:96px; gap:6px }
     .flutua-btn { padding:9px 11px }
     .flutua-btn-lbl { display:none }
-    .flutua-relogio { display:none }
-    .sim-btn { width:26px; height:26px; font-size:12px }
   }
 
   /* O 📖 Manual é chrome global (fica no rodapé esquerdo em todas as telas),

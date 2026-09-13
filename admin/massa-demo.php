@@ -59,8 +59,11 @@ $personas = [
     ['Bianca Moreira',    'f', '1', 'parado',   2], ['Letícia Ramos',   'f', '4', 'parado',   1],
     ['Mariana Costa',     'f', '2', 'nunca',    2], ['Gabriela Nunes',  'f', '3', 'nunca',    1],
     ['Vanessa Teixeira',  'f', '5', 'hoje',     2],
+    ['Aluno Demo',        'm', '3', 'meio',     1, 'aluno@boticario.com.br'],  // acesso "aluno" do card de login
 ];
-$gestores = [1 => ['Marina Castro', 'f', '2', 'gestor1'], 2 => ['Rafael Nunes', 'm', '4', 'gestor2']];
+$gestores = [1 => ['Marina Castro', 'f', '2', 'gestor@boticario.com.br'], 2 => ['Rafael Nunes', 'm', '4', 'gestor2@boticario.com.br']];
+// contas da massa com e-mail simples (fora do domínio demo) — também saem no "limpar"
+$FIXOS = ['gestor@boticario.com.br', 'gestor2@boticario.com.br', 'aluno@boticario.com.br', 'aluna@boticario.com.br'];
 $reais = [['Sara', 'sara@boticario.com.br', 1], ['Gui', 'gui@boticario.com.br', 2], ['Erica', 'erica@boticario.com.br', 1]];
 $semAcento = fn(string $s) => strtolower(strtr($s, ['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','â'=>'a','ê'=>'e','ã'=>'a','ç'=>'c']));
 $emailDe = function (string $nome) use ($DOM, $semAcento) { $p = explode(' ', $nome); return $semAcento($p[0]) . '.' . $semAcento($p[count($p) - 1]) . $DOM; };
@@ -69,8 +72,9 @@ $acao = $_GET['acao'] ?? '';
 $confirmar = !empty($_GET['confirmar']);
 
 // ── limpeza da massa anterior ──
-function massa_limpar(PDO $db, string $dom, callable $out): void {
-    $ids = array_column($db->query("SELECT id FROM usuario WHERE email LIKE '%{$dom}'")->fetchAll(), 'id');
+function massa_limpar(PDO $db, string $dom, callable $out, array $fixos = []): void {
+    $lista = implode(',', array_map(fn($e) => $db->quote($e), $fixos ?: ['-']));
+    $ids = array_column($db->query("SELECT id FROM usuario WHERE email LIKE '%{$dom}' OR email IN ({$lista})")->fetchAll(), 'id');
     if (!$ids) { $out('Massa anterior: nenhuma.'); return; }
     $in = implode(',', array_map('intval', $ids));
     $db->exec("DELETE FROM comentario WHERE usuario_id IN ({$in}) OR parent_id IN (SELECT id FROM comentario WHERE usuario_id IN ({$in}))");
@@ -82,7 +86,7 @@ function massa_limpar(PDO $db, string $dom, callable $out): void {
 }
 
 $out("Treinamento #{$tid} · {$nEtapas} etapas em " . count($fases) . ' fases.');
-if ($acao === 'limpar') { massa_limpar($db, $DOM, $out); $out('Pronto.'); echo '</pre>'; exit; }
+if ($acao === 'limpar') { massa_limpar($db, $DOM, $out, $FIXOS); $out('Pronto.'); echo '</pre>'; exit; }
 if (!$confirmar) {
     $cont = array_count_values(array_column($personas, 3));
     $out('PLANO: ' . count($personas) . ' alunos fictícios (' . implode(', ', array_map(fn($k, $v) => "{$v} {$k}", array_keys($cont), $cont)) . '), 2 gestores com times, comentários e conquistas.');
@@ -99,14 +103,14 @@ $dias = fn(float $d, ?int $hora = null) => date('Y-m-d H:i:s', $agora - (int) ($
 
 $db->beginTransaction();
 try {
-    massa_limpar($db, $DOM, $out);
+    massa_limpar($db, $DOM, $out, $FIXOS);
 
     $ins = $db->prepare('INSERT INTO usuario (cliente_id, nome, email, senha_hash, papel, avatar_genero, avatar_cor_pele, treinamento_id, ultimo_login, acessos, gestor_id, aceite_em, trilhas_vistas, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
 
     // gestores
     $gid = [];
-    foreach ($gestores as $t => [$nome, $g, $p, $slug]) {
-        $ins->execute([$cli, $nome, $slug . $DOM, $h, 'gestor', $g, $p, $tid, $dias(1), 12, null, $dias(20), '[1]', $dias(21)]);
+    foreach ($gestores as $t => [$nome, $g, $p, $email]) {
+        $ins->execute([$cli, $nome, $email, $h, 'gestor', $g, $p, $tid, $dias(1), 12, null, $dias(20), '[1]', $dias(21)]);
         $gid[$t] = (int) $db->lastInsertId();
     }
     $out('Gestores: ' . implode(' · ', array_map(fn($x) => $x[0], $gestores)));
@@ -140,7 +144,9 @@ try {
     $porPerfil = ['completo' => 0, 'meio' => 0, 'fraco' => 0, 'parado' => 0, 'nunca' => 0, 'hoje' => 0];
     $ids = [];
     $nPorFase = array_count_values(array_column($etapas, 'fase'));
-    foreach ($personas as [$nome, $g, $p, $perfil, $time]) {
+    foreach ($personas as $persona) {
+        [$nome, $g, $p, $perfil, $time] = $persona;
+        $email = $persona[5] ?? $emailDe($nome);
         // quantas etapas, janela de dias (início → fim), força, acessos, último login
         [$n, $d0, $d1, $forca, $acessos, $login] = match ($perfil) {
             'completo' => [$nEtapas, $rnd(11, 13), $rnd(2, 4), [86, 100], $rnd(9, 14), $rnd(1, 3)],
@@ -151,7 +157,7 @@ try {
             'hoje'     => [$rnd(1, 2), 0, 0, [70, 95], 1, 0],
         };
         $nunca = $perfil === 'nunca';
-        $ins->execute([$cli, $nome, $emailDe($nome), $h, 'aluno', $nunca ? null : $g, $nunca ? null : $p, $tid,
+        $ins->execute([$cli, $nome, $email, $h, 'aluno', $nunca ? null : $g, $nunca ? null : $p, $tid,
                        $login === null ? null : $dias($login), $acessos, $gid[$time], $nunca ? null : $dias($d0 + 1), $nunca ? null : '[1]', $dias($d0 + 2)]);
         $uid = (int) $db->lastInsertId();
         $ids[$nome] = $uid;
@@ -209,5 +215,5 @@ try {
 $n = db_one('SELECT COUNT(*) AS n FROM usuario WHERE cliente_id = ?', [$cli])['n'];
 $p = db_one('SELECT COUNT(*) AS n FROM progresso_usuario')['n'];
 $out("Pronto. Usuários no tenant: {$n} · registros de progresso: {$p}.");
-$out('Acessos (senha 1234): gestor1' . $DOM . ' · gestor2' . $DOM . ' · rh@boticario.com.br · sara@ / gui@ / erica@boticario.com.br');
+$out('Acessos (senha 1234): admin@ · rh@ · gestor@ · gestor2@ · aluno@ · sara@ · gui@ · erica@boticario.com.br');
 echo '</pre>';

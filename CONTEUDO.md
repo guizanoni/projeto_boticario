@@ -23,8 +23,11 @@ engine. Fonte: `boticario/materiais/` (fora do repo).
   neutros claros. Wordmark e ânfora oficiais em vetor (vindos do site). Mapa refeito nos verdes.
 - ✅ Massa de demonstração: `admin/massa-demo.php?go=DEMO2026&confirmar=1` (só admin) cria 14
   alunos fictícios (`@demo.boticario.com.br`) com progresso nos últimos 14 dias, 2 gestores com
-  times, comentários e conquistas; `&acao=limpar` remove. Contas reais de teste: sara@, gui@,
-  erica@boticario.com.br (zeradas) e rh@boticario.com.br (admin). Senha 1234.
+  times, comentários e conquistas; `&acao=limpar` remove. Acessos (senha 1234, listados no
+  login): admin@, rh@ (admin), gestor@ e gestor2@ (gestores dos times), aluno@ (aluno com
+  progresso), sara@ / gui@ / erica@boticario.com.br (zeradas, jornada do zero).
+- ✅ Sem ciclo do dia neste tenant: relógio, simulador de período e a linha do guia sobre
+  "horário real" saíram do mapa; arte única. Guia rápido e manual refeitos no design.
 - ⏳ Imagens em alta: aguardando o cliente.
 
 

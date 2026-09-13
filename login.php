@@ -40,8 +40,17 @@ lms_head('Entrar');
       </form>
     </div>
 
-    <!-- sem card de "acessos de demonstração": este tenant não tem usuários
-         demo — o único acesso inicial é o admin criado pelo seed. -->
+    <!-- acessos de demonstração (MVP) — remover quando entrarem usuários reais -->
+    <div class="lms-card" style="margin-top:16px; padding:14px 18px; font-size:12.5px; color:var(--lms-ink-soft)">
+      <p style="font-family:var(--lms-font-ui); font-weight:700; letter-spacing:.08em; text-transform:uppercase; font-size:10.5px; margin-bottom:8px; color:var(--lms-primary)">Acessos de demonstração · senha 1234</p>
+      <div style="display:grid; grid-template-columns:auto 1fr; gap:4px 12px; align-items:baseline">
+        <span class="lms-muted">Admin</span>   <code>admin@boticario.com.br</code>
+        <span class="lms-muted">RH</span>      <code>rh@boticario.com.br</code>
+        <span class="lms-muted">Gestor</span>  <code>gestor@boticario.com.br</code>
+        <span class="lms-muted">Aluno</span>   <code>aluno@boticario.com.br</code>
+        <span class="lms-muted">Do zero</span> <code>sara@ · gui@ · erica@boticario.com.br</code>
+      </div>
+    </div>
   </div>
 </main>
 </body></html>

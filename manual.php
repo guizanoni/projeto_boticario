@@ -41,7 +41,7 @@ $dinamicas = [
     ['🗂️', 'Classificação', 'classificacao', 'Um item por vez em 2 a 4 categorias.',
      'Poucos itens, decisão consciente. Ideal para "pode / não pode / depende".'],
     ['🧳', 'Arrastar para Zonas', 'arrastar', 'Vários itens de uma vez em 2 a 4 zonas.',
-     'Volume grande de itens (o embarque usa 20). O painel cheio dá a visão do todo.'],
+     'Volume grande de itens (até 20 de uma vez). O painel cheio dá a visão do todo.'],
     ['🔢', 'Ordenação', 'sequencia', 'Passos na ordem em que acontecem.',
      'Fluxos e procedimentos passo a passo — quando a ORDEM é o que importa.'],
     ['🃏', 'Jogo da Memória', 'memoria', 'Pares relacionados, com virada 3D.',
@@ -123,7 +123,7 @@ lms_topbar($u);
         <?php
         $camadas = [
             ['trilha', '🧭', 'Trilha', 'O universo', 'A trilha é dona do MAPA e da narrativa. Uma trilha pirata tem mapa pirata; uma de loja tem a loja. É a pasta-mãe — o cliente pode ter várias, cada uma com sua arte (e até com variantes de dia, tarde, noite e madrugada).'],
-            ['trein', '📁', 'Treinamento', 'A pasta', 'Agrupa e dá nome ao conjunto ("Diretrizes de SSMS", "Integração 2026"). Não tem conteúdo próprio: é a pasta que o aluno recebe. Cada aluno vive UM treinamento por vez — você escolhe qual, em Usuários.'],
+            ['trein', '📁', 'Treinamento', 'A pasta', 'Agrupa e dá nome ao conjunto ("Da Base ao Look Completo", "Serviço Completo de Make"). Não tem conteúdo próprio: é a pasta que o aluno recebe. Cada aluno vive UM treinamento por vez — você escolhe qual, em Usuários.'],
             ['fase', '📍', 'Fase', 'O jogável', 'É o que o aluno clica no mapa. Tem PIN livre (você escolhe o ponto), regra de quando abre (evolução, data ou XP) e nota mínima. É aqui que a jornada acontece.'],
             ['etapa', '🧩', 'Etapa', 'O minigame', 'O conteúdo de verdade: uma leitura, um quiz, um tabuleiro. A fase é uma sequência de etapas — o aluno percorre na ordem que você montar.'],
         ];
@@ -251,7 +251,6 @@ lms_topbar($u);
       <ul class="man-lista">
         <li><strong>👁 Visão do aluno</strong> (topo) — entra no mapa como um participante, com o SEU treinamento ativo.</li>
         <li><strong>Bypass de fase</strong> — dentro de qualquer fase, a barrinha no canto: <em>✓ Passar fase</em> conclui tudo na hora, <em>✕ Reprovar</em> zera. Só afeta você; os alunos ficam intactos.</li>
-        <li><strong>Simulador de período</strong> — no mapa, os emojis ☀️🌅🌃🌙 forçam o horário para conferir as artes do ciclo do dia.</li>
         <li><strong>Cruzadinha</strong> — para você, o "ver respostas" já nasce liberado (o aluno espera 3 minutos).</li>
       </ul>
     </section>
@@ -427,8 +426,8 @@ lms_topbar($u);
       <div class="man-pins">
         <?php
         $pins = [
-            ['available', '!', 'Azul pulsante = liberada', 'Pode jogar agora! Clique e seu avatar caminha até lá. É a sua próxima missão.'],
-            ['done', '✓', 'Verde = concluída', 'Você já fechou essa fase. Pode voltar e rever quando quiser — sem perder o que ganhou.'],
+            ['available', '!', 'Verde pulsante = liberada', 'Pode jogar agora! Clique e seu avatar caminha até lá. É a sua próxima missão.'],
+            ['done', '✓', 'Selo “concluída” = fechada', 'Você já fechou essa fase. Pode voltar e rever quando quiser — sem perder o que ganhou.'],
             ['locked', '🔒', 'Cinza com cadeado = bloqueada', 'Ainda não é a hora. Passe o mouse: o balão diz o porquê — concluir a fase anterior, esperar uma data ou juntar XP.'],
         ];
         foreach ($pins as $i => [$cls, $ico, $tit, $txt]): ?>
@@ -437,10 +436,6 @@ lms_topbar($u);
       </div>
       <div class="man-din-painel" id="man-pin-painel">
         <p class="lms-muted lms-center" style="padding:14px">👆 Toque num pin.</p>
-      </div>
-
-      <div class="man-caixa is-dica">
-        🌅 Repare no cenário: a plataforma <strong>vive o horário real</strong> — dia, fim de tarde, noite e madrugada. Entre de madrugada e veja. 😉
       </div>
     </section>
 
@@ -465,7 +460,7 @@ lms_topbar($u);
 
     <section class="man-sec" id="s-trilhas-a" data-titulo="Trocar de trilha">
       <h2>🗺️ Sua(s) trilha(s) — e como trocar</h2>
-      <p>Às vezes você recebe <strong>mais de uma trilha</strong> (por exemplo, SSMS e Administrativo). Cada uma tem o seu próprio mapa e guarda o seu próprio progresso — o que você faz numa não mexe na outra.</p>
+      <p>Às vezes você recebe <strong>mais de uma trilha</strong> (por exemplo, Maquiagem e Perfumaria). Cada uma tem o seu próprio mapa e guarda o seu próprio progresso — o que você faz numa não mexe na outra.</p>
       <ul class="man-lista">
         <li><strong>Escolher qual jogar:</strong> se você tem duas trilhas, ao entrar aparece uma tela para escolher em qual quer jogar hoje.</li>
         <li><strong>Trocar a qualquer momento:</strong> já dentro do mapa, use o botão <strong>🗺️ Trocar trilha</strong> no topo. Você volta para a escolha e entra na outra.</li>
@@ -569,7 +564,7 @@ lms_topbar($u);
   .man-capa { display:flex; gap:18px; align-items:center; padding:28px 30px; border-radius:var(--lms-radius-lg, 16px);
     border:var(--lms-border-game); box-shadow:var(--lms-shadow-crisp); position:relative; overflow:hidden;
     background:radial-gradient(600px 200px at 90% -20%, rgba(0,122,84,.3), transparent 60%),
-               linear-gradient(140deg, #1F2A25, #2B3558) }
+               linear-gradient(140deg, #1F2A25, #1F4D3A) }
   .man-capa-ico { font-size:48px; flex:none; filter:drop-shadow(0 3px 6px rgba(0,0,0,.4)) }
   .man-capa h1 { color:#fff; font-size:var(--lms-title-md); margin:0 }
   .man-capa p { color:rgba(255,255,255,.82); font-size:14px; margin:6px 0 0; line-height:1.5 }
@@ -643,7 +638,7 @@ lms_topbar($u);
     font-weight:700; font-size:12.5px; background:var(--lms-white); border:var(--lms-border-game) }
   .man-sim-btn.is-ativo { background:var(--lms-primary); color:#fff; border-color:var(--lms-primary) }
   .man-sim-palco { display:flex; gap:16px; align-items:center; padding:20px;
-    background:linear-gradient(180deg, #CDE9F5, #A9D9E8) }
+    background:linear-gradient(180deg, #E6F4EE, #BFE3D2) }
   .man-sim-pin { flex:none; width:52px; height:52px; border-radius:50%; border:3px solid #fff;
     display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800;
     background:rgba(43,52,80,.92); color:#fff; box-shadow:0 3px 10px rgba(16,24,40,.5);
@@ -664,7 +659,7 @@ lms_topbar($u);
 
   /* ── pins demo (aluno) ── */
   .man-pins { display:flex; gap:22px; justify-content:center; padding:22px; border-radius:var(--lms-radius-md);
-    background:linear-gradient(180deg, #DCEEE9, #97D5C9); margin:14px 0 }
+    background:linear-gradient(180deg, #E6F4EE, #9FD9BF); margin:14px 0 }
   .man-pin-demo { width:44px; height:44px; border-radius:50%; border:3px solid #fff; cursor:pointer;
     font-family:var(--lms-font-ui); font-weight:800; font-size:16px; color:#fff;
     box-shadow:0 3px 10px rgba(16,24,40,.5); transition:transform .15s var(--lms-ease, ease) }
