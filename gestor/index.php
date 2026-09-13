@@ -228,6 +228,42 @@ foreach ($treinos as $t) {
     $porTreinamento[] = ['t' => $t, 'n' => count($doTrein), 'pct' => (int) round($soma / count($doTrein))];
 }
 
+// ── Jornada aberta por fase e por etapa (visão de equipe) ──────
+// Onde cada colaborador está: "aqui" = primeira fase ainda não concluída.
+// Por fase: quantos concluíram, quantos estão nela, quantos não chegaram.
+// Por etapa: quantos já fizeram e o acerto médio de quem fez.
+$etapasTrein = db_all('SELECT e.id, e.titulo, e.ordem, e.fase_id, f.treinamento_id
+                       FROM etapa e JOIN fase f ON f.id = e.fase_id JOIN treinamento t ON t.id = f.treinamento_id JOIN trilha tr ON tr.id = t.trilha_id
+                       WHERE tr.cliente_id = ? AND t.status = \'ativo\' ORDER BY f.ordem, e.ordem', [$u['cliente_id']]);
+$feitoPor = [];
+foreach ($prog as $p) $feitoPor[(int) $p['usuario_id']][(int) $p['etapa_id']] = $p;
+$jornada = [];
+foreach ($porTreinamento as $pt) {
+    $tid = (int) $pt['t']['id'];
+    $cols = [];
+    foreach ($fasesTrein as $f) if ((int) $f['treinamento_id'] === $tid) $cols[(int) $f['id']] = ['f' => $f, 'aqui' => [], 'concluiram' => 0, 'etapas' => []];
+    foreach ($etapasTrein as $e) if ((int) $e['treinamento_id'] === $tid && isset($cols[(int) $e['fase_id']])) $cols[(int) $e['fase_id']]['etapas'][(int) $e['id']] = ['e' => $e, 'n' => 0, 'ac' => 0, 'tt' => 0];
+    $naoComecaram = []; $concluiram = []; $nAlunos = 0;
+    foreach ($alunos as $a) {
+        if ((int) ($a['treinamento_id'] ?? 0) !== $tid) continue;
+        $nAlunos++;
+        $uid = (int) $a['id']; $feitas = $feitoPor[$uid] ?? [];
+        if (!$feitas) { $naoComecaram[] = $a; }
+        $atual = null;
+        foreach ($cols as $fid => &$c) {
+            $nf = 0;
+            foreach ($c['etapas'] as $eid => &$et) if (isset($feitas[$eid])) { $nf++; $et['n']++; $et['ac'] += (int) $feitas[$eid]['acertos']; $et['tt'] += (int) $feitas[$eid]['total']; }
+            unset($et);
+            $tot = count($c['etapas']);
+            if ($tot && $nf >= $tot) $c['concluiram']++;
+            elseif ($atual === null && $feitas) { $atual = $fid; $c['aqui'][] = ['a' => $a, 'feitas' => $nf, 'tot' => $tot]; }
+        }
+        unset($c);
+        if ($feitas && $atual === null) $concluiram[] = $a;
+    }
+    $jornada[$tid] = ['pt' => $pt, 'cols' => $cols, 'nao' => $naoComecaram, 'fim' => $concluiram, 'n' => $nAlunos];
+}
+
 // conformidade por fase (% dos alunos DO treinamento que concluíram cada fase)
 $heat = [];
 foreach ($fasesTrein as $f) {
@@ -544,7 +580,7 @@ lms_topbar($u);
   <div class="lms-card-game dash-entra" style="--i:5; margin-top:18px">
     <div class="lms-row" style="justify-content:space-between; margin-bottom:14px">
       <h3>🗺️ <?= $foco ? 'Onde ' . e(explode(' ', $foco['nome'])[0]) . ' está na jornada' : 'Onde a equipe está na jornada' ?></h3>
-      <span class="lms-small lms-muted"><?= $foco ? 'etapas concluídas por fase' : 'avanço médio por treinamento ativo' ?></span>
+      <span class="lms-small lms-muted"><?= $foco ? 'etapas concluídas por fase' : 'geral e aberto por fase — clique numa fase para ver por etapa' ?></span>
     </div>
     <div class="dash-funil">
       <?php if ($foco): $fasesFoco = array_values(array_filter($fasesTrein, fn($f) => (int) $f['treinamento_id'] === (int) ($foco['treinamento_id'] ?? 0))); ?>
@@ -579,13 +615,75 @@ lms_topbar($u);
       <?php else: ?>
       <?php if (!$porTreinamento): ?>
       <p class="lms-small lms-muted">Nenhum colaborador com treinamento ativo ainda — atribua os treinamentos em Usuários.</p>
-      <?php else: foreach ($porTreinamento as $pt): $t = $pt['t']; ?>
-      <div class="dash-funil-col" style="min-width:150px"
-           data-tip="<?= e($t['trilha_nome']) ?> · <?= e($t['nome']) ?> — <?= $pt['n'] ?> colaborador<?= $pt['n'] === 1 ? '' : 'es' ?>, avanço médio de <?= $pt['pct'] ?>%">
-        <div class="dash-funil-barra"><div class="dash-funil-fill cresce<?= $pt['pct'] >= 100 ? ' is-ok' : '' ?>" style="--w:<?= max(4, $pt['pct']) ?>%"></div></div>
-        <div class="dash-funil-n"><?= $pt['pct'] ?>%</div>
-        <div class="dash-funil-papel"><?= e($t['nome']) ?></div>
-        <div class="dash-funil-fase">🧭 <?= e($t['trilha_nome']) ?> · 👤 <?= $pt['n'] ?></div>
+      <?php else: foreach ($jornada as $tid => $J): $pt = $J['pt']; $t = $pt['t']; $den = max(1, $J['n']);
+          $pctDe = fn(int $q) => (int) round($q / $den * 100); ?>
+      <div class="dash-jor" data-jor="<?= $tid ?>">
+        <div class="dash-jor-topo">
+          <div><strong style="font-family:var(--lms-font-ui)"><?= e($t['nome']) ?></strong> <span class="lms-small lms-muted">· 🧭 <?= e($t['trilha_nome']) ?> · 👤 <?= $J['n'] ?> colaborador<?= $J['n'] === 1 ? '' : 'es' ?></span></div>
+          <div class="dash-jor-geral" title="Média das porcentagens de conclusão de cada colaborador">
+            <div class="lms-progress" style="height:8px; width:150px"><div class="lms-progress-fill" style="width:<?= $pt['pct'] ?>%"></div></div>
+            <strong style="font-family:var(--lms-font-ui)"><?= $pt['pct'] ?>%</strong> <span class="lms-small lms-muted">avanço médio</span>
+          </div>
+        </div>
+        <div class="dash-funil dash-jor-funil">
+          <button type="button" class="dash-funil-col dash-jor-col" data-painel="nao-<?= $tid ?>" data-tip="<?= count($J['nao']) ?> ainda não fizeram nenhuma etapa">
+            <div class="dash-funil-barra"><div class="dash-jor-bar"><span class="is-nao" style="height:<?= 100 - $pctDe(count($J['nao'])) ?>%"></span><span class="is-grey" style="height:<?= $pctDe(count($J['nao'])) ?>%"></span></div></div>
+            <div class="dash-funil-n"><?= count($J['nao']) ?></div>
+            <div class="dash-funil-papel">Não começaram</div>
+            <div class="dash-funil-fase">0 etapas</div>
+          </button>
+          <?php foreach ($J['cols'] as $fid => $c): $aqui = count($c['aqui']); $conc = $c['concluiram']; $naoCheg = max(0, $J['n'] - $aqui - $conc); $o = (int) $c['f']['ordem']; ?>
+          <button type="button" class="dash-funil-col dash-jor-col" data-painel="f-<?= $fid ?>"
+                  data-tip="Fase <?= $o ?> · <?= e($c['f']['nome']) ?> — <?= $aqui ?> aqui · <?= $conc ?> concluíram · <?= $naoCheg ?> não chegaram">
+            <div class="dash-funil-barra"><div class="dash-jor-bar">
+              <span class="is-nao" style="height:<?= $pctDe($naoCheg) ?>%"></span>
+              <span class="is-aqui" style="height:<?= $pctDe($aqui) ?>%"></span>
+              <span class="is-ok" style="height:<?= $pctDe($conc) ?>%"></span>
+            </div></div>
+            <div class="dash-funil-n"><?= $aqui ?></div>
+            <div class="dash-funil-papel">Fase <?= $o ?> · <?= e($c['f']['nome']) ?></div>
+            <div class="dash-funil-fase"><?= $conc ?> concluíram · <?= $pctDe($conc) ?>%</div>
+          </button>
+          <?php endforeach; ?>
+          <button type="button" class="dash-funil-col dash-jor-col" data-painel="fim-<?= $tid ?>" data-tip="<?= count($J['fim']) ?> concluíram o treinamento inteiro">
+            <div class="dash-funil-barra"><div class="dash-jor-bar"><span class="is-nao" style="height:<?= 100 - $pctDe(count($J['fim'])) ?>%"></span><span class="is-ok" style="height:<?= $pctDe(count($J['fim'])) ?>%"></span></div></div>
+            <div class="dash-funil-n" style="color:var(--lms-success)"><?= count($J['fim']) ?></div>
+            <div class="dash-funil-papel">Concluíram 🏆</div>
+            <div class="dash-funil-fase">treinamento inteiro</div>
+          </button>
+        </div>
+        <div class="dash-jor-legenda"><span><i class="is-ok"></i>concluíram a fase</span><span><i class="is-aqui"></i>estão nela agora</span><span><i class="is-nao"></i>ainda não chegaram</span><span class="lms-muted">· o número grande é quem está na fase</span></div>
+
+        <div class="dash-jor-painel lms-hide" data-painel-id="nao-<?= $tid ?>">
+          <div class="dash-jor-painel-topo"><strong>Ainda não começaram</strong><span class="lms-small lms-muted"><?= count($J['nao']) ?> de <?= $J['n'] ?></span></div>
+          <div class="dash-jor-quem"><?php foreach ($J['nao'] as $a): ?><a class="dash-jor-chip" href="/boticario/gestor/?aluno=<?= (int) $a['id'] ?>"><?= e($a['nome']) ?><small><?= $a['ultimo_login'] ? 'entrou, não jogou' : 'nunca acessou' ?></small></a><?php endforeach; if (!$J['nao']): ?><span class="lms-small lms-muted">Todo mundo já começou. 🎉</span><?php endif; ?></div>
+        </div>
+        <?php foreach ($J['cols'] as $fid => $c): $aqui = count($c['aqui']); $conc = $c['concluiram']; $naoCheg = max(0, $J['n'] - $aqui - $conc); ?>
+        <div class="dash-jor-painel lms-hide" data-painel-id="f-<?= $fid ?>">
+          <div class="dash-jor-painel-topo">
+            <strong>Fase <?= (int) $c['f']['ordem'] ?> · <?= e($c['f']['nome']) ?></strong>
+            <span class="lms-small lms-muted"><?= $aqui ?> aqui · <?= $conc ?> concluíram · <?= $naoCheg ?> não chegaram</span>
+          </div>
+          <div class="dash-jor-etapas">
+            <?php foreach ($c['etapas'] as $et): $pctE = $pctDe($et['n']); $ac = $et['tt'] > 0 ? (int) round($et['ac'] / $et['tt'] * 100) : null; ?>
+            <div class="dash-jor-etapa">
+              <span class="dash-jor-etapa-nome"><?= (int) $et['e']['ordem'] ?>. <?= e($et['e']['titulo']) ?></span>
+              <div class="dash-jor-etapa-bar" title="<?= $et['n'] ?> de <?= $J['n'] ?> concluíram (<?= $pctE ?>%)"><span style="width:<?= $pctE ?>%"></span></div>
+              <span class="dash-jor-etapa-n"><?= $et['n'] ?>/<?= $J['n'] ?></span>
+              <span class="dash-jor-etapa-ac"><?= $ac === null ? '—' : $ac . '% acerto' ?></span>
+            </div>
+            <?php endforeach; ?>
+          </div>
+          <div class="dash-jor-quem"><strong class="lms-small">Quem está aqui:</strong>
+            <?php foreach ($c['aqui'] as $q): ?><a class="dash-jor-chip" href="/boticario/gestor/?aluno=<?= (int) $q['a']['id'] ?>"><?= e($q['a']['nome']) ?><small><?= $q['feitas'] ?>/<?= $q['tot'] ?> etapas</small></a><?php endforeach; ?>
+            <?php if (!$c['aqui']): ?><span class="lms-small lms-muted">ninguém parado nesta fase agora</span><?php endif; ?>
+          </div>
+        </div>
+        <?php endforeach; ?>
+        <div class="dash-jor-painel lms-hide" data-painel-id="fim-<?= $tid ?>">
+          <div class="dash-jor-painel-topo"><strong>Concluíram o treinamento 🏆</strong><span class="lms-small lms-muted"><?= count($J['fim']) ?> de <?= $J['n'] ?></span></div>
+          <div class="dash-jor-quem"><?php foreach ($J['fim'] as $a): ?><a class="dash-jor-chip" href="/boticario/gestor/?aluno=<?= (int) $a['id'] ?>"><?= e($a['nome']) ?></a><?php endforeach; if (!$J['fim']): ?><span class="lms-small lms-muted">Ninguém ainda — a primeira pessoa a fechar aparece aqui.</span><?php endif; ?></div>
+        </div>
       </div>
       <?php endforeach; endif; ?>
       <?php endif; ?>
@@ -1052,6 +1150,38 @@ lms_topbar($u);
   @keyframes cresce-h { from { height:0 } to { height:var(--w) } }
   .dash-funil-fill.cresce { height:var(--w) }
 
+  /* jornada aberta por fase (equipe): barra empilhada + painel por etapa */
+  .dash-jor + .dash-jor { margin-top:22px; padding-top:18px; border-top:1px solid var(--lms-border) }
+  .dash-jor-topo { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px }
+  .dash-jor-geral { display:flex; align-items:center; gap:10px }
+  .dash-jor-col { background:none; border:0; font:inherit; color:inherit; cursor:pointer; width:100% }
+  .dash-jor-col.is-ativo { background:rgba(0,122,84,.12); box-shadow:inset 0 0 0 2px var(--lms-primary) }
+  .dash-jor-bar { width:36px; height:100%; border-radius:9px; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-end;
+    background:rgba(31,42,37,.07); border:var(--lms-border-game) }
+  .dash-jor-bar span { display:block; width:100%; transition:height .5s var(--lms-ease, ease) }
+  .dash-jor-bar .is-ok { background:var(--lms-success, #27A567) }
+  .dash-jor-bar .is-aqui { background:var(--lms-warning, #E8A13C) }
+  .dash-jor-bar .is-nao { background:transparent }
+  .dash-jor-bar .is-grey { background:rgba(31,42,37,.28) }
+  .dash-jor-legenda { display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px; color:var(--lms-ink-soft); margin-top:10px }
+  .dash-jor-legenda i { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:5px; vertical-align:-1px; border:1px solid rgba(31,42,37,.25) }
+  .dash-jor-legenda i.is-ok { background:var(--lms-success, #27A567) } .dash-jor-legenda i.is-aqui { background:var(--lms-warning, #E8A13C) } .dash-jor-legenda i.is-nao { background:rgba(31,42,37,.07) }
+  .dash-jor-painel { margin-top:12px; padding:14px 16px; border-radius:var(--lms-radius-md); background:var(--lms-surface); border:var(--lms-border-game) }
+  .dash-jor-painel-topo { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:baseline; margin-bottom:10px }
+  .dash-jor-etapas { display:flex; flex-direction:column; gap:7px }
+  .dash-jor-etapa { display:grid; grid-template-columns:minmax(150px, 1.3fr) 3fr auto auto; gap:10px; align-items:center; font-size:12.5px }
+  .dash-jor-etapa-nome { font-family:var(--lms-font-ui); font-weight:600; color:var(--lms-heading); overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+  .dash-jor-etapa-bar { height:10px; border-radius:999px; background:rgba(31,42,37,.10); overflow:hidden }
+  .dash-jor-etapa-bar span { display:block; height:100%; background:var(--lms-primary); border-radius:999px }
+  .dash-jor-etapa-n { font-family:var(--lms-font-ui); font-weight:700; min-width:44px; text-align:right }
+  .dash-jor-etapa-ac { color:var(--lms-ink-soft); min-width:84px; text-align:right }
+  .dash-jor-quem { margin-top:12px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:12.5px }
+  .dash-jor-chip { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; background:var(--lms-white);
+    border:1.5px solid var(--lms-border); text-decoration:none; color:var(--lms-heading); font-family:var(--lms-font-ui); font-weight:600; font-size:12px }
+  .dash-jor-chip:hover { border-color:var(--lms-primary) }
+  .dash-jor-chip small { color:var(--lms-ink-soft); font-weight:500 }
+  @media (max-width: 700px) { .dash-jor-etapa { grid-template-columns:1fr; gap:4px } .dash-jor-etapa-n, .dash-jor-etapa-ac { text-align:left } }
+
   /* gráfico de atividade */
   .dash-chart { display:flex; gap:6px; align-items:flex-end; padding-top:18px; position:relative }
   .dash-chart-col { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:4px;
@@ -1140,6 +1270,19 @@ if (buscaTopo) {
   buscaTopo.addEventListener('change', vai);
   buscaTopo.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') vai(); });
 }
+
+// jornada por fase: clique numa coluna abre o painel por etapa (um por vez)
+document.querySelectorAll('.dash-jor').forEach(bloco => {
+  bloco.querySelectorAll('.dash-jor-col').forEach(col => col.addEventListener('click', () => {
+    const alvo = col.dataset.painel;
+    const jaAberto = col.classList.contains('is-ativo');
+    bloco.querySelectorAll('.dash-jor-col').forEach(c => c.classList.remove('is-ativo'));
+    bloco.querySelectorAll('.dash-jor-painel').forEach(p => p.classList.add('lms-hide'));
+    if (jaAberto) return;
+    col.classList.add('is-ativo');
+    bloco.querySelector(`.dash-jor-painel[data-painel-id="${alvo}"]`)?.classList.remove('lms-hide');
+  }));
+});
 
 /* paginação client-side (radar de risco): 5 por página */
 document.querySelectorAll('[data-pager]').forEach(lista => {
