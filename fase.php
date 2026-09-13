@@ -164,7 +164,7 @@ lms_topbar($u);
   .byp-bar {
     position:fixed; right:16px; bottom:16px; z-index:30;
     display:flex; align-items:center; gap:8px; padding:9px 14px;
-    background:rgba(30,37,67,.92); backdrop-filter:blur(6px);
+    background:rgba(31,42,37,.92); backdrop-filter:blur(6px);
     border-radius:999px; box-shadow:var(--lms-shadow-crisp);
   }
   .byp-rotulo { color:#fff; font-family:var(--lms-font-ui); font-weight:700; font-size:12px;
@@ -215,7 +215,7 @@ document.getElementById('byp-reprovar').addEventListener('click', () => bypFase(
 
   /* etapas concluídas dão pra reabrir só pra rever (nunca pra mudar) */
   .pl-passo-vert.pl-passo-clicavel { cursor:pointer; border-radius:8px; margin:0 -6px; padding:5px 6px }
-  .pl-passo-vert.pl-passo-clicavel:hover { background:rgba(41,173,220,.08) }
+  .pl-passo-vert.pl-passo-clicavel:hover { background:rgba(0,122,84,.08) }
   .pl-passo-vert.pl-passo-clicavel:hover .pl-passo-titulo { color:var(--lms-primary) }
   .pl-passo-vert.is-revisando .pl-passo-num { background:var(--lms-primary); border-color:var(--lms-primary); color:#fff }
   .pl-passo-vert.is-revisando .pl-passo-titulo { color:var(--lms-primary); font-weight:700 }
@@ -288,7 +288,7 @@ document.getElementById('byp-reprovar').addEventListener('click', () => bypFase(
     font-family:var(--lms-font-ui); font-weight:600; font-size:13.5px; color:var(--lms-ink-soft);
     transition:color .15s ease, background .15s ease;
   }
-  .com-toggle:hover { color:var(--lms-heading); background:rgba(41,173,220,.10) }
+  .com-toggle:hover { color:var(--lms-heading); background:rgba(0,122,84,.10) }
   .com-toggle-n {
     min-width:20px; height:20px; padding:0 6px; border-radius:999px;
     background:var(--lms-sky); color:var(--lms-heading);

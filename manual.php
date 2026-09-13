@@ -568,8 +568,8 @@ lms_topbar($u);
   .man-doc { min-width:0 }
   .man-capa { display:flex; gap:18px; align-items:center; padding:28px 30px; border-radius:var(--lms-radius-lg, 16px);
     border:var(--lms-border-game); box-shadow:var(--lms-shadow-crisp); position:relative; overflow:hidden;
-    background:radial-gradient(600px 200px at 90% -20%, rgba(41,173,220,.3), transparent 60%),
-               linear-gradient(140deg, #2A4971, #2B3558) }
+    background:radial-gradient(600px 200px at 90% -20%, rgba(0,122,84,.3), transparent 60%),
+               linear-gradient(140deg, #1F2A25, #2B3558) }
   .man-capa-ico { font-size:48px; flex:none; filter:drop-shadow(0 3px 6px rgba(0,0,0,.4)) }
   .man-capa h1 { color:#fff; font-size:var(--lms-title-md); margin:0 }
   .man-capa p { color:rgba(255,255,255,.82); font-size:14px; margin:6px 0 0; line-height:1.5 }
@@ -590,7 +590,7 @@ lms_topbar($u);
   .man-arv { margin:16px 0 0 }
   .man-arv-item { display:flex; align-items:center; gap:12px; width:100%; text-align:left; cursor:pointer;
     background:var(--lms-white); border:2.5px solid var(--lms-heading); border-radius:var(--lms-radius-md);
-    padding:12px 16px; font-family:inherit; box-shadow:0 3px 0 rgba(30,37,67,.25);
+    padding:12px 16px; font-family:inherit; box-shadow:0 3px 0 rgba(31,42,37,.25);
     transition:transform .15s var(--lms-ease, ease) }
   .man-arv-item:hover { transform:translateX(4px) }
   .man-arv-item.is-aberto { background:var(--lms-sky, #D3ECF9) }
@@ -649,8 +649,8 @@ lms_topbar($u);
     background:rgba(43,52,80,.92); color:#fff; box-shadow:0 3px 10px rgba(16,24,40,.5);
     transition:background .25s ease }
   .man-sim-pin.is-livre { background:var(--lms-primary); animation:man-pulsa 2s ease-in-out infinite }
-  @keyframes man-pulsa { 0%,100% { box-shadow:0 3px 10px rgba(16,24,40,.5), 0 0 0 0 rgba(41,173,220,.6) }
-                         50% { box-shadow:0 3px 10px rgba(16,24,40,.5), 0 0 0 14px rgba(41,173,220,0) } }
+  @keyframes man-pulsa { 0%,100% { box-shadow:0 3px 10px rgba(16,24,40,.5), 0 0 0 0 rgba(0,122,84,.6) }
+                         50% { box-shadow:0 3px 10px rgba(16,24,40,.5), 0 0 0 14px rgba(0,122,84,0) } }
   .man-sim-txt { font-size:13.5px; line-height:1.55; color:var(--lms-heading); margin:0; font-weight:600 }
 
   /* ── perguntas do gestor ── */

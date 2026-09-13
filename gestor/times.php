@@ -185,7 +185,7 @@ lms_topbar($u);
 </style>
 
 <!-- popup dos alunos de um nível de engajamento -->
-<div id="seg-fundo" class="lms-hide" style="position:fixed; inset:0; background:rgba(30,37,67,.45); z-index:40"></div>
+<div id="seg-fundo" class="lms-hide" style="position:fixed; inset:0; background:rgba(31,42,37,.45); z-index:40"></div>
 <div id="seg-modal" class="lms-hide" style="position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
      width:min(560px, calc(100vw - 32px)); max-height:82vh; overflow:auto; z-index:41;
      background:var(--lms-bg); border:var(--lms-border-game); border-radius:var(--lms-radius-xl);
@@ -211,7 +211,7 @@ const nivelRotulo = { alto: '🟢 Alto', medio: '🟡 Médio', baixo: '🔴 Baix
     const alunos = t[niv] || [];
     titulo.textContent = `${t.nome} · ${nivelRotulo[niv]} (${alunos.length})`;
     lista.innerHTML = alunos.map(a => `
-      <div class="lms-row" style="gap:10px; align-items:center; justify-content:space-between; border-bottom:1px dashed rgba(30,37,67,.12); padding-bottom:8px">
+      <div class="lms-row" style="gap:10px; align-items:center; justify-content:space-between; border-bottom:1px dashed rgba(31,42,37,.12); padding-bottom:8px">
         <div style="min-width:0">
           <strong style="font-family:var(--lms-font-ui); font-weight:600">${esc(a.nome)}</strong><br>
           <span class="lms-muted" style="font-size:12px">${esc(a.email)} · ${a.pct}% do treinamento</span>
@@ -225,7 +225,7 @@ const nivelRotulo = { alto: '🟢 Alto', medio: '🟡 Médio', baixo: '🔴 Baix
 </script>
 
 <!-- editor de time: adicionar / remover alunos (admin) -->
-<div id="ed-fundo" class="lms-hide" style="position:fixed; inset:0; background:rgba(30,37,67,.45); z-index:42"></div>
+<div id="ed-fundo" class="lms-hide" style="position:fixed; inset:0; background:rgba(31,42,37,.45); z-index:42"></div>
 <div id="ed-modal" class="lms-hide" style="position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
      width:min(600px, calc(100vw - 32px)); max-height:86vh; overflow:auto; z-index:43;
      background:var(--lms-bg); border:var(--lms-border-game); border-radius:var(--lms-radius-xl);

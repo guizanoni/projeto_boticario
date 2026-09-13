@@ -263,8 +263,8 @@ lms_topbar($u);
   .ed-mapa::after {
     content:''; position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .2s ease;
     background:
-      repeating-linear-gradient(90deg, rgba(30,37,67,.25) 0 1px, transparent 1px 10%),
-      repeating-linear-gradient(180deg, rgba(30,37,67,.25) 0 1px, transparent 1px 10%);
+      repeating-linear-gradient(90deg, rgba(31,42,37,.25) 0 1px, transparent 1px 10%),
+      repeating-linear-gradient(180deg, rgba(31,42,37,.25) 0 1px, transparent 1px 10%);
   }
   .ed-mapa:hover::after { opacity:.55 }
 
@@ -276,7 +276,7 @@ lms_topbar($u);
   .ed-pin { position:absolute; transform:translate(-50%, -50%); width:38px; height:38px; border-radius:50%;
     background:var(--lms-primary); border:3px solid #fff; color:#fff; cursor:grab; z-index:6;
     display:flex; align-items:center; justify-content:center; font-family:var(--lms-font-ui); font-weight:800; font-size:15px;
-    box-shadow:0 3px 10px rgba(16,24,40,.5), 0 0 0 1.5px rgba(30,37,67,.35); touch-action:none }
+    box-shadow:0 3px 10px rgba(16,24,40,.5), 0 0 0 1.5px rgba(31,42,37,.35); touch-action:none }
   .ed-pin:active { cursor:grabbing }
   .ed-pin.is-drag { z-index:20; transform:translate(-50%, -50%) scale(1.15) }
   /* fantasma: pré-visualização da fase nova enquanto o admin acerta o ponto */
@@ -304,7 +304,7 @@ lms_topbar($u);
     box-shadow:var(--lms-shadow-crisp-sm); overflow:hidden;
     transition:transform .15s var(--lms-ease, ease), box-shadow .15s ease }
   .ed-item:hover { transform:translateY(-2px); box-shadow:var(--lms-shadow-crisp) }
-  .ed-item.is-alvo { box-shadow:var(--lms-shadow-crisp), 0 0 0 3px rgba(41,173,220,.45) }
+  .ed-item.is-alvo { box-shadow:var(--lms-shadow-crisp), 0 0 0 3px rgba(0,122,84,.45) }
 
   .ed-item-topo { display:flex; align-items:center; gap:9px; padding:12px 14px;
     border-bottom:1px dashed var(--lms-border) }

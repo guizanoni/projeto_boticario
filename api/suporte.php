@@ -48,11 +48,11 @@ $meta = '';
 foreach ($linhas as $k => $v) {
     $meta .= '<tr><td style="padding:4px 14px 4px 0;color:#69727D;white-space:nowrap">' . e($k) . '</td><td style="padding:4px 0">' . e($v) . '</td></tr>';
 }
-$html = '<div style="font-family:Arial,sans-serif;font-size:14px;color:#2A4971;max-width:640px">
+$html = '<div style="font-family:Arial,sans-serif;font-size:14px;color:#1F2A25;max-width:640px">
   <h2 style="margin:0 0 4px">' . e($rotulo . ' · ' . $assunto) . '</h2>
   <p style="margin:0 0 16px;color:#69727D">Boticário LMS — enviado pela plataforma</p>
   <table style="font-size:13px;border-collapse:collapse;margin-bottom:18px">' . $meta . '</table>
-  <div style="background:#F6F7F0;border-left:4px solid #1CAE8D;padding:14px 18px;border-radius:6px;white-space:pre-wrap;line-height:1.6">' . e($mensagem) . '</div>
+  <div style="background:#F6F7F0;border-left:4px solid #007A54;padding:14px 18px;border-radius:6px;white-space:pre-wrap;line-height:1.6">' . e($mensagem) . '</div>
 </div>';
 $alt = "{$rotulo} · {$assunto}\n\n" . implode("\n", array_map(fn($k, $v) => "$k: $v", array_keys($linhas), $linhas)) . "\n\n{$mensagem}";
 

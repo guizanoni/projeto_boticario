@@ -140,10 +140,10 @@ SQL);
     $j = fn($a) => json_encode($a, JSON_UNESCAPED_UNICODE);
 
     // ── Tenant ──────────────────────────────────────────────
-    // Cores da paleta do treinamento do cliente (teal + navy) até o brandbook:
+    // Cores do site do O Boticário (verde #007A54 + quase-preto) — ver CONTEUDO.md:
     // cor_primaria vira --lms-primary em toda tela (ver lms_head).
     $db->prepare('INSERT INTO cliente (slug, nome, logo_url, cor_primaria, cor_secundaria) VALUES (?,?,?,?,?)')
-       ->execute(['boticario', 'Grupo Boticário', '/admin/logos/boticario.svg', '#1CAE8D', '#2A4971']);
+       ->execute(['boticario', 'Grupo Boticário', '/admin/logos/boticario.svg', '#007A54', '#1F2A25']);
     $cli = (int) $db->lastInsertId();
 
     // ── Badges (gamificação do engine — independem do conteúdo) ──

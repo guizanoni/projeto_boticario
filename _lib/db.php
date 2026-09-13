@@ -69,7 +69,7 @@ function lms_db(): PDO {
 // (o seed só roda em banco novo). Parte da 31 pra ficar alinhada ao
 // engine de origem (/atlantica): uma correção de schema feita lá pode
 // ser replicada aqui com o mesmo número.
-const LMS_SCHEMA_VERSAO = 32;
+const LMS_SCHEMA_VERSAO = 33;
 
 function lms_migrar(PDO $db): void {
     $v = (int) $db->query('PRAGMA user_version')->fetchColumn();
@@ -93,6 +93,12 @@ function lms_migrar(PDO $db): void {
             // paleta do treinamento do cliente substitui o verde provisório
             $db->exec("UPDATE cliente SET cor_primaria = '#1CAE8D', cor_secundaria = '#2A4971' WHERE id = {$cli} AND cor_primaria = '#00A859'");
         }
+    }
+
+    if ($v < 33) {
+        // v33 · Design system do O Boticário (site oficial): verde #007A54 como
+        // primária e quase-preto nos títulos substituem a paleta do treinamento.
+        $db->exec("UPDATE cliente SET cor_primaria = '#007A54', cor_secundaria = '#1F2A25' WHERE slug = 'boticario' AND cor_primaria IN ('#00A859', '#1CAE8D')");
     }
 
     $db->exec('PRAGMA user_version = ' . LMS_SCHEMA_VERSAO);

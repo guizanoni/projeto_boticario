@@ -272,11 +272,11 @@ if (!$mapaUrl) {
     width:28px; height:28px; border-radius:50%; text-decoration:none;
     display:flex; align-items:center; justify-content:center; font-size:13px;
     background:var(--lms-flutua-bg, rgba(255,255,253,.72)); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
-    border:1.5px solid rgba(30,37,67,.22); opacity:.9;
+    border:1.5px solid rgba(31,42,37,.22); opacity:.9;
     transition:transform .12s var(--lms-ease, ease), opacity .12s ease;
   }
   .sim-btn:hover { transform:scale(1.18); opacity:1 }
-  .sim-btn.is-ativo { background:var(--lms-heading, #2A4971); border-color:var(--lms-heading, #2A4971); opacity:1 }
+  .sim-btn.is-ativo { background:var(--lms-heading, #1F2A25); border-color:var(--lms-heading, #1F2A25); opacity:1 }
 
   /* ações flutuantes (ajuda + suporte) sobre o relógio */
   .flutua-acoes { position:absolute; right:16px; bottom:56px; display:flex; flex-direction:column; gap:8px; align-items:flex-end; z-index:12 }
@@ -284,13 +284,13 @@ if (!$mapaUrl) {
   .flutua-btn {
     position:static; width:auto; padding:8px 14px; border-radius:999px;
     display:inline-flex; align-items:center; gap:6px; cursor:pointer;
-    font-family:var(--lms-font-ui); font-weight:700; font-size:12.5px; color:var(--lms-heading, #2A4971);
+    font-family:var(--lms-font-ui); font-weight:700; font-size:12.5px; color:var(--lms-heading, #1F2A25);
     transition:transform .15s var(--lms-ease, ease);
   }
   .flutua-btn:hover { transform:scale(1.05) }
 
   /* modais locais (ajuda / suporte) */
-  .modal-fundo { position:fixed; inset:0; background:rgba(30,37,67,.45); z-index:40 }
+  .modal-fundo { position:fixed; inset:0; background:rgba(31,42,37,.45); z-index:40 }
   .modal-caixa {
     position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
     width:min(520px, calc(100vw - 32px)); max-height:86vh; overflow:auto; z-index:41;
@@ -349,7 +349,7 @@ if (!$mapaUrl) {
     border:3px solid #fff;
     background:var(--lms-white, #fff); cursor:pointer; z-index:6;
     display:flex; align-items:center; justify-content:center;
-    box-shadow:0 3px 10px rgba(16,24,40,.5), 0 0 0 1.5px rgba(30,37,67,.35);
+    box-shadow:0 3px 10px rgba(16,24,40,.5), 0 0 0 1.5px rgba(31,42,37,.35);
     padding:0; font-family:var(--lms-font-ui); font-weight:800; font-size:15px;
     transition:transform var(--lms-fast, .15s) var(--lms-ease, ease);
   }
@@ -358,7 +358,7 @@ if (!$mapaUrl) {
   .hotspot:hover, .hotspot.is-shake { z-index:20; }
   .hotspot:hover { transform:translate(-50%, -50%) scale(1.18); }
 
-  .hotspot.is-available { background:var(--lms-primary, #1CAE8D); color:#fff; animation:hs-pulsa 2s ease-in-out infinite; }
+  .hotspot.is-available { background:var(--lms-primary, #007A54); color:#fff; animation:hs-pulsa 2s ease-in-out infinite; }
 
   /* concluída = comemoração: pin maior com anel dourado que respira, ✓ grande,
      estrela balançando e selo "concluída" — entra com um pop escalonado */
@@ -376,7 +376,7 @@ if (!$mapaUrl) {
   }
   .hotspot.is-done::after {
     content:'concluída'; position:absolute; top:calc(100% + 6px); left:50%; transform:translateX(-50%);
-    background:#FCCA5B; color:#2A4971; font-size:10.5px; font-weight:800; letter-spacing:.06em;
+    background:#FCCA5B; color:#1F2A25; font-size:10.5px; font-weight:800; letter-spacing:.06em;
     text-transform:uppercase; padding:2px 8px; border-radius:999px; white-space:nowrap;
     box-shadow:0 2px 6px rgba(16,24,40,.3);
   }
@@ -397,8 +397,8 @@ if (!$mapaUrl) {
   }
 
   @keyframes hs-pulsa {
-    0%, 100% { box-shadow:0 3px 10px rgba(16,24,40,.5), 0 0 0 0 rgba(41,173,220,.6); }
-    50%      { box-shadow:0 3px 10px rgba(16,24,40,.5), 0 0 0 14px rgba(41,173,220,0); }
+    0%, 100% { box-shadow:0 3px 10px rgba(16,24,40,.5), 0 0 0 0 rgba(0,122,84,.6); }
+    50%      { box-shadow:0 3px 10px rgba(16,24,40,.5), 0 0 0 14px rgba(0,122,84,0); }
   }
   .hotspot.is-shake { animation:hs-shake .5s ease }
   @keyframes hs-shake {
@@ -409,7 +409,7 @@ if (!$mapaUrl) {
   /* tooltip do pin */
   .hotspot-tip {
     position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%);
-    background:var(--lms-heading, #2A4971); color:#fff; font-family:var(--lms-font-ui);
+    background:var(--lms-heading, #1F2A25); color:#fff; font-family:var(--lms-font-ui);
     font-size:12px; font-weight:600; white-space:nowrap; padding:5px 10px;
     border-radius:6px; opacity:0; pointer-events:none; transition:opacity .18s ease; z-index:7;
   }
@@ -424,13 +424,13 @@ if (!$mapaUrl) {
   .avatar::after {
     content:''; position:absolute; left:50%; bottom:-2px; transform:translateX(-50%);
     width:54px; height:17px; border-radius:50%;
-    border:3px solid rgba(41,173,220,.95);
-    box-shadow:0 0 0 3px rgba(255,255,255,.85), inset 0 0 10px rgba(41,173,220,.4);
+    border:3px solid rgba(0,122,84,.95);
+    box-shadow:0 0 0 3px rgba(255,255,255,.85), inset 0 0 10px rgba(0,122,84,.4);
     animation:av-anel 2s ease-in-out infinite;
   }
   .avatar-img {
     position:relative; z-index:1; width:64px; height:auto;
-    filter:drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 5px 7px rgba(30,37,67,.45));
+    filter:drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 5px 7px rgba(31,42,37,.45));
     animation:av-flutua 3s ease-in-out infinite;
   }
   @keyframes av-flutua { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-5px) } }

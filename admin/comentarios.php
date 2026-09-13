@@ -146,7 +146,7 @@ lms_topbar($u);
 </main>
 
 <style>
-  .modc-item { display:flex; gap:12px; padding:14px 0; border-top:1px dashed rgba(30,37,67,.15) }
+  .modc-item { display:flex; gap:12px; padding:14px 0; border-top:1px dashed rgba(31,42,37,.15) }
   .modc-item:first-of-type { border-top:none }
 </style>
 </body></html>

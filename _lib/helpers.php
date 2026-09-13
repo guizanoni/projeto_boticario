@@ -236,7 +236,7 @@ function lms_avatar_mapa(?string $genero = null, ?string $pele = null, ?int $tri
 // senão o avatar SVG de gênero/pele.
 function lms_avatar_html(?string $genero, ?string $pele, int $size = 44, ?string $foto = null): string {
     if ($foto) {
-        return '<img src="' . e($foto) . '" alt="Foto de perfil" loading="lazy" style="width:' . $size . 'px; height:' . $size . 'px; border-radius:50%; object-fit:cover; border:2px solid var(--lms-heading, #2A4971); display:block; flex:none">';
+        return '<img src="' . e($foto) . '" alt="Foto de perfil" loading="lazy" style="width:' . $size . 'px; height:' . $size . 'px; border-radius:50%; object-fit:cover; border:2px solid var(--lms-heading, #1F2A25); display:block; flex:none">';
     }
     return lms_avatar_svg($genero, $pele, $size);
 }
@@ -253,8 +253,8 @@ function lms_avatar_svg(?string $genero, ?string $pele, int $size = 64): string 
         ? '<path d="M14 34 Q12 52 18 56 L24 50 Q20 44 21 34 Z" fill="' . $cabeloCor . '"/><path d="M50 34 Q52 52 46 56 L40 50 Q44 44 43 34 Z" fill="' . $cabeloCor . '"/>'
         : '';
     return '<svg width="' . $size . '" height="' . $size . '" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Avatar">
-      <circle cx="32" cy="32" r="31" fill="#E7F9F3" stroke="#272C30" stroke-width="2"/>
-      <path d="M12 58 Q32 44 52 58 L52 64 L12 64 Z" fill="#1CAE8D"/>
+      <circle cx="32" cy="32" r="31" fill="#E6F4EE" stroke="#272C30" stroke-width="2"/>
+      <path d="M12 58 Q32 44 52 58 L52 64 L12 64 Z" fill="#007A54"/>
       <rect x="26" y="46" width="12" height="8" rx="3" fill="' . $skin . '"/>
       ' . $cabelo . '
       <circle cx="32" cy="34" r="14" fill="' . $skin . '"/>
@@ -267,14 +267,11 @@ function lms_avatar_svg(?string $genero, ?string $pele, int $size = 64): string 
 
 /* ── Chrome comum ────────────────────────────────────────── */
 
-// Ícone da marca do tenant (PROVISÓRIO do whitelabel): disco magenta com B,
-// na paleta do treinamento do cliente. Trocar pela marca oficial quando vier
-// o brandbook. SVG próprio — sem emoji.
+// Ícone da marca do tenant: a ÂNFORA do O Boticário (vetor oficial do site),
+// no verde-marca. Usado onde o tenant não tem logo em imagem.
 function lms_logo_icon(int $size = 24): string {
-    return '<svg width="' . $size . '" height="' . $size . '" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;flex:none" aria-hidden="true">
-      <circle cx="32" cy="32" r="30" fill="#A84E84"/>
-      <text x="32" y="44" text-anchor="middle" font-family="Poppins, Avenir Next, Arial, sans-serif" font-size="34" font-weight="800" fill="#FFFFFF">B</text>
-    </svg>';
+    $w = round($size * 245 / 274, 1);
+    return '<svg width="' . $w . '" height="' . $size . '" viewBox="0 0 245 274" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;flex:none" aria-hidden="true"><path ' . 'd="M124.06 43.36c9.05.11 18 .74 26.66 3.77A36.63 36.63 0 0 1 155 49a5.78 5.78 0 0 1 3.46 6 82.57 82.57 0 0 0 0 8.76c.15 3-1.28 4.79-3.72 6.13a33.55 33.55 0 0 1-11.4 3.66c-2.13.33-3.18 1.14-3 3.55a82.55 82.55 0 0 1 0 8.76 4.24 4.24 0 0 0 2.17 4.08c13.32 8.36 21.83 20 23.77 35.87 1 8 0 16-1.79 23.88-2.1 9-6 17.19-10.38 25.22-2.18 4-4.19 8.09-6.1 12.24a21.5 21.5 0 0 0-.41 17c2.48 6.76 5.1 13.47 7.64 20.22 1.75 4.62.8 7.15-3.72 9.26-5.37 2.51-11.15 3.37-17 3.65a162.9 162.9 0 0 1-26.78-.51 34.37 34.37 0 0 1-11.54-3.17c-4.5-2.25-5.41-4.93-3.6-9.58 2.41-6.2 4.75-12.44 7.21-18.62a24 24 0 0 0-1.09-21.09c-3.16-6-6.23-12-9.28-18A75.78 75.78 0 0 1 81.31 132c-.11-17.88 8.27-31.38 22.87-41.2 2.36-1.59 3.78-3.14 3.48-6.13a39.66 39.66 0 0 1 0-7.39c.22-2.47-.85-3.4-3.12-3.78a35.06 35.06 0 0 1-10.42-3.19c-2.9-1.49-4.76-3.44-4.35-7.09a42.87 42.87 0 0 0 0-7.93c-.26-3.44 1.38-5.44 4.3-6.85 5.77-2.78 12-3.75 18.23-4.49a73 73 0 0 1 11.76-.59z"' . ' fill="#00B77D"/></svg>';
 }
 
 /* ── Busca (padrão do sistema) ───────────────────────────────
@@ -558,7 +555,7 @@ function lms_dock(bool $comManual = true): void {
     echo '</div>';
 
     echo <<<'HTML'
-<div id="bug-fundo" class="lms-hide" style="position:fixed;inset:0;background:rgba(30,37,67,.45);z-index:60"></div>
+<div id="bug-fundo" class="lms-hide" style="position:fixed;inset:0;background:rgba(31,42,37,.45);z-index:60"></div>
 <div id="bug-modal" class="lms-hide" role="dialog" aria-label="Reportar um problema" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(520px,calc(100vw - 32px));max-height:88vh;overflow:auto;z-index:61;background:var(--lms-bg);border:var(--lms-border-game);border-radius:var(--lms-radius-xl);box-shadow:var(--lms-shadow-crisp);padding:24px">
   <div class="lms-row" style="justify-content:space-between;margin-bottom:4px">
     <h3>🐛 Reportar um problema</h3>

@@ -18,7 +18,7 @@ lms_head('Entrar');
 <main style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px">
   <div style="width:100%; max-width:420px">
     <div class="lms-center" style="margin-bottom:28px">
-      <img src="/admin/logos/boticario.svg" alt="Grupo Boticário" style="width:min(378px, 88%); height:auto; margin:0 auto">
+      <img src="/admin/logos/boticario.svg" alt="O Boticário" style="width:min(320px, 80%); height:auto; margin:0 auto">
       <p class="lms-muted lms-small" style="margin-top:12px">Plataforma de treinamento · powered by Skope LMS</p>
     </div>
 

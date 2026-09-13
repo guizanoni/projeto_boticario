@@ -16,7 +16,10 @@ engine. Fonte: `boticario/materiais/` (fora do repo).
 - ✅ Carga: `_lib/conteudo/servico-make.php` + migração v32 — trilha, treinamento,
   5 fases e 11 etapas entraram em produção no primeiro acesso após o deploy.
 - ✅ Mapa provisório `assets/make/mapa-loja.webp` (SVG em `materiais/mapa-loja.svg`).
-- ⏳ Imagens em alta e marca oficial: aguardando o cliente.
+- ✅ Design system do O Boticário aplicado (2026-09-13, fim do dia): DM Sans (fonte do site),
+  verde `#007A54` nas ações, `#00B77D` como verde-marca, quase-preto `#1F2A25` nos títulos,
+  neutros claros. Wordmark e ânfora oficiais em vetor (vindos do site). Mapa refeito nos verdes.
+- ⏳ Imagens em alta: aguardando o cliente.
 
 
 ## O que veio

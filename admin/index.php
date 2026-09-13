@@ -159,10 +159,10 @@ lms_topbar($u);
     /* tabela orgânica e elegante */
     .lms-table th, .lms-table td { padding:12px 14px; vertical-align:middle }
     .lms-table thead th { text-transform:uppercase; letter-spacing:.04em; font-size:11px;
-      font-weight:700; color:var(--lms-muted); background:transparent; border-bottom:1px solid rgba(30,37,67,.1) }
-    .lms-table tbody td { border-top-color:rgba(30,37,67,.07) }
+      font-weight:700; color:var(--lms-muted); background:transparent; border-bottom:1px solid rgba(31,42,37,.1) }
+    .lms-table tbody td { border-top-color:rgba(31,42,37,.07) }
     .lms-table tbody tr { transition:background .12s ease }
-    .lms-table tbody tr:hover td { background:rgba(41,173,220,.05) }
+    .lms-table tbody tr:hover td { background:rgba(0,122,84,.05) }
     .lms-table .lms-progress { border-radius:999px }
     /* ações agrupadas, com respiro entre os ícones */
     .u-acoes { display:inline-flex; gap:6px; align-items:center; justify-content:flex-end }

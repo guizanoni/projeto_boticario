@@ -117,7 +117,7 @@ lms_topbar($u);
           <?php foreach (lms_tons_pele() as $k => $cor): ?>
           <label title="Tom <?= e($k) ?>" style="cursor:pointer">
             <input type="radio" name="pele" value="<?= e($k) ?>" <?= ($u['avatar_cor_pele'] ?? '2') === $k ? 'checked' : '' ?> style="display:none">
-            <span style="display:block; width:34px; height:34px; border-radius:50%; background:<?= e($cor) ?>; border:3px solid <?= ($u['avatar_cor_pele'] ?? '2') === $k ? 'var(--lms-primary)' : 'rgba(30,37,67,.3)' ?>"></span>
+            <span style="display:block; width:34px; height:34px; border-radius:50%; background:<?= e($cor) ?>; border:3px solid <?= ($u['avatar_cor_pele'] ?? '2') === $k ? 'var(--lms-primary)' : 'rgba(31,42,37,.3)' ?>"></span>
           </label>
           <?php endforeach; ?>
         </div>

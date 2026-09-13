@@ -104,10 +104,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'lembret
             fn($p) => '<p>' . nl2br(e(trim($p))) . '</p>',
             array_filter(preg_split("/\n{2,}/", $corpo), fn($p) => trim($p) !== '')
         ));
-        $html = '<div style="font-family:Arial,sans-serif;font-size:15px;color:#2A4971;max-width:560px;line-height:1.6">'
+        $html = '<div style="font-family:Arial,sans-serif;font-size:15px;color:#1F2A25;max-width:560px;line-height:1.6">'
           . $ps . '
           <p style="margin:24px 0">
-            <a href="https://skope.cc/boticario/" style="background:#1CAE8D;color:#fff;font-weight:bold;padding:12px 26px;border-radius:8px;text-decoration:none">Voltar para a plataforma ▶</a>
+            <a href="https://skope.cc/boticario/" style="background:#007A54;color:#fff;font-weight:bold;padding:12px 26px;border-radius:8px;text-decoration:none">Voltar para a plataforma ▶</a>
           </p>
           <p style="color:#69727D">— ' . e($u['nome']) . ' · ' . e($u['cliente_nome']) . '</p>
         </div>';
@@ -416,7 +416,7 @@ lms_topbar($u);
       <span class="lms-pill is-primary" style="display:inline-flex; align-items:center; gap:8px; padding:8px 8px 8px 14px">
         Visão individual: <strong><?= e($foco['nome']) ?></strong>
         <a href="/boticario/gestor/" title="Voltar à visão da equipe"
-           style="display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:rgba(30,37,67,.15); color:inherit; text-decoration:none; font-weight:800">✕</a>
+           style="display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:rgba(31,42,37,.15); color:inherit; text-decoration:none; font-weight:800">✕</a>
       </span>
       <?php else: ?>
       <div style="position:relative; min-width:260px">
@@ -473,7 +473,7 @@ lms_topbar($u);
   <?php else: ?>
   <div class="dash-kpis">
     <div class="lms-stat dash-entra" style="--i:0" data-tip="Total de alunos cadastrados na plataforma — tenham acessado ou não.">
-      <div class="lms-stat-value kpi-num" data-val="<?= count($alunos) ?>" style="color:var(--lms-heading, #2A4971)">0</div>
+      <div class="lms-stat-value kpi-num" data-val="<?= count($alunos) ?>" style="color:var(--lms-heading, #1F2A25)">0</div>
       <div class="lms-stat-label">Alunos cadastrados</div>
     </div>
     <div class="lms-stat dash-entra" style="--i:1" data-tip="Média do avanço de cada aluno no próprio treinamento ativo (etapas concluídas ÷ total de etapas).">
@@ -680,7 +680,7 @@ lms_topbar($u);
       <?php if (!$lembF): [$lembAssunto, $lembCorpo] = lembrete_sugestao($foco, $u, $tipoEmail);
         $tituloPopup = ['resgate' => '✉️ E-mail de resgate', 'parabens' => '🎉 Parabéns', 'continue' => '💪 Incentivo'][$tipoEmail]; ?>
       <!-- popup do e-mail (resgate / parabéns / incentivo): revisa a sugestão antes de enviar -->
-      <div id="lemb-fundo" class="lms-hide" style="position:fixed; inset:0; background:rgba(30,37,67,.45); z-index:40"></div>
+      <div id="lemb-fundo" class="lms-hide" style="position:fixed; inset:0; background:rgba(31,42,37,.45); z-index:40"></div>
       <div id="lemb-modal" class="lms-hide" style="position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
            width:min(580px, calc(100vw - 32px)); max-height:88vh; overflow:auto; z-index:41;
            background:var(--lms-bg); border:var(--lms-border-game); border-radius:var(--lms-radius-xl);
@@ -921,7 +921,7 @@ lms_topbar($u);
 
   <?php if (!$foco && $nuncaLogaram > 0): $nuncaLista = array_values(array_filter($linhas, fn($l) => $l['status'] === 'nunca')); ?>
   <!-- popup: quem nunca acessou (tomada de ação) — vale para todos os perfis -->
-  <div id="nunca-fundo" class="lms-hide" style="position:fixed; inset:0; background:rgba(30,37,67,.45); z-index:40"></div>
+  <div id="nunca-fundo" class="lms-hide" style="position:fixed; inset:0; background:rgba(31,42,37,.45); z-index:40"></div>
   <div id="nunca-modal" class="lms-hide" style="position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
        width:min(560px, calc(100vw - 32px)); max-height:82vh; overflow:auto; z-index:41;
        background:var(--lms-bg); border:var(--lms-border-game); border-radius:var(--lms-radius-xl);
@@ -933,7 +933,7 @@ lms_topbar($u);
     <p class="lms-small lms-muted" style="margin-bottom:14px">Abra o report de cada um e envie o e-mail de resgate com o passo a passo de acesso.</p>
     <div class="lms-stack-3">
       <?php foreach ($nuncaLista as $l): $a = $l['u']; ?>
-      <div class="lms-row" style="gap:10px; align-items:center; justify-content:space-between; border-bottom:1px dashed rgba(30,37,67,.12); padding-bottom:8px">
+      <div class="lms-row" style="gap:10px; align-items:center; justify-content:space-between; border-bottom:1px dashed rgba(31,42,37,.12); padding-bottom:8px">
         <div class="lms-row" style="gap:10px; min-width:0">
           <?= lms_avatar_html($a['avatar_genero'], $a['avatar_cor_pele'], 34, $a['foto_url'] ?? null) ?>
           <div style="min-width:0">
@@ -975,14 +975,14 @@ lms_topbar($u);
   [data-tip]:hover::after {
     content:attr(data-tip);
     position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%);
-    background:var(--lms-heading, #2A4971); color:#fff;
+    background:var(--lms-heading, #1F2A25); color:#fff;
     font-family:var(--lms-font-ui); font-size:12px; font-weight:600;
     white-space:nowrap; padding:6px 12px; border-radius:8px; z-index:30;
     box-shadow:0 4px 12px rgba(16,24,40,.35); pointer-events:none;
   }
   [data-tip]:hover::before {
     content:''; position:absolute; bottom:calc(100% + 2px); left:50%; transform:translateX(-50%);
-    border:6px solid transparent; border-top-color:var(--lms-heading, #2A4971); z-index:30;
+    border:6px solid transparent; border-top-color:var(--lms-heading, #1F2A25); z-index:30;
   }
   /* nas bordas, o balão encosta no lado em vez de centralizar (não corta) */
   .dash-funil-col:first-child:hover::after, .dash-chart-col:first-child:hover::after,
@@ -1000,45 +1000,45 @@ lms_topbar($u);
   /* linha de referência (média) sobre os gráficos */
   .dash-media {
     position:absolute; left:8px; right:8px; bottom:var(--alt); z-index:2;
-    border-top:2px dashed rgba(30,37,67,.45); pointer-events:none;
+    border-top:2px dashed rgba(31,42,37,.45); pointer-events:none;
   }
   .dash-media.is-funil { bottom:auto; top:calc(110px - var(--alt)) }
   /* duas linhas no funil do aluno: a dele (azul, sólida) vs a geral (cinza, tracejada) */
-  .dash-media.is-aluno { border-top:2px solid var(--lms-primary, #1CAE8D) }
-  .dash-media.is-geral { border-top:2px dashed rgba(30,37,67,.4) }
+  .dash-media.is-aluno { border-top:2px solid var(--lms-primary, #007A54) }
+  .dash-media.is-geral { border-top:2px dashed rgba(31,42,37,.4) }
   .dash-media-tag {
     position:absolute; right:0; bottom:3px;
     font-family:var(--lms-font-ui); font-size:10.5px; font-weight:700;
     color:var(--lms-ink-soft, #69727D); background:rgba(255,255,253,.9);
-    padding:1px 7px; border-radius:999px; border:1px solid rgba(30,37,67,.2);
+    padding:1px 7px; border-radius:999px; border:1px solid rgba(31,42,37,.2);
   }
   /* tags em lados opostos pra nunca se sobreporem quando as médias ficam perto */
-  .dash-media-tag.is-aluno { right:0; left:auto; color:var(--lms-primary, #1E7BA6); border-color:rgba(41,173,220,.55) }
+  .dash-media-tag.is-aluno { right:0; left:auto; color:var(--lms-primary, #1E7BA6); border-color:rgba(0,122,84,.55) }
   .dash-media-tag.is-geral { left:0; right:auto }
 
   /* funil da jornada — tudo numa linha só (fluxo em coluna, sem quebra).
      align-items:start alinha as barras pelo TOPO (sem "montanha russa"). */
   .dash-funil { display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0, 1fr); gap:10px; align-items:start; position:relative }
   .dash-funil-col { text-align:center; border-radius:var(--lms-radius-md); transition:background .15s ease; padding:4px 2px }
-  .dash-funil-col:hover { background:rgba(41,173,220,.08) }
+  .dash-funil-col:hover { background:rgba(0,122,84,.08) }
   .dash-funil-col:hover .dash-funil-fill { filter:brightness(1.15) }
   .dash-funil-barra { height:110px; display:flex; align-items:flex-end; justify-content:center; position:relative }
   /* trilho vazio (a "meta" da fase): mostra o quanto ainda falta preencher */
   .dash-funil-barra::before {
     content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%);
     width:min(46px, 72%); height:100%; border-radius:6px; box-sizing:border-box;
-    background:rgba(30,37,67,.045); border:2px dashed rgba(30,37,67,.13);
+    background:rgba(31,42,37,.045); border:2px dashed rgba(31,42,37,.13);
   }
   .dash-funil-fill {
     position:relative; z-index:1;
     width:min(46px, 72%); border-radius:6px; min-height:8px; box-sizing:border-box;
-    background:var(--lms-primary, #1CAE8D);
-    border:2px solid var(--lms-heading, #2A4971);
+    background:var(--lms-primary, #007A54);
+    border:2px solid var(--lms-heading, #1F2A25);
     transition:filter .15s ease;
   }
   .dash-funil-fill.is-ok { background:var(--lms-success, #27A567); }
   /* fase não iniciada: base neutra dentro do trilho (não azul, evita confusão) */
-  .dash-funil-fill.is-zero { background:rgba(30,37,67,.14); border-color:rgba(30,37,67,.22); }
+  .dash-funil-fill.is-zero { background:rgba(31,42,37,.14); border-color:rgba(31,42,37,.22); }
   .dash-funil-n { font-family:var(--lms-font-ui); font-weight:800; font-size:22px; margin-top:6px }
   /* rótulo com altura fixa (2 linhas) para o "Fase X · Y%" ficar alinhado
      entre todas as colunas — nome completo continua no tooltip da coluna. */
@@ -1056,13 +1056,13 @@ lms_topbar($u);
   .dash-chart { display:flex; gap:6px; align-items:flex-end; padding-top:18px; position:relative }
   .dash-chart-col { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:4px;
     border-radius:var(--lms-radius-sm); transition:background .15s ease }
-  .dash-chart-col:hover { background:rgba(41,173,220,.08) }
+  .dash-chart-col:hover { background:rgba(0,122,84,.08) }
   .dash-chart-col:hover .dash-chart-bar { filter:brightness(1.18) }
   .dash-chart-col:hover .dash-chart-n { transform:scale(1.25) }
   .dash-chart-track { height:92px; width:100%; display:flex; align-items:flex-end; justify-content:center }
   .dash-chart-bar { width:100%; max-width:30px; height:var(--h); min-height:6px; border-radius:5px;
-    box-sizing:border-box; background:var(--lms-primary, #1CAE8D);
-    border:1.5px solid var(--lms-heading, #2A4971);
+    box-sizing:border-box; background:var(--lms-primary, #007A54);
+    border:1.5px solid var(--lms-heading, #1F2A25);
     transform-origin:bottom; animation:chart-sobe .7s var(--lms-ease, ease) calc(var(--i) * 45ms) both;
     transition:filter .15s ease }
   @keyframes chart-sobe { from { transform:scaleY(0) } to { transform:scaleY(1) } }
@@ -1079,18 +1079,18 @@ lms_topbar($u);
 
   /* radar de risco · ranking · feed */
   .dash-risco, .dash-rank, .dash-feed { display:flex; align-items:center; gap:10px; padding:8px 0;
-    border-bottom:1px dashed rgba(30,37,67,.12) }
+    border-bottom:1px dashed rgba(31,42,37,.12) }
   .dash-risco:last-child, .dash-rank:last-child, .dash-feed:last-child { border-bottom:none; padding-bottom:0 }
   .dash-rank-pos { font-size:17px; width:28px; text-align:center; flex:none; font-family:var(--lms-font-ui); font-weight:700 }
 
   /* paginação (radar de risco) */
   .dash-risco-list .dash-risco.is-hidden { display:none }
   .dash-pager { display:flex; align-items:center; justify-content:center; gap:14px; margin-top:12px;
-    padding-top:10px; border-top:1px dashed rgba(30,37,67,.12) }
+    padding-top:10px; border-top:1px dashed rgba(31,42,37,.12) }
   .dash-pager-info { font-family:var(--lms-font-ui); font-size:12.5px; font-weight:700; color:var(--lms-muted);
     min-width:74px; text-align:center }
-  .dash-pager-btn { width:30px; height:30px; border-radius:8px; border:1px solid rgba(30,37,67,.16);
-    background:#fff; color:var(--lms-ink, #2A4971); font-size:16px; line-height:1; cursor:pointer;
+  .dash-pager-btn { width:30px; height:30px; border-radius:8px; border:1px solid rgba(31,42,37,.16);
+    background:#fff; color:var(--lms-ink, #1F2A25); font-size:16px; line-height:1; cursor:pointer;
     display:flex; align-items:center; justify-content:center; transition:filter .15s, opacity .15s }
   .dash-pager-btn:hover:not(:disabled) { filter:brightness(.96) }
   .dash-pager-btn:disabled { opacity:.4; cursor:default }

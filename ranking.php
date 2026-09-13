@@ -144,7 +144,7 @@ lms_topbar($u);
   .is-prata  .podio-bloco { height:88px;  background:linear-gradient(180deg, #E8ECF1, #CDD5DE); animation-delay:0s }
   .is-bronze .podio-bloco { height:66px;  background:linear-gradient(180deg, #E8B583, #D89B5E); animation-delay:.3s }
   @keyframes podio-sobe { from { transform:scaleY(0) } to { transform:scaleY(1) } }
-  .podio-medalha { font-size:32px; filter:drop-shadow(0 2px 2px rgba(30,37,67,.25)) }
+  .podio-medalha { font-size:32px; filter:drop-shadow(0 2px 2px rgba(31,42,37,.25)) }
 
   @media (max-width: 620px) {
     .podio { gap:8px }
@@ -162,7 +162,7 @@ lms_topbar($u);
   cv.width = innerWidth; cv.height = innerHeight;
   document.body.appendChild(cv);
   const ctx = cv.getContext('2d');
-  const cores = ['#1CAE8D', '#F0B429', '#E8641B', '#2E7D32', '#2A4971'];
+  const cores = ['#007A54', '#F0B429', '#E8641B', '#2E7D32', '#1F2A25'];
   const ps = Array.from({ length: 110 }, () => ({
     x: cv.width / 2 + (Math.random() - .5) * cv.width * .6,
     y: cv.height * .3 + (Math.random() - .5) * 60,
