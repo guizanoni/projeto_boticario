@@ -38,10 +38,11 @@ function conteudo_servico_make(): array {
         'descricao' => 'Trilha de aprendizado sobre a categoria de maquiagem e o Serviço Completo de Make.',
     ];
 
-    // fase => [nome, pin_x, pin_y, nota_minima, etapas[]]
+    // fase => [nome, pin_x, pin_y, nota_minima, etapas[]] — pins medidos sobre os
+    // pontos verdes da arte final (materiais/mapa-final.png), em % da imagem
     // etapa => [titulo, tipo, minigame_tipo, config]
     $fases = [
-        ['Bem-vindo ao universo da maquiagem', 13, 74, 0, [
+        ['Bem-vindo ao universo da maquiagem', 22, 69, 0, [
             ['Vamos entrar no universo da maquiagem?', 'leitura', 'leitura', [
                 'texto' => [
                     'Nesta jornada, você vai explorar diferentes estilos, descobrir como construir um look completo passo a passo e experimentar novas formas de conduzir o atendimento.',
@@ -69,7 +70,7 @@ function conteudo_servico_make(): array {
             ]],
         ]],
 
-        ['Os 16 produtos', 35, 42, 0, [
+        ['Os 16 produtos', 40, 39, 0, [
             ['Quantos produtos você imagina?', 'minigame', 'quiz', [
                 'intro' => 'Pense em uma maquiagem social completa. Quantos produtos você acha que são necessários, sem contar preparação de pele, pincéis ou acessórios?',
                 'perguntas' => [[
@@ -115,7 +116,7 @@ function conteudo_servico_make(): array {
             ]],
         ]],
 
-        ['Adaptando a venda', 55, 66, 0, [
+        ['Adaptando a venda', 57, 71.5, 0, [
             ['Versão resumida x versão completa', 'leitura', 'leitura', [
                 'texto' => [
                     'Agora que você conhece os 16 itens, veja como adaptar a apresentação conforme o perfil da pessoa cliente.',
@@ -129,7 +130,7 @@ function conteudo_servico_make(): array {
             ]],
         ]],
 
-        ['Jornada Boti Beleza', 74, 40, 0, [
+        ['Jornada Boti Beleza', 75, 37.5, 0, [
             ['Relembrando o Boti Beleza', 'minigame', 'historia', [
                 'cenas' => [
                     ['icone' => '🧭', 'titulo' => 'Relembrando o Boti Beleza', 'imagem' => '', 'texto' => 'Toda venda de maquiagem acontece dentro da jornada de atendimento que você já conhece. Avance por cada etapa para ver a imagem e relembrar.'],
@@ -192,7 +193,7 @@ function conteudo_servico_make(): array {
             ]],
         ]],
 
-        ['Quiz final', 89, 70, 80, [
+        ['Quiz final', 85.5, 75.5, 80, [
             ['Quiz final', 'minigame', 'quiz', [
                 'intro' => 'Vamos ver o que ficou da trilha!',
                 'perguntas' => [

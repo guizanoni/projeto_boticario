@@ -15,7 +15,9 @@ engine. Fonte: `boticario/materiais/` (fora do repo).
   enviado pra produção pelo editor (`data/midia`) e gravado na etapa 3.
 - ✅ Carga: `_lib/conteudo/servico-make.php` + migração v32 — trilha, treinamento,
   5 fases e 11 etapas entraram em produção no primeiro acesso após o deploy.
-- ✅ Mapa provisório `assets/make/mapa-loja.webp` (SVG em `materiais/mapa-loja.svg`).
+- ✅ Mapa FINAL: arte gerada a partir do briefing (`materiais/mapa-final.png`, 1586×992) em
+  `assets/make/mapa-loja.webp`; pins realinhados nos pontos verdes do chão (22/69, 40/39,
+  57/71,5, 75/37,5, 85,5/75,5) via módulo + migração v34. O SVG provisório ficou em `materiais/`.
 - ✅ Design system do O Boticário aplicado (2026-09-13, fim do dia): DM Sans (fonte do site),
   verde `#007A54` nas ações, `#00B77D` como verde-marca, quase-preto `#1F2A25` nos títulos,
   neutros claros. Wordmark e ânfora oficiais em vetor (vindos do site). Mapa refeito nos verdes.
