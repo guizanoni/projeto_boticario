@@ -197,7 +197,7 @@ document.getElementById('byp-reprovar').addEventListener('click', () => bypFase(
     position:sticky; top:18px; max-height:calc(100vh - 36px); overflow-y:auto;
     padding:4px 10px 4px 2px; margin-left:-2px;
   }
-  .pl-main { flex:1; min-width:0; max-width:760px }
+  .pl-main { flex:1; min-width:0; max-width:760px; margin:0 auto }  /* margin auto: na tela final a espinha some e o card fica centrado */
 
   .pl-passo-vert { display:flex; align-items:flex-start; gap:10px; padding:5px 0; cursor:default }
   .pl-passo-num { flex:none; width:28px; height:28px; border-radius:50%; border:var(--lms-border-game);

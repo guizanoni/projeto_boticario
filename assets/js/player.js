@@ -87,9 +87,9 @@ document.head.appendChild(el(`<style>
     font-weight:700; font-size:12px; margin-right:8px }
 
   .mg-passo-grid { display:flex; flex-wrap:wrap; gap:10px; justify-content:center }
-  .mg-passo.is-card { width:124px; display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 8px; gap:6px; font-size:13px }
+  .mg-passo.is-card { width:150px; display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 8px 12px; gap:8px; font-size:14px; font-weight:600; font-family:var(--lms-font-ui); color:var(--lms-heading, #2A4971); line-height:1.2 }
   .mg-passo.is-card:hover:not(:disabled) { transform:translateY(-3px) }
-  .mg-passo-img { width:92px; height:92px; object-fit:contain; border-radius:8px; background:var(--lms-surface, #F4F1EA); display:flex; align-items:center; justify-content:center; font-size:28px }
+  .mg-passo-img { width:120px; height:120px; object-fit:contain; border-radius:8px; background:var(--lms-surface, #F4F1EA); display:flex; align-items:center; justify-content:center; font-size:28px }
   .mg-passo-thumb { width:40px; height:40px; object-fit:contain; border-radius:6px; background:var(--lms-surface, #F4F1EA); vertical-align:middle; margin-right:8px }
   .mg-passo-desc { display:block; margin:6px 0 0 32px; font-size:13px; color:var(--lms-ink-soft, #69727D) }
   .mg-inv-audio { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px }

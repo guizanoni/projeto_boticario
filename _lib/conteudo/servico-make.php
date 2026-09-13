@@ -81,7 +81,7 @@ function conteudo_servico_make(): array {
             ]],
             ['Correção de pele — 7 produtos', 'minigame', 'sequencia', [
                 'instrucao' => 'Toque nas cartas na ordem correta de aplicação. A cada acerto, você descobre a função daquele produto.',
-                'so_imagem' => true,
+                'so_imagem' => false,
                 'passos' => [
                     ['texto' => 'Primer',     'imagem' => $u('pele-1-primer.png'),     'descricao' => 'Uniformiza a textura da pele e fixa a maquiagem.'],
                     ['texto' => 'Corretivo',  'imagem' => $u('pele-2-corretivo.png'),  'descricao' => 'Suaviza imperfeições com pigmentação de cor diferente do tom da pele.'],
@@ -94,7 +94,7 @@ function conteudo_servico_make(): array {
             ]],
             ['Realçando o olhar', 'minigame', 'sequencia', [
                 'instrucao' => 'Toque nas cartas na ordem correta de aplicação. A cada acerto, você descobre a função daquele passo.',
-                'so_imagem' => true,
+                'so_imagem' => false,
                 'passos' => [
                     ['texto' => 'Primer ou Corretivo', 'imagem' => $u('olhos-1-primer-ou-corretivo.png'), 'descricao' => 'Uniformiza a pálpebra e prepara a base para as sombras renderem melhor.'],
                     ['texto' => 'Sombra',             'imagem' => $u('olhos-2-sombra.png'),             'descricao' => 'Adiciona cor, profundidade e dimensão ao olhar.'],

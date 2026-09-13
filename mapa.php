@@ -322,10 +322,32 @@ if (!$mapaUrl) {
 
   .hotspot.is-available { background:var(--lms-primary, #1CAE8D); color:#fff; animation:hs-pulsa 2s ease-in-out infinite; }
 
+  /* concluída = comemoração: pin maior com anel dourado que respira, ✓ grande,
+     estrela balançando e selo "concluída" — entra com um pop escalonado */
   .hotspot.is-done {
-    background:var(--lms-success, #2E7D32); color:#fff;
-    box-shadow:0 3px 10px rgba(16,24,40,.5), 0 0 0 6px rgba(46,125,50,.30);
+    width:46px; height:46px; font-size:22px;
+    background:var(--lms-success, #27A567); color:#fff; border-color:#FCCA5B;
+    box-shadow:0 4px 12px rgba(16,24,40,.5), 0 0 0 5px rgba(252,202,91,.55);
+    animation:hs-done-pop .7s cubic-bezier(.34,1.56,.64,1) calc(var(--i, 0) * .15s) backwards,
+              hs-done-glow 2.6s ease-in-out calc(1s + var(--i, 0) * .15s) infinite;
   }
+  .hotspot.is-done::before {
+    content:'⭐'; position:absolute; top:-15px; right:-13px; font-size:19px; line-height:1;
+    filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));
+    animation:hs-star 1.8s ease-in-out infinite;
+  }
+  .hotspot.is-done::after {
+    content:'concluída'; position:absolute; top:calc(100% + 6px); left:50%; transform:translateX(-50%);
+    background:#FCCA5B; color:#2A4971; font-size:10.5px; font-weight:800; letter-spacing:.06em;
+    text-transform:uppercase; padding:2px 8px; border-radius:999px; white-space:nowrap;
+    box-shadow:0 2px 6px rgba(16,24,40,.3);
+  }
+  @keyframes hs-done-pop { 0% { transform:translate(-50%,-50%) scale(0) } 60% { transform:translate(-50%,-50%) scale(1.3) } 100% { transform:translate(-50%,-50%) scale(1) } }
+  @keyframes hs-done-glow {
+    0%, 100% { box-shadow:0 4px 12px rgba(16,24,40,.5), 0 0 0 5px rgba(252,202,91,.55) }
+    50%      { box-shadow:0 4px 12px rgba(16,24,40,.5), 0 0 0 13px rgba(252,202,91,.10) }
+  }
+  @keyframes hs-star { 0%, 100% { transform:rotate(-12deg) scale(1) } 50% { transform:rotate(14deg) scale(1.3) } }
 
   .hotspot.is-locked {
     background:rgba(43,52,80,.92); cursor:not-allowed; color:transparent;
@@ -414,9 +436,10 @@ window.addEventListener('pageshow', () => { avatarBusy = false; });
 
 // pins das fases (bloqueadas ficam só com o cadeado — sem névoa,
 // para a arte do cenário permanecer inteira à vista)
-FASES.forEach(f => {
+FASES.forEach((f, i) => {
   const hs = document.createElement('button');
   hs.className = 'hotspot is-' + f.estado;
+  hs.style.setProperty('--i', i);  // escalona o pop das concluídas
   hs.style.left = f.x + '%';
   hs.style.top = f.y + '%';
   if (f.estado === 'locked') hs.setAttribute('aria-disabled', 'true');
