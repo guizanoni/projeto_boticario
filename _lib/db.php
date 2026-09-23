@@ -69,7 +69,7 @@ function lms_db(): PDO {
 // (o seed só roda em banco novo). Parte da 31 pra ficar alinhada ao
 // engine de origem (/atlantica): uma correção de schema feita lá pode
 // ser replicada aqui com o mesmo número.
-const LMS_SCHEMA_VERSAO = 36;
+const LMS_SCHEMA_VERSAO = 37;
 
 function lms_migrar(PDO $db): void {
     $v = (int) $db->query('PRAGMA user_version')->fetchColumn();
@@ -128,6 +128,15 @@ function lms_migrar(PDO $db): void {
         require_once __DIR__ . '/conteudo/simulacao-atendimento.php';
         $cli = (int) $db->query("SELECT id FROM cliente WHERE slug = 'boticario'")->fetchColumn();
         if ($cli) conteudo_sim_atendimento_atualizar_briefing($db, $cli);
+    }
+
+    if ($v < 37) {
+        // v37 · Simulação em duas passadas (atendimento real sem correção +
+        // revisão guiada) com desvios de roteiro: reaplica o config inteiro
+        // das duas etapas de atendimento.
+        require_once __DIR__ . '/conteudo/simulacao-atendimento.php';
+        $cli = (int) $db->query("SELECT id FROM cliente WHERE slug = 'boticario'")->fetchColumn();
+        if ($cli) conteudo_sim_atendimento_reaplicar($db, $cli);
     }
 
     $db->exec('PRAGMA user_version = ' . LMS_SCHEMA_VERSAO);

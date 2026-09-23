@@ -124,22 +124,32 @@ Fonte: `boticario/materiais/nova-dinamica/` (fora do repo; textos extraídos em
   dentro do player. A cliente "digita" e fala em balões; o aluno escolhe a própria
   fala entre 2–4 opções por turno. HUD com as 4 etapas (acende conforme avança),
   as 3 bandeiras (capturam com festa), barra de satisfação (humor da cliente) e
-  sacola com valor. Errou → a cliente reage, o coach explica o que o modelo pede,
-  e escolhe de novo (modo domínio; há modo "livre" ramificado). No fim, relatório:
-  % de primeira, bandeiras, nota provável no NPS, sacola itemizada e **checklist
-  do Cliente Oculto** marcado só pelo que foi feito de primeira ("!" = acertou
-  depois do coach). `{nome}` nas falas vira o primeiro nome de quem joga. Revisão
-  reproduz a conversa gravada (eventos por turno) sem esperas.
+  sacola com valor. **Modo simulação (padrão, decisão do Gui em 23/09): duas
+  passadas na mesma sessão.** Na primeira ninguém corrige: a cliente reage com
+  fala e comportamento, escolhas erradas desviam o roteiro (`marca` na opção +
+  `desvio` no turno) e, com a satisfação abaixo de `humor_saida`, ela vai embora.
+  Depois vem o relatório (% de primeira, bandeiras, NPS provável, sacola × o que
+  levaria no caminho ideal = "ficou na mesa", checklist do Cliente Oculto) e a
+  **revisão guiada** só dos momentos errados: o que disse, como ela reagiu, o
+  coach, e refaz até acertar. O "Concluir" só aparece depois da revisão. Modos
+  antigos continuam no admin: "domínio" (coach na hora) e "livre". `{nome}` nas
+  falas vira o primeiro nome de quem joga. Revisão da etapa reproduz a conversa
+  gravada sem esperas.
 - **Fase 6 "Simulação de atendimento"** no treinamento "Da Base ao Look Completo"
   (migração v35, pin 40/80 no chão livre da loja, formativa, sem nota mínima):
   1. *Amanda — da base ao Serviço Completo*: o roteiro 02 inteiro, 14 turnos, com
      as falas da Jéssica como opção certa e os anti-padrões do material como
      erradas (CPF "pra nota", pular biossegurança, validar o mito do hidratante,
-     desistir na objeção de preço, sacola sem fragrância, pedir nota 10…).
+     desistir na objeção de preço, sacola sem fragrância, pedir nota 10…). Dois
+     desvios: sem CPF no Acolha (marca `sem_id`) o turno de benefícios vira o
+     T15 "ID Cliente vazio"; recusou ou nem ofereceu o Serviço Completo (marca
+     `sem_servico`) pula pro T14 "fecha só a base" e o boleto encolhe.
   2. *Bia — "só dando uma olhada"*: persona 2 do roteiro 01 que vira objeção de
      preço e sai sem comprar; 6 turnos; termina com motivo da não compra
      registrado, lembrete no Beautybox, amostra e NPS. Mostra que sem venda
-     também é resultado válido.
+     também é resultado válido. Bia é volátil (satisfação começa em 45 e ela
+     sai abaixo de 30): dois erros seguidos e ela foi embora; insistir ou
+     fechar a porta cedo encerra a conversa na hora.
 - **Admin**: tipo no catálogo, construtor visual completo (cliente, abertura,
   bandeiras, checklist, turnos com falas/opções/reação/coach/sacola/destino,
   relatório) e validação no servidor. Manual e massa de demonstração conhecem o

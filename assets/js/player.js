@@ -795,7 +795,7 @@ const COMO_JOGAR = {
   caca_palavras: ['🔤', 'Ache as palavras da lista: clique na <strong>primeira</strong> e na <strong>última</strong> letra de cada uma. A 💡 dá dica.'],
   cruzadinha:    ['✏️', 'Digite as letras na grade seguindo as dicas. Há tempo no relógio — confira ao final.'],
   tabuleiro:     ['🎲', 'Jogue o dado, ande pelas casas e responda ao cair. Errou? Volta uma casa.'],
-  atendimento:   ['💬', 'A cliente fala, você escolhe a sua resposta. Errou? Ela reage, o coach explica e você tenta de novo — só a escolha de primeira conta.'],
+  atendimento:   ['💬', 'A cliente fala e você escolhe a sua resposta. Ninguém corrige na hora: é a cliente que reage. No fim, o relatório mostra o que pesou e você refaz esses momentos.'],
 };
 
 /* ════════ MINIGAMES ════════ */
@@ -2398,17 +2398,25 @@ const Minigames = {
      a própria fala entre 2–4 opções. O HUD mostra as etapas fixas do
      modelo de atendimento (Acolha → Personalize → Potencialize → Encante),
      as bandeiras a capturar, a satisfação da cliente e a sacola.
-     Modo domínio (padrão): errou → a cliente reage, o coach explica e o
-     aluno escolhe de novo; só avança acertando. Conta como acerto (nota,
-     bandeira e checklist do Cliente Oculto) só a escolha de primeira —
-     a que um auditor teria visto. Modo "livre": errar segue o caminho.
-     Tudo vem do config (cliente, turnos, bandeiras, checklist, sacola);
-     "{nome}" nas falas vira o primeiro nome de quem está jogando. */
+
+     Modo "simulacao" (padrão): duas passadas na mesma sessão.
+       1. Atendimento real — ninguém corrige. Cada escolha tem consequência
+          na conversa: a cliente reage com fala e comportamento, a satisfação
+          sobe ou cai, opções podem desviar o roteiro (`vai`, `marca` +
+          `desvio`) e, abaixo de `humor_saida`, ela vai embora.
+       2. Relatório (Cliente Oculto, NPS provável, sacola × potencial) e a
+          passada guiada: só os momentos em que o aluno errou, com o que ele
+          disse, como a cliente reagiu, o coach e a chance de refazer até
+          acertar. Quem não errou vai direto ao "Concluir".
+     Modo "dominio": coach na hora e escolhe de novo (jogo anterior).
+     Modo "livre": errar segue o caminho, sem passada guiada.
+     Nota, bandeiras e checklist contam só a escolha de primeira — a que um
+     auditor teria visto. "{nome}" nas falas vira o nome de quem joga. */
   atendimento(cfg, host, done, revisao) {
     const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const eu = typeof EU !== 'undefined' ? EU : (window.EU || null);   // fase.php declara `const EU` (não é window.EU)
     const meuNome = esc(((eu && eu.nome) || 'Consultora').trim().split(/\s+/)[0]);
-    const T = s => String(s ?? '').replace(/\{nome\}/g, meuNome);
+    const T = s => String(s ?? '').replace(/\{nome\}/g, meuNome).replace(/\{cliente\}/g, esc((cfg.cliente || {}).nome || 'A cliente'));
     const lista = v => v == null || v === '' ? [] : (Array.isArray(v) ? v : [v]);
     const brl = v => 'R$ ' + (+v || 0).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
@@ -2417,22 +2425,43 @@ const Minigames = {
     const bandeiras = cfg.bandeiras || [];
     const checklist = cfg.checklist || [];
     const turnos = cfg.turnos || [];
-    const dominio = (cfg.modo || 'dominio') !== 'livre';
+    const modo = ['dominio', 'livre', 'simulacao'].includes(cfg.modo) ? cfg.modo : 'simulacao';
+    const dominio = modo === 'dominio';
+    const humorSaida = Number.isFinite(+cfg.humor_saida) ? +cfg.humor_saida : 20;
     const replay = !!revisao;                       // modo revisão: reproduz o que foi respondido, sem esperar
     const gravado = replay ? (revisao.resposta || null) : null;
 
     // estado da partida
     let humor = Number.isFinite(+cfg.humor_inicial) ? +cfg.humor_inicial : 50;
-    let acertos = 0, total = 0, etapaAtual = -1, passos = 0;
-    const eventos = [];                              // {t, o, ok} na ordem em que aconteceu
+    let acertos = 0, total = 0, etapaAtual = -1, passos = 0, saiu = false, guiando = false;
+    const eventos = [];                              // {t, o, ok} na ordem em que aconteceu (passada 1)
+    const guiado = [];                               // {t, o, ok} da passada guiada
     const primeira = {};                             // turno → acertou de primeira?
     const bandEstado = {};                           // id → 'ok' | 'ajuda'
     const ocultoEstado = {};                         // id → 'ok' | 'ajuda'
+    const marcas = new Set();                        // marcas deixadas por escolhas (desviam turnos à frente)
     const sacola = [];                               // {item, preco, brinde}
     const rapido = { on: replay };
 
     const esperar = ms => new Promise(r => setTimeout(r, rapido.on ? 0 : ms));
     const tempoDigitando = txt => Math.min(1900, 450 + String(txt).replace(/<[^>]+>/g, '').length * 16);
+    const proximo = (v, idx) => v === null ? -1 : (v ?? idx + 1);   // null encerra; ausente = próximo turno
+
+    // sacola do caminho ideal (opção certa de cada turno, seguindo `vai`) — o
+    // "quanto ficou na mesa" do relatório
+    const sacolaPotencial = () => {
+      let tot = 0, idx = 0, g = 0;
+      const vistos = new Set();
+      while (idx >= 0 && turnos[idx] && !vistos.has(idx) && g++ < 80) {
+        vistos.add(idx);
+        const t = turnos[idx];
+        const o = (t.opcoes || []).find(x => x.correta);
+        if (!o) { idx = proximo(t.vai, idx); continue; }
+        lista(o.sacola).forEach(x => { tot += +x.preco || 0; });
+        idx = proximo(o.vai, idx);
+      }
+      return tot;
+    };
 
     /* ── abertura: ficha da cliente, a cena, a missão e o botão.
        Sem manual — o HUD e o coach ensinam jogando. ── */
@@ -2497,6 +2526,7 @@ const Minigames = {
       chat.appendChild(d); rola(); return d;
     };
     const cena = txt => { chat.appendChild(el(`<div class="at-cena">${T(txt)}</div>`)); rola(); };
+    const separador = txt => { chat.appendChild(el(`<div class="at-sep"><span>${txt}</span></div>`)); rola(); };
     const coach = (txt, ok) => {
       chat.appendChild(el(`<div class="at-coach ${ok ? 'is-ok' : ''}"><span class="at-coach-ico">${ok ? '✅' : '🧭'}</span>
         <div><span class="at-coach-lbl">${ok ? 'Coach · boa!' : 'Coach · o que o modelo pede'}</span>${T(txt)}</div></div>`));
@@ -2542,34 +2572,53 @@ const Minigames = {
       if (elB) { elB.classList.remove('is-ok', 'is-ajuda'); elB.classList.add(estado === 'ok' ? 'is-ok' : 'is-ajuda'); elB.classList.add('jc-festa'); }
     };
 
-    /* ── um turno: didascália → falas da cliente → decisão ── */
+    // o que uma escolha certa rende (bandeira, checklist, sacola) — na
+    // passada 1 vale 'ok'; na guiada, 'ajuda'
+    const premia = (o, estado, comSacola) => {
+      lista(o.bandeira).forEach(id => marcaBandeira(id, estado));
+      lista(o.oculto).forEach(id => { if (ocultoEstado[id] !== 'ok') ocultoEstado[id] = estado; });
+      if (comSacola) {
+        lista(o.sacola).forEach(x => { if (x && x.item) sacola.push({ item: T(x.item), preco: +x.preco || 0, brinde: !!x.brinde }); });
+        if (lista(o.sacola).length) { pintaSacola(); ganho(`🛍️ ${lista(o.sacola).map(x => T(x.item)).join(' + ')} na sacola`); }
+      }
+      if (lista(o.bandeira).length) {
+        const nomes = lista(o.bandeira).map(id => bandeiras.find(x => x.id === id)).filter(Boolean);
+        if (nomes.length) ganho(`${nomes.map(x => x.icone || '🚩').join('')} Bandeira: ${nomes.map(x => x.nome).join(' + ')}${estado === 'ajuda' ? ' (na revisão)' : ''}`);
+        if (!rapido.on && hud.bands) { const r = hud.bands.getBoundingClientRect(); confeteMini(r.left + r.width / 2, r.top + r.height / 2, 14); }
+      }
+    };
+
+    /* ── um turno: desvio por marca → didascália → falas da cliente → decisão ── */
     const turno = async (idx) => {
       if (passos++ > 80) return fim();                 // trava anti-loop (config com ciclo)
-      const t = turnos[idx];
+      let t = turnos[idx];
       if (!t) return fim();
+      // desvio: escolhas anteriores deixaram uma marca que muda este turno
+      const dv = lista(t.desvio).find(d => d && d.marca && marcas.has(d.marca) && turnos[d.vai]);
+      if (dv) { idx = +dv.vai; t = turnos[idx]; }
       const et = Math.max(0, Math.min(etapas.length - 1, +t.etapa || 0));
       if (et !== etapaAtual) {
         etapaAtual = et;
         pintaEtapa(et);
-        chat.appendChild(el(`<div class="at-sep"><span>${esc(etapas[et])}</span></div>`)); rola();
+        separador(esc(etapas[et]));
         await esperar(350);
       }
       acoes.innerHTML = `<div class="at-espera"><div class="at-typing"><i></i><i></i><i></i></div>${esc(T(cli.nome || 'A cliente'))}…</div>`;
       if (t.cena) { cena(t.cena); await esperar(600); }
       for (const f of lista(t.falas)) await clienteFala(f);
-      if (!(t.opcoes || []).length) return turno(t.vai === null ? -1 : (t.vai ?? idx + 1));
+      if (!(t.opcoes || []).length) return turno(proximo(t.vai, idx));
       decisao(idx, t);
     };
 
     const decisao = (idx, t, tentadas = new Set()) => {
       acoes.innerHTML = '';
-      acoes.appendChild(el(`<p class="at-perg"><span class="at-perg-tag">${esc(etapas[etapaAtual] || 'Você')}</span>${T(t.pergunta || 'O que você diz?')}</p>`));
+      acoes.appendChild(el(`<p class="at-perg"><span class="at-perg-tag">${guiando ? 'Revisão' : esc(etapas[etapaAtual] || 'Você')}</span>${T(t.pergunta || 'O que você diz?')}</p>`));
       const letras = 'ABCDEFGH';
       let travado = false;
       t.opcoes.forEach((o, oi) => {
         if (tentadas.has(oi)) return;
         const b = el(`<button type="button" class="at-op"><span class="at-op-badge">${letras[oi]}</span><span>${T(o.texto)}</span></button>`);
-        b.addEventListener('click', () => { if (travado) return; travado = true; escolher(idx, t, oi, tentadas); });
+        b.addEventListener('click', () => { if (travado) return; travado = true; (guiando ? escolherGuiado : escolher)(idx, t, oi, tentadas); });
         acoes.appendChild(b);
       });
       if (replay) {
@@ -2580,6 +2629,20 @@ const Minigames = {
       }
     };
 
+    // a cliente desiste: satisfação abaixo do limite
+    const saida = async () => {
+      saiu = true;
+      sacola.length = 0; pintaSacola();
+      cena(cfg.saida_cena || '{cliente} olha o relógio, agradece sem muito entusiasmo e vai embora.');
+      await esperar(700);
+      if (cfg.saida_fala) await clienteFala(cfg.saida_fala);
+      acoes.innerHTML = '';
+      const b = el('<button type="button" class="lms-btn lms-btn-primary" style="width:100%">Ver o relatório →</button>');
+      b.addEventListener('click', fim);
+      acoes.appendChild(b);
+      if (replay) b.click();
+    };
+
     const escolher = async (idx, t, oi, tentadas) => {
       const o = t.opcoes[oi];
       const ok = !!o.correta;
@@ -2587,29 +2650,22 @@ const Minigames = {
       if (primeiraVez) { total++; primeira[idx] = ok; if (ok) acertos++; }
       eventos.push({ t: idx, o: oi, ok });
       acoes.querySelectorAll('.at-op').forEach(b => { b.disabled = true; });
-      balao(o.texto, 'eu', ok ? '' : 'is-errou');
-      if (!rapido.on) (ok ? SFX.ok : SFX.err)();
+      // na simulação a fala errada não é riscada: quem joga não sabe que errou — a cliente é que mostra
+      balao(o.texto, 'eu', (dominio && !ok) ? 'is-errou' : '');
+      if (!rapido.on) { if (dominio) (ok ? SFX.ok : SFX.err)(); else SFX.flip(); }
       await esperar(500);
 
       // a cliente reage à sua fala (positiva ou não)
       for (const r of lista(o.reacao)) await clienteFala(r);
       humor += Number.isFinite(+o.humor) ? +o.humor : (ok ? 8 : -12);
       pintaHumor();
+      lista(o.marca).forEach(m => marcas.add(m));
 
       if (ok) {
-        const estado = primeira[idx] ? 'ok' : 'ajuda';
-        lista(o.bandeira).forEach(id => marcaBandeira(id, estado));
-        lista(o.oculto).forEach(id => { if (ocultoEstado[id] !== 'ok') ocultoEstado[id] = estado; });
-        lista(o.sacola).forEach(x => { if (x && x.item) sacola.push({ item: T(x.item), preco: +x.preco || 0, brinde: !!x.brinde }); });
-        if (lista(o.sacola).length) { pintaSacola(); ganho(`🛍️ ${lista(o.sacola).map(x => T(x.item)).join(' + ')} na sacola`); }
-        if (lista(o.bandeira).length) {
-          const nomes = lista(o.bandeira).map(id => bandeiras.find(x => x.id === id)).filter(Boolean);
-          if (nomes.length) ganho(`${nomes.map(x => x.icone || '🚩').join('')} Bandeira: ${nomes.map(x => x.nome).join(' + ')}${estado === 'ajuda' ? ' (com ajuda do coach)' : ''}`);
-          if (!rapido.on && hud.bands) { const r = hud.bands.getBoundingClientRect(); confeteMini(r.left + r.width / 2, r.top + r.height / 2, 14); }
-        }
-        if (o.feedback) coach(o.feedback, true);
-        await esperar(o.feedback ? 1100 : 500);
-        return turno(o.vai === null ? -1 : (o.vai ?? idx + 1));
+        premia(o, primeira[idx] ? 'ok' : 'ajuda', true);
+        if (dominio && o.feedback) coach(o.feedback, true);
+        await esperar(dominio && o.feedback ? 1100 : 500);
+        return turno(proximo(o.vai, idx));
       }
 
       // errou
@@ -2624,59 +2680,148 @@ const Minigames = {
         if (replay) { await esperar(0); btn.click(); }
         return;
       }
-      if (o.feedback) coach(o.feedback, false);
-      await esperar(o.feedback ? 1100 : 500);
-      return turno(o.vai === null ? -1 : (o.vai ?? idx + 1));
+      // simulação / livre: a consequência é a conversa. Sacola da opção (se
+      // tiver) entra — é o que a cliente leva depois dessa fala.
+      lista(o.sacola).forEach(x => { if (x && x.item) sacola.push({ item: T(x.item), preco: +x.preco || 0, brinde: !!x.brinde }); });
+      if (lista(o.sacola).length) pintaSacola();
+      if (humor < humorSaida && turnos[proximo(o.vai, idx)]) return saida();
+      await esperar(500);
+      return turno(proximo(o.vai, idx));
     };
+
+    /* ── passada guiada: só os momentos em que errou ── */
+    const errados = () => {
+      const vistos = new Set(); const out = [];
+      eventos.forEach(e2 => { if (!e2.ok && !primeira[e2.t] && !vistos.has(e2.t)) { vistos.add(e2.t); out.push(e2); } });
+      return out;
+    };
+    let fila = [], posFila = 0;
+    const guiar = async () => {
+      guiando = true;
+      fila = errados(); posFila = 0;
+      chat.innerHTML = '';
+      pintaEtapa(-1);
+      separador(`🧭 Revisão guiada · ${fila.length} ${fila.length === 1 ? 'momento' : 'momentos'}`);
+      chat.appendChild(el(`<div class="at-coach is-ok"><span class="at-coach-ico">🧭</span><div><span class="at-coach-lbl">Coach</span>Vamos voltar só aos momentos que pesaram. Você vê o que disse, como ${esc(T(cli.nome || 'a cliente'))} reagiu e o que o modelo de atendimento pede — e refaz a fala.</div></div>`));
+      await esperar(500);
+      momento();
+    };
+    const momento = async () => {
+      const ev = fila[posFila];
+      if (!ev) return fimGuiado();
+      const t = turnos[ev.t];
+      const et = Math.max(0, Math.min(etapas.length - 1, +t.etapa || 0));
+      pintaEtapa(et);
+      separador(`Momento ${posFila + 1} de ${fila.length} · ${esc(etapas[et])}`);
+      if (t.cena) cena(t.cena);
+      for (const f of lista(t.falas)) balao(f, 'cli');
+      const o = t.opcoes[ev.o];
+      balao(o.texto, 'eu', 'is-errou');
+      for (const r of lista(o.reacao)) balao(r, 'cli');
+      coach(o.feedback || 'Não foi por aí. Veja o que o modelo pede nesta etapa e refaça a fala.', false);
+      await esperar(400);
+      decisao(ev.t, t, new Set([ev.o]));
+    };
+    const escolherGuiado = async (idx, t, oi, tentadas) => {
+      const o = t.opcoes[oi];
+      const ok = !!o.correta;
+      guiado.push({ t: idx, o: oi, ok });
+      acoes.querySelectorAll('.at-op').forEach(b => { b.disabled = true; });
+      balao(o.texto, 'eu', ok ? '' : 'is-errou');
+      if (!rapido.on) (ok ? SFX.ok : SFX.err)();
+      await esperar(400);
+      for (const r of lista(o.reacao)) await clienteFala(r);
+      if (!ok) {
+        coach(o.feedback || 'Ainda não. Releia o que o coach pediu e tente outra fala.', false);
+        tentadas.add(oi);
+        return decisao(idx, t, tentadas);
+      }
+      humor += Number.isFinite(+o.humor) ? +o.humor : 8;
+      pintaHumor();
+      premia(o, 'ajuda', false);
+      if (o.feedback) coach(o.feedback, true);
+      acoes.innerHTML = '';
+      posFila++;
+      const ultimo = posFila >= fila.length;
+      const btn = el(`<button type="button" class="lms-btn lms-btn-primary" style="width:100%">${ultimo ? 'Fechar a revisão →' : 'Próximo momento →'}</button>`);
+      btn.addEventListener('click', momento);
+      acoes.appendChild(btn);
+    };
+    const fimGuiado = () => {
+      const f = cfg.final || {};
+      acoes.innerHTML = '';
+      acoes.appendChild(el(`
+        <div class="lms-stack-4">
+          <div class="lms-card-pastel is-mint lms-pop" style="padding:22px">
+            <div class="lms-row" style="gap:12px; align-items:center"><span style="font-size:30px">🎯</span>
+              <div><h3 style="margin:0">Revisão concluída</h3>
+              <p class="lms-small lms-muted" style="margin:2px 0 0">${fila.length} ${fila.length === 1 ? 'momento refeito' : 'momentos refeitos'} · da próxima vez, ${esc(T(cli.nome || 'a cliente'))} sai da loja de outro jeito.</p></div></div>
+          </div>
+          <button type="button" class="lms-btn lms-btn-primary lms-btn-lg" style="width:100%">${f.botao || 'Concluir atendimento'} ✓</button>
+        </div>`));
+      acoes.querySelector('button').addEventListener('click', concluir);
+      confete(50);
+    };
+
+    const concluir = () => done({
+      acertos, total: Math.max(1, total),
+      resposta: { eventos: eventos.map(e2 => ({ t: e2.t, o: e2.o, ok: e2.ok })), guiado, humor, sacola, bandeiras: bandEstado, oculto: ocultoEstado, saiu, marcas: [...marcas] },
+    });
 
     /* ── relatório do atendimento ── */
     const fim = () => {
-      pintaEtapa(etapas.length);
+      pintaEtapa(saiu ? etapaAtual : etapas.length);
       const pct = total ? Math.round(acertos / total * 100) : 100;
-      const nps = humor >= 85 ? 10 : humor >= 70 ? 9 : humor >= 55 ? 8 : humor >= 40 ? 7 : humor >= 25 ? 5 : 3;
+      const nps = saiu ? 3 : humor >= 85 ? 10 : humor >= 70 ? 9 : humor >= 55 ? 8 : humor >= 40 ? 7 : humor >= 25 ? 5 : 3;
       const nBandOk = bandeiras.filter(x => bandEstado[x.id] === 'ok').length;
-      const nBandAjuda = bandeiras.filter(x => bandEstado[x.id] === 'ajuda').length;
       const totalR = sacola.reduce((s, x) => s + (+x.preco || 0), 0);
+      const potencial = sacolaPotencial();
       const f = cfg.final || {};
       const semVenda = !!f.sem_venda || !sacola.length;
+      const registrou = !checklist.some(c => c.id === 'motivo_nao_compra') || !!ocultoEstado.motivo_nao_compra;
+      const naMesa = !f.sem_venda && potencial > totalR ? potencial - totalR : 0;
+      const nErros = errados().length;
+      const temGuia = modo === 'simulacao' && nErros > 0 && !replay;
       acoes.innerHTML = '';
       const rel = el(`
         <div class="lms-stack-4">
-          <div class="lms-card-pastel ${pct >= 70 ? 'is-mint' : 'is-sand'} lms-pop" style="padding:24px">
+          <div class="lms-card-pastel ${saiu ? 'is-rose' : pct >= 70 ? 'is-mint' : 'is-sand'} lms-pop" style="padding:24px">
             <div class="lms-row" style="gap:12px; align-items:center">
-              <span style="font-size:34px">${pct >= 90 ? '🏆' : pct >= 70 ? '🎉' : '📋'}</span>
-              <div><h3 style="margin:0">${T(f.titulo || 'Relatório do atendimento')}</h3>
+              <span style="font-size:34px">${saiu ? '🚪' : pct >= 90 ? '🏆' : pct >= 70 ? '🎉' : '📋'}</span>
+              <div><h3 style="margin:0">${saiu ? esc(T(cli.nome || 'A cliente')) + ' foi embora' : T(f.titulo || 'Relatório do atendimento')}</h3>
               <p class="lms-small lms-muted" style="margin:2px 0 0">${T(cli.nome || 'Cliente')}${cli.persona ? ' · ' + T(cli.persona) : ''}</p></div>
             </div>
-            ${f.texto ? `<p style="margin-top:12px; font-size:15px; line-height:1.6">${T(f.texto)}</p>` : ''}
+            ${saiu ? `<p style="margin-top:12px; font-size:15px; line-height:1.6">A satisfação caiu abaixo do que segura uma cliente na loja. Ela saiu na etapa <strong>${esc(etapas[etapaAtual] || '')}</strong>, sem comprar. Veja abaixo o que um auditor teria marcado — e depois refaça os momentos que pesaram.</p>`
+                    : f.texto ? `<p style="margin-top:12px; font-size:15px; line-height:1.6">${T(f.texto)}</p>` : ''}
             <div class="at-rel-stats">
-              <div class="at-rel-stat"><b style="color:var(--lms-success)">${pct}%</b><span>de primeira (${acertos} de ${total})</span></div>
-              ${bandeiras.length ? `<div class="at-rel-stat"><b>${nBandOk}<small style="font-size:14px; color:var(--lms-ink-soft)">/${bandeiras.length}</small></b><span>bandeiras${nBandAjuda ? ` · ${nBandAjuda} com ajuda` : ''}</span></div>` : ''}
+              <div class="at-rel-stat"><b style="color:${pct >= 70 ? 'var(--lms-success)' : '#B07A10'}">${pct}%</b><span>de primeira (${acertos} de ${total})</span></div>
+              ${bandeiras.length ? `<div class="at-rel-stat"><b>${nBandOk}<small style="font-size:14px; color:var(--lms-ink-soft)">/${bandeiras.length}</small></b><span>bandeiras</span></div>` : ''}
               <div class="at-rel-stat"><b>${nps}</b><span>nota provável no NPS</span></div>
-              <div class="at-rel-stat"><b style="font-size:${semVenda ? '18px' : '22px'}">${semVenda ? 'sem venda' : brl(totalR)}</b><span>${semVenda ? (f.motivo_nao_compra ? 'motivo registrado' : 'hoje') : 'na sacola · ' + sacola.length + (sacola.length === 1 ? ' item' : ' itens')}</span></div>
+              <div class="at-rel-stat"><b style="font-size:${semVenda ? '18px' : '22px'}">${semVenda ? 'sem venda' : brl(totalR)}</b><span>${semVenda ? (saiu ? 'ela foi embora' : f.motivo_nao_compra ? (registrou ? 'motivo registrado' : 'sem motivo registrado') : 'hoje') : 'na sacola · ' + sacola.length + (sacola.length === 1 ? ' item' : ' itens')}</span></div>
             </div>
+            ${naMesa > 0 ? `<div class="lms-alert is-error" style="margin-top:4px">💸 <div><strong>${brl(naMesa)} ficaram na mesa.</strong> Com o atendimento completo, ${esc(T(cli.nome || 'a cliente'))} levaria ${brl(potencial)}.</div></div>` : ''}
           </div>
           ${sacola.length ? `<div class="lms-card" style="padding:20px"><h4>🛍️ Sacola de ${T(cli.nome || 'cliente')}</h4>
             <ul class="at-sacola-lista">${sacola.map(x => `<li><span>${x.item}</span><span>${x.brinde ? 'brinde' : brl(x.preco)}</span></li>`).join('')}
             <li class="is-total"><span>Total</span><span>${brl(totalR)}</span></li></ul>
             ${cfg.nota_precos ? `<p class="lms-small lms-muted" style="margin-top:8px">${T(cfg.nota_precos)}</p>` : ''}</div>` : ''}
-          ${semVenda && f.motivo_nao_compra ? `<div class="lms-alert is-info">📝 <div><strong>Motivo da não compra registrado:</strong> ${T(f.motivo_nao_compra)}. Sem venda também é resultado válido do atendimento — o dado alimenta o CRM e a próxima oferta.</div></div>` : ''}
+          ${semVenda && !saiu && f.motivo_nao_compra && registrou ? `<div class="lms-alert is-info">📝 <div><strong>Motivo da não compra registrado:</strong> ${T(f.motivo_nao_compra)}. Sem venda também é resultado válido do atendimento — o dado alimenta o CRM e a próxima oferta.</div></div>` : ''}
           ${checklist.length ? `<div class="lms-card" style="padding:20px"><h4>📋 Checklist do Cliente Oculto</h4>
-            <p class="lms-small lms-muted" style="margin:2px 0 6px">O que um auditor teria marcado vendo só as suas escolhas de primeira.</p>
+            <p class="lms-small lms-muted" style="margin:2px 0 6px">O que um auditor teria marcado vendo o atendimento.</p>
             <ul class="at-check">${checklist.map(c => {
               const st = ocultoEstado[c.id] || 'nao';
               return `<li class="is-${st}"><i>${st === 'ok' ? '✓' : st === 'ajuda' ? '!' : '✕'}</i><span>${T(c.texto)}${st === 'ajuda' ? ' <em class="lms-small lms-muted">(acertou depois do coach)</em>' : ''}</span></li>`;
             }).join('')}</ul></div>` : ''}
-          ${replay ? '' : `<button type="button" class="lms-btn lms-btn-primary lms-btn-lg" style="width:100%">${f.botao || 'Concluir atendimento'} ✓</button>`}
+          ${replay ? '' : temGuia
+            ? `<button type="button" class="lms-btn lms-btn-primary lms-btn-lg" style="width:100%">Refazer os momentos que pesaram (${nErros}) →</button>
+               <p class="lms-small lms-muted lms-center" style="margin-top:6px">O atendimento só conclui depois da revisão: é nela que o erro vira aprendizado.</p>`
+            : `<button type="button" class="lms-btn lms-btn-primary lms-btn-lg" style="width:100%">${f.botao || 'Concluir atendimento'} ✓</button>`}
         </div>`);
       acoes.appendChild(rel);
       rel.scrollIntoView({ behavior: 'smooth', block: 'start' });
       if (!replay) {
-        if (pct >= 70) confete(60);
-        rel.querySelector('button').addEventListener('click', () => done({
-          acertos, total: Math.max(1, total),
-          resposta: { eventos: eventos.map(e2 => ({ t: e2.t, o: e2.o, ok: e2.ok })), humor, sacola, bandeiras: bandEstado, oculto: ocultoEstado },
-        }));
+        if (!saiu && pct >= 70 && !temGuia) confete(60);   // festa só quando não há nada a rever
+        rel.querySelector('button').addEventListener('click', temGuia ? guiar : concluir);
       }
     };
 
@@ -2742,6 +2887,8 @@ const Player = {
     // investigação em modo domínio joga diferente: a dica precisa dizer isso
     const dica = (slug === 'investigacao' && e2.config?.modo === 'dominio')
       ? ['🎧', 'Ouça a cena e escolha. Errou? Leia o feedback e escolha de novo — só avança acertando.']
+      : (slug === 'atendimento' && e2.config?.modo === 'dominio')
+      ? ['💬', 'A cliente fala, você escolhe a sua resposta. Errou? Ela reage, o coach explica e você tenta de novo — só a escolha de primeira conta.']
       : COMO_JOGAR[slug];
     host.appendChild(el(`
       <div class="lms-stack-4 mg-slide">

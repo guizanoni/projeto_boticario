@@ -39,7 +39,7 @@ $tipos = [
     'sete_erros'    => ['🔎', 'Jogo dos erros', 'Imagem com pontos escondidos para o aluno clicar e encontrar.'],
     'investigacao'  => ['🕵️', 'Investigação', 'Narrativa em cartas com áudio opcional por cena: ramificada (cada escolha abre um caminho) ou em modo domínio (errou? feedback e tenta de novo).'],
     'tabuleiro'     => ['🎲', 'Tabuleiro', 'Jogo de tabuleiro: jogue o dado, avance e responda a pergunta da casa.'],
-    'atendimento'   => ['💬', 'Simulação de atendimento (chat)', 'A cliente conversa em balões de chat e o aluno escolhe a própria fala, turno a turno, pelas 4 etapas do atendimento — com bandeiras, satisfação, sacola e checklist do Cliente Oculto no fim.'],
+    'atendimento'   => ['💬', 'Simulação de atendimento (chat)', 'A cliente conversa em balões de chat e o aluno escolhe a própria fala, turno a turno, pelas 4 etapas do atendimento. Ninguém corrige na hora: a cliente reage e pode ir embora; no fim, relatório (Cliente Oculto, NPS, sacola) e revisão guiada só dos momentos errados.'],
 ];
 
 // Validação mínima do config por tipo — garante que o player consegue rodar.
@@ -181,6 +181,7 @@ function etapa_valida(string $tipo, $cfg): ?string {
                     if (!$temTexto($o['texto'] ?? '')) return 'Toda opção precisa de texto.';
                     if (array_key_exists('vai', $o) && $o['vai'] !== null && (!is_numeric($o['vai']) || (int) $o['vai'] < 0 || (int) $o['vai'] >= $n)) return 'Opção apontando para um turno que não existe.';
                 }
+                foreach ($t['desvio'] ?? [] as $d) if (!$temTexto($d['marca'] ?? '') || !is_numeric($d['vai'] ?? null) || (int) $d['vai'] < 0 || (int) $d['vai'] >= $n) return 'Desvio sem marca ou apontando para um turno que não existe.';
             }
             foreach ($cfg['bandeiras'] ?? [] as $b) if (!$temTexto($b['id'] ?? '') || !$temTexto($b['nome'] ?? '')) return 'Toda bandeira precisa de id e nome.';
             foreach ($cfg['checklist'] ?? [] as $c) if (!$temTexto($c['id'] ?? '') || !$temTexto($c['texto'] ?? '')) return 'Todo item do checklist precisa de id e texto.';
@@ -403,7 +404,7 @@ const VAZIOS = {
     { icone: '🔎', titulo: '', pista: '', pergunta: '', audio: '', audio_quem: '', opcoes: [{ texto: '', correta: true, vai: null, feedback: '' }, { texto: '', correta: false, vai: null, feedback: '' }] },
   ] }),
   tabuleiro:     () => ({ instrucao: '', casas: Array.from({ length: 4 }, () => ({ pergunta: '', alternativas: ['', ''], corretas: [0] })) }),
-  atendimento:   () => ({ modo: 'dominio', humor_inicial: 50, etapas: ['Acolha', 'Personalize', 'Potencialize', 'Encante'],
+  atendimento:   () => ({ modo: 'simulacao', humor_inicial: 50, humor_saida: 20, saida_fala: '', etapas: ['Acolha', 'Personalize', 'Potencialize', 'Encante'],
     cliente: { nome: '', avatar: '👩', persona: '', descricao: '' }, briefing: { texto: '', missao: '', botao: '' },
     bandeiras: [{ id: 'identificacao', icone: '🆔', nome: 'Identificação' }, { id: 'experimentacao', icone: '🧪', nome: 'Experimentação' }, { id: 'beautybox', icone: '💚', nome: 'Beautybox' }],
     checklist: [], turnos: [{ etapa: 0, cena: '', falas: [], pergunta: '', opcoes: [{ texto: '', correta: true, reacao: [], feedback: '' }, { texto: '', correta: false, reacao: [], feedback: '' }] }],
@@ -1118,12 +1119,16 @@ const RENDERS = {
     bl0.appendChild(l0);
     bl0.appendChild(campo(s.cliente.descricao || '', 'Quem é e o que veio fazer (aparece na ficha de abertura)…', v => s.cliente.descricao = v, 'textarea'));
     const l1 = h('<div class="b-linha" style="flex-wrap:wrap"></div>');
-    const selModo = h(`<select class="lms-select"><option value="dominio" ${s.modo !== 'livre' ? 'selected' : ''}>Domínio — errou? a cliente reage, o coach explica e escolhe de novo (conta só de primeira)</option><option value="livre" ${s.modo === 'livre' ? 'selected' : ''}>Livre — errar segue o caminho da opção</option></select>`);
+    const selModo = h(`<select class="lms-select"><option value="simulacao" ${!['dominio', 'livre'].includes(s.modo) ? 'selected' : ''}>Simulação — ninguém corrige na hora; relatório e revisão guiada dos erros no fim</option><option value="dominio" ${s.modo === 'dominio' ? 'selected' : ''}>Domínio — errou? a cliente reage, o coach explica e escolhe de novo</option><option value="livre" ${s.modo === 'livre' ? 'selected' : ''}>Livre — errar segue o caminho, sem revisão</option></select>`);
     selModo.addEventListener('change', ev => s.modo = ev.target.value);
     l1.appendChild(selModo);
     const humor = campo(String(s.humor_inicial ?? 50), 'Satisfação inicial (0–100)', v => s.humor_inicial = +v || 0); humor.style.maxWidth = '200px';
     l1.appendChild(humor);
+    const hs = campo(String(s.humor_saida ?? 20), 'Vai embora abaixo de (0–100)', v => s.humor_saida = +v || 0); hs.style.maxWidth = '220px';
+    l1.appendChild(hs);
     bl0.appendChild(l1);
+    bl0.appendChild(campo(s.saida_fala || '', 'Fala da cliente ao ir embora (opcional — ex.: Vou dar uma olhada em outra loja.)', v => s.saida_fala = v));
+    bl0.appendChild(campo(s.saida_cena || '', 'Didascália da saída (opcional — {cliente} vira o nome dela)', v => s.saida_cena = v));
     bl0.appendChild(h('<label class="lms-label" style="margin-top:8px; display:block">Etapas do atendimento (separadas por vírgula)</label>'));
     bl0.appendChild(campo(ETAPAS().join(', '), 'Acolha, Personalize, Potencialize, Encante', v => { s.etapas = v.split(',').map(x => x.trim()).filter(Boolean); }));
     bl0.appendChild(campo(s.nota_precos || '', 'Nota sobre os preços da sacola (opcional, aparece no relatório)', v => s.nota_precos = v));
@@ -1183,6 +1188,15 @@ const RENDERS = {
       le.appendChild(campo(t.pergunta || '', 'Pergunta ao aluno (ex.: Como você recebe a Amanda?)', v => t.pergunta = v));
       bl.appendChild(le);
       bl.appendChild(campo(t.cena || '', 'Didascália — o que acontece na cena (opcional)…', v => t.cena = v));
+      const dv = (t.desvio || [])[0] || {};
+      const ld = h('<div class="b-linha" style="flex-wrap:wrap"><span class="lms-small lms-muted" style="flex:none">↪ Desvio: se a marca</span></div>');
+      const dm = campo(dv.marca || '', 'marca (ex.: sem_id)', v => { t.desvio = v ? [{ marca: v, vai: dv.vai ?? 0 }] : []; dv.marca = v; }); dm.style.maxWidth = '170px';
+      ld.appendChild(dm);
+      const dsel = h(`<select class="lms-select" style="max-width:170px">${s.turnos.map((_, d) => d === ti ? '' : `<option value="${d}" ${dv.vai === d ? 'selected' : ''}>→ Turno ${d + 1}</option>`).join('')}</select>`);
+      dsel.addEventListener('change', ev => { dv.vai = +ev.target.value; if (dv.marca) t.desvio = [{ marca: dv.marca, vai: dv.vai }]; });
+      ld.appendChild(dsel);
+      ld.appendChild(h('<span class="lms-small lms-muted" style="flex:none">estiver ativa, este turno é trocado por esse</span>'));
+      bl.appendChild(ld);
       bl.appendChild(h('<label class="lms-label" style="margin-top:8px; display:block">Falas da cliente antes da decisão (uma por linha, opcional)</label>'));
       bl.appendChild(campo(lista(t.falas).join('\n'), 'Ex.: Oi! Vim buscar uma base…', v => t.falas = v.split('\n').map(x => x.trim()).filter(Boolean), 'textarea'));
       bl.appendChild(h('<label class="lms-label" style="margin-top:10px; display:block">Opções de resposta do aluno — <span class="lms-muted">{nome} vira o nome de quem joga</span></label>'));
@@ -1206,6 +1220,8 @@ const RENDERS = {
         l2.appendChild(campo(lista(o.oculto).join(', '), 'ids do checklist que esta fala cumpre (ex.: cpf, cpf_motivo)', v => o.oculto = v.split(',').map(x => x.trim()).filter(Boolean)));
         const hu = campo(o.humor == null ? '' : String(o.humor), '± satisfação', v => { if (v === '') delete o.humor; else o.humor = +v; }); hu.style.maxWidth = '120px';
         l2.appendChild(hu);
+        const mk = campo(lista(o.marca).join(', '), 'marca que deixa (ex.: sem_id)', v => { const m = v.split(',').map(x => x.trim()).filter(Boolean); if (m.length) o.marca = m; else delete o.marca; }); mk.style.maxWidth = '190px';
+        l2.appendChild(mk);
         const selV = h(`<select class="lms-select" style="max-width:180px"><option value="">→ próximo turno</option><option value="fim" ${o.vai === null ? 'selected' : ''}>🏁 Encerra</option>${s.turnos.map((_, d) => d === ti ? '' : `<option value="${d}" ${o.vai === d ? 'selected' : ''}>→ Turno ${d + 1}</option>`).join('')}</select>`);
         selV.addEventListener('change', ev => { const v = ev.target.value; if (v === '') delete o.vai; else o.vai = v === 'fim' ? null : +v; });
         l2.appendChild(selV);

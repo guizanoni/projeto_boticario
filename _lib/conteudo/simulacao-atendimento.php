@@ -19,9 +19,11 @@
 //   2. Bia — persona "uso próprio, explorando" que vira objeção de preço
 //      e sai sem comprar (o resultado válido do roteiro não linear:
 //      motivo da não compra capturado, porta aberta, mimo de saída).
-// Regras de jogo (mesma metodologia das outras fases): modo domínio —
-// errou, a cliente reage, o coach explica, escolhe de novo; conta acerto,
-// bandeira e checklist só de primeira. Fase formativa: sem nota mínima.
+// Regras de jogo: modo simulação — ninguém corrige na hora; a cliente reage,
+// escolhas erradas desviam o roteiro (marcas `sem_id`/`sem_servico` → turnos
+// 14/15 da Amanda) e, com a satisfação lá embaixo, ela vai embora. No fim,
+// relatório + revisão guiada só dos momentos errados, na mesma sessão. Conta
+// acerto, bandeira e checklist só de primeira. Fase formativa: sem nota mínima.
 // ──────────────────────────────────────────────────────────────
 
 const CONTEUDO_SIM_ATENDIMENTO_FASE = 'Simulação de atendimento';
@@ -34,8 +36,9 @@ function conteudo_sim_atendimento_comum(): array {
             ['id' => 'experimentacao', 'icone' => '🧪', 'nome' => 'Experimentação'],
             ['id' => 'beautybox',      'icone' => '💚', 'nome' => 'Beautybox'],
         ],
-        'modo'          => 'dominio',
+        'modo'          => 'simulacao',   // duas passadas: atendimento real + revisão guiada dos erros
         'humor_inicial' => 50,
+        'humor_saida'   => 20,           // abaixo disso a cliente vai embora
         'loja'          => 'Loja O Boticário',
         'nota_precos'   => 'Valores ilustrativos, só pra simulação — na loja vale a tabela vigente.',
     ];
@@ -73,6 +76,7 @@ function conteudo_sim_atendimento_amanda(): array {
         'persona'   => 'Uso próprio · item definido',
         'descricao' => 'Entrou na loja procurando uma base. A dela acabou e ela precisa repor — mas não tem certeza se usava a cor certa.',
     ];
+    $c['saida_fala'] = 'Sabe, acho que vou dar uma olhada em outra loja. Obrigada!';
     $c['briefing'] = [
         'texto'  => 'Terça à tarde, loja tranquila. Amanda entra e para em frente às bases.',
         'missao' => 'Levar uma reposição de base até o Serviço Completo de Make, do jeito que o modelo de atendimento pede.',
@@ -127,11 +131,11 @@ function conteudo_sim_atendimento_amanda(): array {
              'reacao' => ['Claro! É 123.456.789-00.', '<i>(Você digita o CPF no Mobshop: Amanda é cliente fidelidade.)</i>'],
              'feedback' => 'Bandeira 1 capturada: o CPF entrou como benefício, não como burocracia. É a pergunta obrigatória do Cliente Oculto — e é ela que liga o ID Cliente ao resto do atendimento.'],
             ['texto' => 'Me passa o seu CPF? É pra nota.',
-             'correta' => false,
+             'correta' => false, 'marca' => 'sem_id',
              'reacao' => 'Ah, pode ser sem CPF mesmo.',
              'feedback' => '"Pra nota" não dá motivo nenhum. A pergunta obrigatória do Cliente Oculto é: explicou o motivo da solicitação do CPF, comentando o Programa de Fidelidade (benefícios, pontos, promoções ou descontos)?'],
             ['texto' => 'Vamos direto pra bancada testar a cor! Depois a gente vê o cadastro.',
-             'correta' => false,
+             'correta' => false, 'marca' => 'sem_id',
              'reacao' => 'Combinado!',
              'feedback' => 'Sem o CPF agora, o ID Cliente fica fora da conversa: sem histórico, sem promoção personalizada, sem cashback. A identificação vem antes da experimentação porque alimenta tudo que vem depois.'],
          ]],
@@ -162,7 +166,7 @@ function conteudo_sim_atendimento_amanda(): array {
              'reacao' => ['Minha pele é de normal a seca, e às vezes descama um pouco no frio. Por isso morro de medo de base que craquela ou marca as linhas.', 'No dia a dia eu só passo protetor solar, mas queria uma cobertura bonita pra quando saio ou tenho eventos.'],
              'feedback' => 'Biossegurança visível + diagnóstico 360°: rotina, tipo de pele e acabamento preferido. Agora a recomendação tem base.'],
             ['texto' => '<i>(Pego a base do expositor e aplico direto no rosto dela com o dedo.)</i> Olha só, essa é ótima.',
-             'correta' => false,
+             'correta' => false, 'humor' => -18,
              'reacao' => '<i>(Amanda recua um pouco.)</i> Você não vai lavar a mão?',
              'feedback' => 'Biossegurança não é detalhe: álcool 70%, espátula esterilizada, aplicadores descartáveis — sempre à vista da cliente. É o que dá segurança pra ela deixar você tocar no rosto.'],
             ['texto' => '<i>(Higienizo tudo.)</i> Pronto! Essa base aqui é a mais vendida, vou aplicar.',
@@ -213,11 +217,11 @@ function conteudo_sim_atendimento_amanda(): array {
              'reacao' => 'Nossa, eu adoraria! Mas quanto custa esse serviço completo? Tenho medo de sair do meu orçamento.',
              'feedback' => 'Escuta ativa virou oportunidade: a ocasião (jantar) pede o Serviço Completo. Você ofereceu experiência, não "mais um produto".'],
             ['texto' => 'Ficou linda! Vamos pro caixa fechar a base?',
-             'correta' => false,
+             'correta' => false, 'marca' => 'sem_servico', 'vai' => 14,
              'reacao' => 'Vamos… <i>(Amanda olha o relógio, pensando no jantar.)</i>',
              'feedback' => 'Ela falou do jantar — a pista estava na conversa. Personalize é onde a gente evolui o atendimento pro Serviço Completo quando a ocasião pede.'],
             ['texto' => 'Ficou linda! Aproveita e leva o tônico e o creme também, foram eles que fizeram a diferença.',
-             'correta' => false,
+             'correta' => false, 'marca' => 'sem_servico', 'vai' => 14,
              'reacao' => 'Ah, mas eu vim só pra base…',
              'feedback' => 'Empurrar produto antes de mostrar valor gera resistência. A ocasião pede o Serviço Completo: experiência primeiro, venda depois.'],
          ]],
@@ -229,11 +233,11 @@ function conteudo_sim_atendimento_amanda(): array {
              'reacao' => ['Sério? Essa conversão é sensacional!', 'Eu tenho tempo sim, e hoje à noite tenho um jantar especial. Quero fazer!'],
              'feedback' => 'Objeção de dinheiro respondida com dinheiro: o valor não é gasto, vira produto. E ela já ia levar a base.'],
             ['texto' => 'É R$ 139,90. Mas se está apertado, deixa pra próxima, sem problema!',
-             'correta' => false,
+             'correta' => false, 'marca' => 'sem_servico', 'vai' => 14,
              'reacao' => 'Ah, então deixa… fico só com a base mesmo.',
              'feedback' => 'Desistiu na primeira objeção. O argumento que resolve o medo do orçamento já existe: o valor do serviço é 100% convertido em produtos. Ela não gasta a mais — ela escolhe o que leva.'],
             ['texto' => 'Fica R$ 139,90 e vale muito a pena, você vai amar. Fechado?',
-             'correta' => false,
+             'correta' => false, 'marca' => 'sem_servico', 'vai' => 14,
              'reacao' => 'Hum… vou pensar, tá?',
              'feedback' => '"Vale a pena" não responde "tenho medo do orçamento". A objeção era de dinheiro; a resposta precisa ser de dinheiro: conversão total em produtos, e ela já ia levar a base.'],
          ]],
@@ -273,7 +277,7 @@ function conteudo_sim_atendimento_amanda(): array {
              'reacao' => 'Nossa, R$ 470?! Calma…',
              'feedback' => 'Sem consultar o ID Cliente antes, a oferta vem sem condição e sem personalização. Primeiro os benefícios e promoções do perfil dela; a proposta chega com o valor já facilitado.'],
          ]],
-        ['etapa' => 2,
+        ['etapa' => 2, 'desvio' => [['marca' => 'sem_id', 'vai' => 15]],
          'cena' => 'No ID Cliente: uma condição exclusiva pro perfil dela e a ação "compre e ganhe" do ciclo.',
          'pergunta' => 'Como você apresenta os benefícios?',
          'opcoes' => [
@@ -314,17 +318,59 @@ function conteudo_sim_atendimento_amanda(): array {
          'pergunta' => 'Última fala. Como você se despede?',
          'opcoes' => [
             ['texto' => 'Você é muito especial pra nós, Amanda! Nos próximos dias você vai receber uma pesquisa rápida de satisfação — se puder avaliar o meu atendimento, ficamos muito gratos. E quando as embalagens acabarem, traz três de volta pro Boti Recicla: dá R$ 15 de desconto a partir de R$ 150. Tenha um jantar incrível e volte pra resgatar os pontos dessa compra!',
-             'correta' => true, 'oculto' => ['nps', 'recicla'],
+             'correta' => true, 'oculto' => ['nps', 'recicla'], 'vai' => null,
              'reacao' => ['Pode deixar! Vou responder sim — vocês merecem nota 10 com louvor!', 'Até breve, {nome}! 💚'],
              'feedback' => 'NPS anunciado, Boti Recicla explicado, pontos lembrados: as três frases que fecham o ciclo e trazem a cliente de volta.'],
             ['texto' => 'Obrigada, Amanda! Bom jantar!',
-             'correta' => false,
+             'correta' => false, 'vai' => null,
              'reacao' => 'Obrigada, tchau!',
              'feedback' => 'Simpático, mas incompleto: sem NPS anunciado, sem Boti Recicla, sem lembrar dos pontos gerados. São as três frases que fecham o ciclo e trazem a cliente de volta.'],
             ['texto' => 'Você vai receber uma pesquisa — responde nota 10 pra mim, tá? Conto com você!',
-             'correta' => false,
+             'correta' => false, 'humor' => -15, 'vai' => null,
              'reacao' => 'Ha, tá bom… <i>(meio sem graça)</i>',
              'feedback' => 'Pedir a nota constrange e distorce o NPS. Anuncie a pesquisa e peça a avaliação sincera do atendimento: a nota vem do encantamento, não do pedido.'],
+         ]],
+
+        // ── desvios (consequência de escolhas erradas lá atrás) ──
+        // 14 · sem o Serviço Completo (recusou ou nem ofereceu): fecha só a base
+        ['etapa' => 2,
+         'cena' => 'Sem o Serviço Completo, a experimentação termina aqui. Amanda pega a bolsa.',
+         'falas' => 'Então vou levar só a base mesmo. Fica quanto?',
+         'pergunta' => 'Sem o serviço, como você ainda potencializa?',
+         'opcoes' => [
+            ['texto' => 'R$ 99,90. E como você tem o jantar hoje, que tal levar também a palette e o batom que usamos na experimentação? Vou ver no seu ID Cliente se tem alguma condição pra você.',
+             'correta' => true, 'oculto' => ['adicional'], 'humor' => 6, 'vai' => 11,
+             'sacola' => [['item' => 'Palette de Sombras', 'preco' => 79.90], ['item' => 'Batom Hidratante', 'preco' => 39.90]],
+             'reacao' => 'Ah, pode ser! Se tiver uma condição boa eu levo.',
+             'feedback' => 'Mesmo sem o serviço, Potencialize existe: o que ela experimentou vira a oferta, ligado à ocasião, com o ID Cliente antes do preço. Só que o boleto que o Serviço Completo traria não volta mais.'],
+            ['texto' => 'R$ 99,90. Vamos pro caixa?',
+             'correta' => false, 'humor' => -4, 'vai' => 11,
+             'reacao' => 'Vamos.',
+             'feedback' => 'Fechou sem oferecer nada além do que ela pediu. O Cliente Oculto pergunta: ofereceu algum produto ou promoção adicional? Ela acabou de experimentar palette, batom e preparação de pele.'],
+            ['texto' => 'R$ 99,90! Leva mais alguma coisa?',
+             'correta' => false, 'humor' => -4, 'vai' => 11,
+             'reacao' => 'Não, só isso.',
+             'feedback' => 'Pergunta genérica recebe "não". Oferta boa é específica: o produto que ela acabou de experimentar, ligado à ocasião (o jantar), com o ID Cliente consultado.'],
+         ]],
+        // 15 · sem o CPF no Acolha: o ID Cliente está vazio na hora dos benefícios
+        ['etapa' => 2,
+         'cena' => 'Você abre o ID Cliente, mas sem o CPF no início não há cadastro na conversa: nem histórico, nem condição personalizada.',
+         'falas' => 'E aí, tem alguma promoção?',
+         'pergunta' => 'Sem o ID Cliente, como você apresenta os benefícios?',
+         'opcoes' => [
+            ['texto' => 'Deixa eu fazer o seu cadastro no Beautybox agora, é rapidinho: assim o cashback dessa compra já entra e você participa da ação do ciclo, que dá o Primer Facial de graça a partir de R$ 300. E dá pra parcelar em 10x sem juros.',
+             'correta' => true, 'bandeira' => 'beautybox', 'oculto' => ['adicional', 'cpf', 'cpf_motivo'], 'humor' => 6, 'vai' => 12,
+             'sacola' => [['item' => 'Tônico Facial Botik', 'preco' => 59.90], ['item' => 'Creme Ácido Hialurônico Botik', 'preco' => 89.90], ['item' => 'Corretivo', 'preco' => 49.90], ['item' => 'Primer Facial Antioleosidade', 'preco' => 0, 'brinde' => true]],
+             'reacao' => 'Ah, então faz sentido. Levo o corretivo e o hidratante também.',
+             'feedback' => 'Recuperou a bandeira 3, mas tarde: sem o ID desde o Acolha não houve condição exclusiva nem histórico — e a reposição do perfume, que estava no histórico dela, nem apareceu na conversa.'],
+            ['texto' => 'Sem cadastro não aparece promoção. Mas dá pra parcelar em 10x.',
+             'correta' => false, 'humor' => -8, 'vai' => 12,
+             'reacao' => 'Hum… então vou levar só o que já separei.',
+             'feedback' => 'Beautybox não é só consulta: é cadastro na hora, cashback e a ação do ciclo. "Não aparece promoção" joga fora a bandeira 3 e o boleto.'],
+            ['texto' => 'Tem a ação compre e ganhe: acima de R$ 300 leva o primer. Fecha?',
+             'correta' => false, 'humor' => -6, 'vai' => 12,
+             'reacao' => 'R$ 300? Não, hoje não.',
+             'feedback' => 'Alavanca sem cadastro e sem condição do perfil vira só um número alto. Primeiro o Beautybox (cadastro, cashback), depois a ação do ciclo como bônus.'],
          ]],
     ];
     return $c;
@@ -339,6 +385,9 @@ function conteudo_sim_atendimento_bia(): array {
         'persona'   => 'Uso próprio · explorando',
         'descricao' => 'Entrou "só dando uma olhada", sem alvo definido. É a maior parte do fluxo real da loja.',
     ];
+    $c['humor_inicial'] = 45;
+    $c['humor_saida'] = 30;   // quem está "só olhando" vai embora fácil
+    $c['saida_fala'] = 'Tá bom, vou dar mais uma olhada por aí. Valeu!';
     $c['briefing'] = [
         'texto'  => 'Sábado, loja cheia. Bia entra e passeia pelas prateleiras de make sem parar em nada.',
         'missao' => 'Entender antes de vender. Sair sem venda pode ser um resultado válido, se o atendimento terminar do jeito certo.',
@@ -416,11 +465,11 @@ function conteudo_sim_atendimento_bia(): array {
              'reacao' => 'Acho que prefiro esperar uma promoção.',
              'feedback' => 'Sem insistir, com alternativa de menor fricção: opção de entrada ou guardar com lembrete. É o que a persona "objeção" pede.'],
             ['texto' => 'Mas é só R$ 79,90! Dá pra parcelar em 3x.',
-             'correta' => false,
+             'correta' => false, 'vai' => null,
              'reacao' => 'Não, hoje não… valeu.',
              'feedback' => 'Insistir na objeção de preço gera fuga. A persona "objeção" pede alternativa de menor fricção: opção de entrada, amostra, ou guardar com lembrete de condição futura.'],
             ['texto' => 'Ah, tudo bem então! Qualquer coisa a gente tá aí.',
-             'correta' => false,
+             'correta' => false, 'vai' => null,
              'reacao' => 'Valeu! <i>(Bia sai.)</i>',
              'feedback' => 'Fechou a porta rápido demais: nem alternativa nem registro. Sem intenção de compra, o atendimento muda de "vender" pra "entender o motivo" e deixar uma porta aberta.'],
          ]],
@@ -432,7 +481,7 @@ function conteudo_sim_atendimento_bia(): array {
              'reacao' => 'Foi o valor mesmo. O produto eu gostei de verdade!',
              'feedback' => 'Motivo da não compra capturado de forma leve. Esse dado alimenta o ID Cliente e as missões da Loja Digital — a próxima oferta chega certa.'],
             ['texto' => 'Beleza! <i>(Encerro o atendimento.)</i>',
-             'correta' => false,
+             'correta' => false, 'vai' => null,
              'reacao' => '<i>(Bia sai sem deixar nada registrado.)</i>',
              'feedback' => 'O motivo da não compra é dado de CRM: alimenta as missões da Loja Digital e a promoção certa depois. Sem ele, a loja não sabe por que não vendeu.'],
             ['texto' => 'Que pena, você ia amar! Tem certeza?',
@@ -446,15 +495,15 @@ function conteudo_sim_atendimento_bia(): array {
          'pergunta' => 'Encerrar bem, mesmo sem venda. Como?',
          'opcoes' => [
             ['texto' => 'Registrei aqui no seu cadastro: quando esse iluminador entrar em condição especial, você recebe o aviso pelo app do Beautybox. Leva essa amostrinha pra testar em casa — e volta pra me contar! Ah, você ainda vai receber uma pesquisa rápida de satisfação; se puder avaliar, ajuda muito.',
-             'correta' => true, 'bandeira' => 'beautybox', 'oculto' => ['mimo', 'nps'],
+             'correta' => true, 'bandeira' => 'beautybox', 'oculto' => ['mimo', 'nps'], 'vai' => null,
              'reacao' => ['Ai, que fofa! Vou testar sim.', 'Obrigada, {nome}! 💕'],
              'feedback' => 'Bandeira 3 mesmo sem venda: Beautybox como canal do lembrete, mimo de saída, convite de retorno e NPS. Fechou bem.'],
             ['texto' => 'Tá bom, tchau!',
-             'correta' => false,
+             'correta' => false, 'vai' => null,
              'reacao' => 'Tchau.',
              'feedback' => 'Encante vale sem compra: mimo pequeno de saída (amostra ou cupom), convite de retorno e a pesquisa. É o que transforma "só olhando" em cliente que volta.'],
             ['texto' => 'Se você levar hoje eu consigo 5% de desconto — última chance!',
-             'correta' => false,
+             'correta' => false, 'vai' => null, 'humor' => -15,
              'reacao' => 'Não… obrigada. <i>(Bia sai apressada.)</i>',
              'feedback' => 'Desconto de última hora depois de "vou esperar" soa como pressão. A regra: fechar bem mesmo sem venda, capturar o motivo e deixar a porta aberta.'],
          ]],
@@ -489,6 +538,21 @@ function conteudo_sim_atendimento_atualizar_briefing(PDO $db, int $clienteId): i
             $up->execute([json_encode($atual, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $e['id']]);
             $n++;
         }
+    }
+    return $n;
+}
+
+// Reaplica o config INTEIRO das etapas já inseridas (v37: modo simulação com
+// desvios). Casa pelo título da etapa; progresso dos alunos fica como está.
+function conteudo_sim_atendimento_reaplicar(PDO $db, int $clienteId): int {
+    [, $etapas] = conteudo_sim_atendimento();
+    $st = $db->prepare("SELECT e.id FROM etapa e JOIN fase f ON f.id = e.fase_id JOIN treinamento t ON t.id = f.treinamento_id
+                        JOIN trilha tr ON tr.id = t.trilha_id WHERE tr.cliente_id = ? AND e.minigame_tipo = 'atendimento' AND e.titulo = ?");
+    $up = $db->prepare('UPDATE etapa SET config = ? WHERE id = ?');
+    $n = 0;
+    foreach ($etapas as [$titulo, , , $cfg]) {
+        $st->execute([$clienteId, $titulo]);
+        foreach ($st->fetchAll() as $e) { $up->execute([json_encode($cfg, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $e['id']]); $n++; }
     }
     return $n;
 }
