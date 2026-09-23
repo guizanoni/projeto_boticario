@@ -550,6 +550,19 @@ document.head.appendChild(el(`<style>
   .at-humor-fill { height:100%; border-radius:999px; background:linear-gradient(90deg, #FCCA5B, #7CE0B0); transition:width .5s var(--lms-ease, ease) }
   .at-humor-lbl { font-family:var(--lms-font-ui); font-weight:700; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; opacity:.8 }
 
+  /* tooltip do HUD: explica cada ícone no hover, no foco (teclado) e no toque (celular) */
+  .at-tip { position:relative; outline:none }
+  .at-tip::after { content:attr(data-tip); position:absolute; top:calc(100% + 9px); left:50%; transform:translateX(-50%) translateY(-4px);
+    background:var(--lms-heading, #1F2A25); color:#fff; font-family:var(--lms-font-ui); font-weight:600; font-size:12px; line-height:1.4;
+    letter-spacing:0; text-transform:none; white-space:normal; text-align:left; width:max-content; max-width:230px; padding:8px 11px;
+    border-radius:9px; box-shadow:0 6px 16px rgba(0,0,0,.3); opacity:0; pointer-events:none; z-index:40;
+    transition:opacity .15s ease, transform .15s var(--lms-ease, ease) }
+  .at-tip::before { content:''; position:absolute; top:calc(100% + 3px); left:50%; transform:translateX(-50%); border:6px solid transparent;
+    border-bottom-color:var(--lms-heading, #1F2A25); opacity:0; pointer-events:none; z-index:41; transition:opacity .15s ease }
+  .at-tip.is-dir::after { left:auto; right:0; transform:translateY(-4px) }
+  .at-tip:hover::after, .at-tip:focus::after, .at-tip:hover::before, .at-tip:focus::before { opacity:1 }
+  .at-tip:hover::after, .at-tip:focus::after { transform:translateX(-50%) translateY(0) }
+  .at-tip.is-dir:hover::after, .at-tip.is-dir:focus::after { transform:none }
   .at-etapas { display:flex; gap:6px; margin-top:12px; flex-wrap:wrap }
   .at-etapa { flex:1; min-width:104px; display:flex; align-items:center; gap:7px; padding:7px 10px; border-radius:10px;
     background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.22); font-family:var(--lms-font-ui);
@@ -563,11 +576,14 @@ document.head.appendChild(el(`<style>
 
   .at-bandeiras { display:flex; gap:6px }
   .at-band { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:17px;
-    background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.28); filter:grayscale(1); opacity:.55; cursor:default;
+    background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.28); cursor:default;
     transition:all .3s var(--lms-ease, ease); position:relative }
-  .at-band.is-ok { filter:none; opacity:1; background:#FCCA5B; border-color:#FCCA5B; box-shadow:0 0 0 3px rgba(252,202,91,.35) }
-  .at-band.is-ajuda { filter:none; opacity:1; background:repeating-linear-gradient(45deg, #FCCA5B 0 5px, #E8B24A 5px 10px); border-color:#FCCA5B }
-  .at-band.is-ajuda::after { content:'!'; position:absolute; right:-5px; top:-6px; width:15px; height:15px; border-radius:50%;
+  .at-band i { font-style:normal; display:block; position:relative; filter:grayscale(1); opacity:.55; transition:all .3s ease }
+  .at-band.is-ok, .at-band.is-ajuda { background:#FCCA5B; border-color:#FCCA5B }
+  .at-band.is-ok { box-shadow:0 0 0 3px rgba(252,202,91,.35) }
+  .at-band.is-ajuda { background:repeating-linear-gradient(45deg, #FCCA5B 0 5px, #E8B24A 5px 10px) }
+  .at-band.is-ok i, .at-band.is-ajuda i { filter:none; opacity:1 }
+  .at-band.is-ajuda i::after { content:'!'; position:absolute; right:-13px; top:-12px; width:15px; height:15px; border-radius:50%;
     background:var(--lms-heading); color:#fff; font-family:var(--lms-font-ui); font-weight:900; font-size:10px; display:flex; align-items:center; justify-content:center }
 
   /* ── chat ── */
@@ -2499,11 +2515,11 @@ const Minigames = {
               <div class="at-cli-av">${cli.avatar || '🙂'}</div>
               <div><div class="at-cli-nome">${T(cli.nome || 'Cliente')}</div><div class="at-cli-sub">${cli.persona ? T(cli.persona) : (cfg.loja || 'Na loja')}</div></div>
               <div class="at-hud-dir">
-                <div class="at-humor" title="Satisfação da cliente"><span class="at-humor-face" id="at-face">🙂</span>
+                <div class="at-humor at-tip" tabindex="0" data-tip="Satisfação da cliente. Sobe e desce a cada resposta sua — e é ela que decide a nota no NPS."><span class="at-humor-face" id="at-face">🙂</span>
                   <div style="flex:1"><div class="at-humor-lbl">Satisfação</div><div class="at-humor-bar"><div class="at-humor-fill" id="at-humor" style="width:${humor}%"></div></div></div></div>
-                ${bandeiras.length ? `<div class="at-bandeiras" id="at-bands">${bandeiras.map(x => `<span class="at-band" data-id="${esc(x.id)}" title="${esc(x.nome)}">${x.icone || '🚩'}</span>`).join('')}</div>` : ''}
-                <span class="at-chip" id="at-sacola" title="Sacola da cliente">🛍️ <span>0</span></span>
-                <button type="button" class="at-chip at-chip-btn ${rapido.on ? 'is-on' : ''}" id="at-rapido" title="Mostrar as mensagens sem esperar a digitação">⏩</button>
+                ${bandeiras.length ? `<div class="at-bandeiras" id="at-bands">${bandeiras.map(x => `<span class="at-band at-tip" tabindex="0" data-id="${esc(x.id)}" data-tip="${esc(x.nome)} — bandeira do modelo de atendimento. Ainda não apareceu na conversa."><i>${x.icone || '🚩'}</i></span>`).join('')}</div>` : ''}
+                <span class="at-chip at-tip is-dir" id="at-sacola" tabindex="0" data-tip="Sacola da cliente: o que ela vai levar e quanto dá. Ainda vazia.">🛍️ <span>0</span></span>
+                <button type="button" class="at-chip at-chip-btn at-tip is-dir ${rapido.on ? 'is-on' : ''}" id="at-rapido" data-tip="${rapido.on ? 'Modo rápido ligado: as falas aparecem na hora. Clique pra voltar ao ritmo normal.' : 'Modo rápido: mostra as falas sem esperar a cliente digitar.'}">⏩</button>
               </div>
             </div>
             <div class="at-etapas" id="at-etapas">${etapas.map((n, i) => `<span class="at-etapa" data-i="${i}"><span class="at-etapa-n">${i + 1}</span>${esc(n)}</span>`).join('')}</div>
@@ -2515,7 +2531,11 @@ const Minigames = {
       acoes = host.querySelector('#at-acoes');
       hud = { face: host.querySelector('#at-face'), humor: host.querySelector('#at-humor'), sacola: host.querySelector('#at-sacola'), bands: host.querySelector('#at-bands') };
       const btnRapido = host.querySelector('#at-rapido');
-      btnRapido.addEventListener('click', () => { rapido.on = !rapido.on; btnRapido.classList.toggle('is-on', rapido.on); SFX.flip(); });
+      btnRapido.addEventListener('click', () => {
+        rapido.on = !rapido.on; btnRapido.classList.toggle('is-on', rapido.on); SFX.flip();
+        btnRapido.dataset.tip = rapido.on ? 'Modo rápido ligado: as falas aparecem na hora. Clique pra voltar ao ritmo normal.' : 'Modo rápido: mostra as falas sem esperar a cliente digitar.';
+        btnRapido.blur();
+      });
       pintaHumor(false);
     };
 
@@ -2561,7 +2581,7 @@ const Minigames = {
     const pintaSacola = () => {
       const totalR = sacola.reduce((s, x) => s + (+x.preco || 0), 0);
       hud.sacola.innerHTML = `🛍️ <span>${sacola.length}${totalR ? ' · ' + brl(totalR) : ''}</span>`;
-      hud.sacola.title = sacola.length ? sacola.map(x => x.item + (x.brinde ? ' (brinde)' : '')).join(' · ') : 'Sacola vazia';
+      hud.sacola.dataset.tip = sacola.length ? 'Sacola da cliente: ' + sacola.map(x => x.item + (x.brinde ? ' (brinde)' : '')).join(' · ') + '.' : 'Sacola da cliente: o que ela vai levar e quanto dá. Ainda vazia.';
       hud.sacola.classList.remove('jc-pousa'); void hud.sacola.offsetWidth; hud.sacola.classList.add('jc-pousa');
     };
     const marcaBandeira = (id, estado) => {
@@ -2569,7 +2589,11 @@ const Minigames = {
       if (bandEstado[id] === 'ok') return;             // já capturada de primeira: não rebaixa
       bandEstado[id] = estado;
       const elB = hud.bands?.querySelector(`[data-id="${CSS.escape(id)}"]`);
-      if (elB) { elB.classList.remove('is-ok', 'is-ajuda'); elB.classList.add(estado === 'ok' ? 'is-ok' : 'is-ajuda'); elB.classList.add('jc-festa'); }
+      if (elB) {
+        elB.classList.remove('is-ok', 'is-ajuda'); elB.classList.add(estado === 'ok' ? 'is-ok' : 'is-ajuda'); elB.classList.add('jc-festa');
+        const nome = (bandeiras.find(x => x.id === id) || {}).nome || id;
+        elB.dataset.tip = estado === 'ok' ? `${nome} — bandeira capturada no atendimento.` : `${nome} — bandeira capturada só na revisão: no atendimento real ela ficou faltando.`;
+      }
     };
 
     // o que uma escolha certa rende (bandeira, checklist, sacola) — na
