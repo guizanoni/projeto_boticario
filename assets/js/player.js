@@ -627,12 +627,18 @@ document.head.appendChild(el(`<style>
   .at-brief-av { flex:none; width:72px; height:72px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; font-size:40px; box-shadow:0 3px 0 rgba(0,0,0,.25) }
   .at-brief-tag { font-family:var(--lms-font-ui); font-weight:800; font-size:11px; letter-spacing:.1em; text-transform:uppercase; opacity:.8 }
   .at-brief-nome { font-family:var(--lms-font-ui); font-weight:800; font-size:24px; line-height:1.1; margin:2px 0 4px }
-  .at-brief-corpo { padding:20px 24px }
-  .at-brief-corpo p { font-size:15px; line-height:1.6 }
-  .at-brief-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px; margin-top:16px }
-  .at-brief-item { display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border-radius:12px; background:var(--lms-surface, #EFEEE8); font-size:13.5px; line-height:1.45 }
-  .at-brief-item b { display:block; font-family:var(--lms-font-ui); color:var(--lms-heading); margin-bottom:2px }
-  .at-brief-item span:first-child { font-size:20px; flex:none }
+  .at-brief-desc { font-size:13.5px; opacity:.9; line-height:1.45 }
+  .at-brief-corpo { padding:22px 24px 24px }
+  .at-brief-cena { font-size:16px; line-height:1.6; color:var(--lms-ink); margin:0 }
+  .at-brief-missao { display:flex; gap:12px; align-items:flex-start; margin:16px 0 0; padding:14px 16px; border-radius:12px;
+    background:var(--lms-sky, #E4EFEA); font-size:15px; line-height:1.5; color:var(--lms-heading) }
+  .at-brief-missao span { flex:none; font-family:var(--lms-font-ui); font-weight:800; font-size:10.5px; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--lms-primary, #007A54); padding-top:4px }
+  .at-brief-bands { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:16px }
+  .at-brief-bands-lbl { font-family:var(--lms-font-ui); font-weight:700; font-size:12px; color:var(--lms-ink-soft); margin-right:2px }
+  .at-brief-band { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px; font-size:13px;
+    font-family:var(--lms-font-ui); font-weight:700; color:var(--lms-heading); background:var(--lms-white, #fff); border:var(--lms-border-game) }
+  @media (max-width: 560px) { .at-brief-topo { padding:18px 18px } .at-brief-corpo { padding:18px } .at-brief-missao { flex-direction:column; gap:4px } }
 
   .at-rel-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px; margin:16px 0 }
   .at-rel-stat { background:var(--lms-white, #fff); border:var(--lms-border-game); border-radius:12px; padding:14px 12px; text-align:center; box-shadow:var(--lms-shadow-crisp-sm) }
@@ -2428,15 +2434,10 @@ const Minigames = {
     const esperar = ms => new Promise(r => setTimeout(r, rapido.on ? 0 : ms));
     const tempoDigitando = txt => Math.min(1900, 450 + String(txt).replace(/<[^>]+>/g, '').length * 16);
 
-    /* ── briefing: ficha da cliente + a missão ── */
+    /* ── abertura: ficha da cliente, a cena, a missão e o botão.
+       Sem manual — o HUD e o coach ensinam jogando. ── */
     const briefing = () => {
       const b = cfg.briefing || {};
-      const itens = [
-        ['🧭', 'As etapas', `Conduza a conversa nessa ordem:<br><b>${etapas.join(' → ')}</b>`],
-        bandeiras.length ? ['🚩', 'As bandeiras', `Faça aparecer, em algum momento:${bandeiras.map(x => `<span style="display:block; white-space:nowrap">${x.icone || '🚩'} <b>${x.nome}</b></span>`).join('')}`] : null,
-        ['💛', 'A satisfação', 'Cada resposta muda o humor da cliente. É ela que dá a nota no NPS.'],
-        checklist.length ? ['📋', 'O Cliente Oculto', 'No fim, o checklist da auditoria mostra o que você fez de primeira.'] : null,
-      ].filter(Boolean);
       host.innerHTML = '';
       host.appendChild(el(`
         <div class="at-brief mg-slide">
@@ -2445,17 +2446,14 @@ const Minigames = {
             <div>
               <div class="at-brief-tag">${cli.persona ? 'Cliente · ' + cli.persona : 'Cliente'}</div>
               <div class="at-brief-nome">${T(cli.nome || 'Cliente')}</div>
-              ${cli.descricao ? `<div style="font-size:13.5px; opacity:.9; line-height:1.45">${T(cli.descricao)}</div>` : ''}
+              ${cli.descricao ? `<div class="at-brief-desc">${T(cli.descricao)}</div>` : ''}
             </div>
           </div>
           <div class="at-brief-corpo">
-            ${b.titulo ? `<h3 style="margin-bottom:6px">${T(b.titulo)}</h3>` : ''}
-            <p>${T(b.texto || 'Uma cliente acabou de entrar. A partir de agora, cada fala é sua: leia o que ela diz e escolha como responder.')}</p>
-            <div class="at-brief-grid">${itens.map(([i, t, d]) => `<div class="at-brief-item"><span>${i}</span><div><b>${t}</b>${d}</div></div>`).join('')}</div>
-            <p class="lms-small lms-muted" style="margin-top:14px">${dominio
-              ? 'Errou? A cliente reage, o coach explica e você escolhe de novo. Só a escolha de primeira conta — é a que o Cliente Oculto teria visto.'
-              : 'Cada escolha segue o seu caminho: a conversa muda conforme o que você responde.'}</p>
-            <button type="button" class="lms-btn lms-btn-primary lms-btn-lg" style="width:100%; margin-top:16px">${b.botao || 'Começar o atendimento'} 💬</button>
+            <p class="at-brief-cena">${T(b.texto || 'Uma cliente acabou de entrar na loja.')}</p>
+            ${b.missao ? `<p class="at-brief-missao"><span>Sua missão</span>${T(b.missao)}</p>` : ''}
+            ${bandeiras.length ? `<div class="at-brief-bands"><span class="at-brief-bands-lbl">Bandeiras pra capturar</span>${bandeiras.map(x => `<span class="at-brief-band">${x.icone || '🚩'} ${esc(x.nome)}</span>`).join('')}</div>` : ''}
+            <button type="button" class="lms-btn lms-btn-primary lms-btn-lg" style="width:100%; margin-top:18px">${b.botao || 'Começar o atendimento'} 💬</button>
           </div>
         </div>`));
       host.querySelector('button').addEventListener('click', () => { SFX.ok(); montar(); jogar(); });

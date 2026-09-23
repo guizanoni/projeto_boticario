@@ -74,8 +74,8 @@ function conteudo_sim_atendimento_amanda(): array {
         'descricao' => 'Entrou na loja procurando uma base. A dela acabou e ela precisa repor — mas não tem certeza se usava a cor certa.',
     ];
     $c['briefing'] = [
-        'titulo' => 'Sua vez de atender',
-        'texto'  => 'Terça à tarde, loja tranquila. Amanda entra e para em frente às bases. Daqui pra frente, cada fala é sua: leia o que ela diz e escolha como responder. O objetivo é levar uma reposição de base até o Serviço Completo de Make — do jeito que o modelo de atendimento pede.',
+        'texto'  => 'Terça à tarde, loja tranquila. Amanda entra e para em frente às bases.',
+        'missao' => 'Levar uma reposição de base até o Serviço Completo de Make, do jeito que o modelo de atendimento pede.',
         'botao'  => 'Receber a Amanda',
     ];
     $c['checklist'] = conteudo_sim_atendimento_checklist(['apresentou', 'nome', 'motivo', 'cpf', 'cpf_motivo', 'experimentar', 'aplicacao', 'adicional', 'fragrancia', 'recicla', 'nps']);
@@ -337,11 +337,11 @@ function conteudo_sim_atendimento_bia(): array {
         'nome'      => 'Bia',
         'avatar'    => '👩🏻‍🦱',
         'persona'   => 'Uso próprio · explorando',
-        'descricao' => 'Entrou "só dando uma olhada", sem alvo. É a maior parte do fluxo real da loja — e o roteiro linear não cobre.',
+        'descricao' => 'Entrou "só dando uma olhada", sem alvo definido. É a maior parte do fluxo real da loja.',
     ];
     $c['briefing'] = [
-        'titulo' => 'Nem todo atendimento termina em venda',
-        'texto'  => 'Sábado, loja cheia. Uma cliente entra e passeia pelas prateleiras de make sem parar em nada. Aqui a jornada é a mesma — Acolha, Personalize, Potencialize, Encante — mas o objetivo muda: entender, não empurrar. Sair sem venda pode ser um resultado válido, desde que o atendimento termine do jeito certo.',
+        'texto'  => 'Sábado, loja cheia. Bia entra e passeia pelas prateleiras de make sem parar em nada.',
+        'missao' => 'Entender antes de vender. Sair sem venda pode ser um resultado válido, se o atendimento terminar do jeito certo.',
         'botao'  => 'Receber a Bia',
     ];
     $c['checklist'] = conteudo_sim_atendimento_checklist(['apresentou', 'nome', 'motivo', 'cpf', 'cpf_motivo', 'experimentar', 'aplicacao', 'motivo_nao_compra', 'mimo', 'nps']);
@@ -470,6 +470,27 @@ function conteudo_sim_atendimento(): array {
         ['Atendimento 2: Bia — "só dando uma olhada"',           'minigame', 'atendimento', conteudo_sim_atendimento_bia()],
     ];
     return [$fase, $etapas];
+}
+
+// Reaplica os blocos `briefing` e `cliente` das etapas já inseridas (v36: abertura enxuta).
+// Casa pelo título da etapa; não mexe em turnos nem em progresso.
+function conteudo_sim_atendimento_atualizar_briefing(PDO $db, int $clienteId): int {
+    [, $etapas] = conteudo_sim_atendimento();
+    $st = $db->prepare("SELECT e.id, e.config FROM etapa e JOIN fase f ON f.id = e.fase_id JOIN treinamento t ON t.id = f.treinamento_id
+                        JOIN trilha tr ON tr.id = t.trilha_id WHERE tr.cliente_id = ? AND e.minigame_tipo = 'atendimento' AND e.titulo = ?");
+    $up = $db->prepare('UPDATE etapa SET config = ? WHERE id = ?');
+    $n = 0;
+    foreach ($etapas as [$titulo, , , $cfg]) {
+        $st->execute([$clienteId, $titulo]);
+        foreach ($st->fetchAll() as $e) {
+            $atual = json_decode($e['config'], true) ?: [];
+            $atual['briefing'] = $cfg['briefing'];
+            $atual['cliente']  = $cfg['cliente'];
+            $up->execute([json_encode($atual, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $e['id']]);
+            $n++;
+        }
+    }
+    return $n;
 }
 
 // Insere a fase no treinamento inaugural do cliente. Idempotente: se a fase

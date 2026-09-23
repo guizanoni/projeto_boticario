@@ -404,7 +404,7 @@ const VAZIOS = {
   ] }),
   tabuleiro:     () => ({ instrucao: '', casas: Array.from({ length: 4 }, () => ({ pergunta: '', alternativas: ['', ''], corretas: [0] })) }),
   atendimento:   () => ({ modo: 'dominio', humor_inicial: 50, etapas: ['Acolha', 'Personalize', 'Potencialize', 'Encante'],
-    cliente: { nome: '', avatar: '👩', persona: '', descricao: '' }, briefing: { titulo: '', texto: '', botao: '' },
+    cliente: { nome: '', avatar: '👩', persona: '', descricao: '' }, briefing: { texto: '', missao: '', botao: '' },
     bandeiras: [{ id: 'identificacao', icone: '🆔', nome: 'Identificação' }, { id: 'experimentacao', icone: '🧪', nome: 'Experimentação' }, { id: 'beautybox', icone: '💚', nome: 'Beautybox' }],
     checklist: [], turnos: [{ etapa: 0, cena: '', falas: [], pergunta: '', opcoes: [{ texto: '', correta: true, reacao: [], feedback: '' }, { texto: '', correta: false, reacao: [], feedback: '' }] }],
     final: { titulo: '', texto: '', sem_venda: false, motivo_nao_compra: '' } }),
@@ -1131,8 +1131,8 @@ const RENDERS = {
 
     // abertura
     const blB = h('<div class="b-bloco"><label class="lms-label">📋 Abertura (a ficha antes do chat)</label></div>');
-    blB.appendChild(campo(s.briefing.titulo || '', 'Título (ex.: Sua vez de atender)', v => s.briefing.titulo = v));
-    blB.appendChild(campo(s.briefing.texto || '', 'Contexto da cena e a missão…', v => s.briefing.texto = v, 'textarea'));
+    blB.appendChild(campo(s.briefing.texto || '', 'A cena, em uma linha (ex.: Terça à tarde, loja tranquila. Amanda entra…)', v => s.briefing.texto = v, 'textarea'));
+    blB.appendChild(campo(s.briefing.missao || '', 'A missão, em uma linha (ex.: Levar a reposição de base até o Serviço Completo)', v => s.briefing.missao = v));
     blB.appendChild(campo(s.briefing.botao || '', 'Texto do botão (ex.: Receber a Amanda)', v => s.briefing.botao = v));
     box.appendChild(blB);
 
