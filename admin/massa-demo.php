@@ -40,9 +40,10 @@ foreach ($fases as $f) {
             'quiz'         => max(1, count($c['perguntas'] ?? [])),
             'sequencia'    => max(1, count($c['passos'] ?? [])),
             'investigacao' => max(1, count($c['cartas'] ?? [])),
+            'atendimento'  => max(1, count(array_filter($c['turnos'] ?? [], fn($t) => count($t['opcoes'] ?? []) >= 2))),
             default        => 1,
         };
-        $tempo = match ($e['minigame_tipo']) { 'video' => 250, 'investigacao' => [150, 300], 'sequencia' => [90, 240], 'quiz' => [60, 150], 'historia' => [90, 180], default => [60, 120] };
+        $tempo = match ($e['minigame_tipo']) { 'video' => 250, 'investigacao' => [150, 300], 'atendimento' => [300, 600], 'sequencia' => [90, 240], 'quiz' => [60, 150], 'historia' => [90, 180], default => [60, 120] };
         $etapas[] = ['id' => (int) $e['id'], 'fase' => (int) $f['ordem'], 'fase_id' => (int) $f['id'], 'total' => $total, 'tipo' => $e['minigame_tipo'], 'tempo' => $tempo, 'nota' => (int) $f['nota_minima']];
     }
 }

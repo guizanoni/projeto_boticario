@@ -39,6 +39,7 @@ $tipos = [
     'sete_erros'    => ['🔎', 'Jogo dos erros', 'Imagem com pontos escondidos para o aluno clicar e encontrar.'],
     'investigacao'  => ['🕵️', 'Investigação', 'Narrativa em cartas com áudio opcional por cena: ramificada (cada escolha abre um caminho) ou em modo domínio (errou? feedback e tenta de novo).'],
     'tabuleiro'     => ['🎲', 'Tabuleiro', 'Jogo de tabuleiro: jogue o dado, avance e responda a pergunta da casa.'],
+    'atendimento'   => ['💬', 'Simulação de atendimento (chat)', 'A cliente conversa em balões de chat e o aluno escolhe a própria fala, turno a turno, pelas 4 etapas do atendimento — com bandeiras, satisfação, sacola e checklist do Cliente Oculto no fim.'],
 ];
 
 // Validação mínima do config por tipo — garante que o player consegue rodar.
@@ -165,6 +166,24 @@ function etapa_valida(string $tipo, $cfg): ?string {
                     if ($vai !== null && (!is_numeric($vai) || (int) $vai < 0 || (int) $vai >= count($cfg['cartas']))) return 'Opção apontando para uma carta que não existe.';
                 }
             }
+            return null;
+        case 'atendimento':
+            if (!$temTexto($cfg['cliente']['nome'] ?? '')) return 'Dê um nome à cliente.';
+            if (empty($cfg['turnos']) || !is_array($cfg['turnos'])) return 'O atendimento precisa de ao menos um turno.';
+            $n = count($cfg['turnos']);
+            foreach ($cfg['turnos'] as $t) {
+                if (!is_array($t)) return 'Turno inválido.';
+                $nOp = count($t['opcoes'] ?? []);
+                if ($nOp === 0) continue;   // turno só narrativo (didascália + falas), sem decisão
+                if ($nOp < 2) return 'Todo turno com decisão precisa de ao menos 2 opções de resposta.';
+                if (!array_filter($t['opcoes'], fn($o) => !empty($o['correta']))) return 'Marque a opção correta em cada turno.';
+                foreach ($t['opcoes'] as $o) {
+                    if (!$temTexto($o['texto'] ?? '')) return 'Toda opção precisa de texto.';
+                    if (array_key_exists('vai', $o) && $o['vai'] !== null && (!is_numeric($o['vai']) || (int) $o['vai'] < 0 || (int) $o['vai'] >= $n)) return 'Opção apontando para um turno que não existe.';
+                }
+            }
+            foreach ($cfg['bandeiras'] ?? [] as $b) if (!$temTexto($b['id'] ?? '') || !$temTexto($b['nome'] ?? '')) return 'Toda bandeira precisa de id e nome.';
+            foreach ($cfg['checklist'] ?? [] as $c) if (!$temTexto($c['id'] ?? '') || !$temTexto($c['texto'] ?? '')) return 'Todo item do checklist precisa de id e texto.';
             return null;
         case 'tabuleiro':
             if (count($cfg['casas'] ?? []) < 4) return 'O tabuleiro precisa de ao menos 4 casas.';
@@ -384,6 +403,11 @@ const VAZIOS = {
     { icone: '🔎', titulo: '', pista: '', pergunta: '', audio: '', audio_quem: '', opcoes: [{ texto: '', correta: true, vai: null, feedback: '' }, { texto: '', correta: false, vai: null, feedback: '' }] },
   ] }),
   tabuleiro:     () => ({ instrucao: '', casas: Array.from({ length: 4 }, () => ({ pergunta: '', alternativas: ['', ''], corretas: [0] })) }),
+  atendimento:   () => ({ modo: 'dominio', humor_inicial: 50, etapas: ['Acolha', 'Personalize', 'Potencialize', 'Encante'],
+    cliente: { nome: '', avatar: '👩', persona: '', descricao: '' }, briefing: { titulo: '', texto: '', botao: '' },
+    bandeiras: [{ id: 'identificacao', icone: '🆔', nome: 'Identificação' }, { id: 'experimentacao', icone: '🧪', nome: 'Experimentação' }, { id: 'beautybox', icone: '💚', nome: 'Beautybox' }],
+    checklist: [], turnos: [{ etapa: 0, cena: '', falas: [], pergunta: '', opcoes: [{ texto: '', correta: true, reacao: [], feedback: '' }, { texto: '', correta: false, reacao: [], feedback: '' }] }],
+    final: { titulo: '', texto: '', sem_venda: false, motivo_nao_compra: '' } }),
 };
 const CORES_ZONA = { mint: '🟢 Verde', sand: '🟡 Âmbar', rose: '🔴 Vermelho', sky: '🔵 Azul' };
 
@@ -1074,6 +1098,141 @@ const RENDERS = {
       box.appendChild(bl);
     });
     box.appendChild(btnAdd('passo', () => { s.passos.push({ texto: '', imagem: '', descricao: '' }); render(); }));
+    return box;
+  },
+
+  atendimento(s) {
+    const box = h('<div></div>');
+    const lista = v => v == null || v === '' ? [] : (Array.isArray(v) ? v : [v]);
+    const ETAPAS = () => (s.etapas && s.etapas.length) ? s.etapas : ['Acolha', 'Personalize', 'Potencialize', 'Encante'];
+    s.cliente = s.cliente || {}; s.briefing = s.briefing || {}; s.final = s.final || {};
+    s.bandeiras = s.bandeiras || []; s.checklist = s.checklist || []; s.turnos = s.turnos || [];
+
+    // a cliente e as regras da partida
+    const bl0 = h('<div class="b-bloco"><label class="lms-label">🙂 A cliente</label></div>');
+    const l0 = h('<div class="b-linha" style="flex-wrap:wrap"></div>');
+    const av = campo(s.cliente.avatar || '', '👩', v => s.cliente.avatar = v); av.style.cssText = 'max-width:70px; text-align:center; font-size:20px';
+    l0.appendChild(av);
+    l0.appendChild(campo(s.cliente.nome || '', 'Nome (ex.: Amanda)', v => s.cliente.nome = v));
+    l0.appendChild(campo(s.cliente.persona || '', 'Persona (ex.: Uso próprio · item definido)', v => s.cliente.persona = v));
+    bl0.appendChild(l0);
+    bl0.appendChild(campo(s.cliente.descricao || '', 'Quem é e o que veio fazer (aparece na ficha de abertura)…', v => s.cliente.descricao = v, 'textarea'));
+    const l1 = h('<div class="b-linha" style="flex-wrap:wrap"></div>');
+    const selModo = h(`<select class="lms-select"><option value="dominio" ${s.modo !== 'livre' ? 'selected' : ''}>Domínio — errou? a cliente reage, o coach explica e escolhe de novo (conta só de primeira)</option><option value="livre" ${s.modo === 'livre' ? 'selected' : ''}>Livre — errar segue o caminho da opção</option></select>`);
+    selModo.addEventListener('change', ev => s.modo = ev.target.value);
+    l1.appendChild(selModo);
+    const humor = campo(String(s.humor_inicial ?? 50), 'Satisfação inicial (0–100)', v => s.humor_inicial = +v || 0); humor.style.maxWidth = '200px';
+    l1.appendChild(humor);
+    bl0.appendChild(l1);
+    bl0.appendChild(h('<label class="lms-label" style="margin-top:8px; display:block">Etapas do atendimento (separadas por vírgula)</label>'));
+    bl0.appendChild(campo(ETAPAS().join(', '), 'Acolha, Personalize, Potencialize, Encante', v => { s.etapas = v.split(',').map(x => x.trim()).filter(Boolean); }));
+    bl0.appendChild(campo(s.nota_precos || '', 'Nota sobre os preços da sacola (opcional, aparece no relatório)', v => s.nota_precos = v));
+    box.appendChild(bl0);
+
+    // abertura
+    const blB = h('<div class="b-bloco"><label class="lms-label">📋 Abertura (a ficha antes do chat)</label></div>');
+    blB.appendChild(campo(s.briefing.titulo || '', 'Título (ex.: Sua vez de atender)', v => s.briefing.titulo = v));
+    blB.appendChild(campo(s.briefing.texto || '', 'Contexto da cena e a missão…', v => s.briefing.texto = v, 'textarea'));
+    blB.appendChild(campo(s.briefing.botao || '', 'Texto do botão (ex.: Receber a Amanda)', v => s.briefing.botao = v));
+    box.appendChild(blB);
+
+    // bandeiras
+    const blF = h('<div class="b-bloco"><label class="lms-label">🚩 Bandeiras — o que precisa aparecer em algum momento</label></div>');
+    s.bandeiras.forEach((b, i) => {
+      const l = h('<div class="b-linha"></div>');
+      const ic = campo(b.icone || '', '🚩', v => b.icone = v); ic.style.cssText = 'max-width:64px; text-align:center; font-size:18px';
+      l.appendChild(ic);
+      const id = campo(b.id || '', 'id (ex.: identificacao)', v => b.id = v); id.style.maxWidth = '190px';
+      l.appendChild(id);
+      l.appendChild(campo(b.nome || '', 'Nome (ex.: Identificação)', v => b.nome = v));
+      l.appendChild(btnRm(() => { s.bandeiras.splice(i, 1); render(); }));
+      blF.appendChild(l);
+    });
+    blF.appendChild(btnAdd('bandeira', () => { s.bandeiras.push({ id: '', icone: '🚩', nome: '' }); render(); }));
+    box.appendChild(blF);
+
+    // checklist do cliente oculto
+    const blC = h('<div class="b-bloco"><label class="lms-label">🕵️ Checklist do Cliente Oculto (aparece no relatório final)</label></div>');
+    s.checklist.forEach((c, i) => {
+      const l = h('<div class="b-linha"></div>');
+      const id = campo(c.id || '', 'id (ex.: cpf)', v => c.id = v); id.style.maxWidth = '160px';
+      l.appendChild(id);
+      l.appendChild(campo(c.texto || '', 'Pergunta do checklist…', v => c.texto = v));
+      l.appendChild(btnRm(() => { s.checklist.splice(i, 1); render(); }));
+      blC.appendChild(l);
+    });
+    blC.appendChild(btnAdd('item do checklist', () => { s.checklist.push({ id: '', texto: '' }); render(); }));
+    box.appendChild(blC);
+
+    // turnos da conversa
+    const bandIds = () => s.bandeiras.map(b => b.id).filter(Boolean);
+    s.turnos.forEach((t, ti) => {
+      t.opcoes = t.opcoes || [];
+      const bl = h('<div class="b-bloco"></div>');
+      const cab = h(`<div class="lms-row" style="justify-content:space-between"><label class="lms-label">💬 Turno ${ti + 1}</label></div>`);
+      if (s.turnos.length > 1) cab.appendChild(btnRm(() => {
+        s.turnos.splice(ti, 1);
+        s.turnos.forEach(t2 => (t2.opcoes || []).forEach(o => { if (o.vai === ti) o.vai = null; else if (o.vai != null && o.vai > ti) o.vai--; }));
+        render();
+      }, 'Remover turno'));
+      bl.appendChild(cab);
+      const le = h('<div class="b-linha" style="flex-wrap:wrap"></div>');
+      const selEt = h(`<select class="lms-select" style="max-width:230px">${ETAPAS().map((n, i) => `<option value="${i}" ${(+t.etapa || 0) === i ? 'selected' : ''}>${i + 1}. ${esc(n)}</option>`).join('')}</select>`);
+      selEt.addEventListener('change', ev => t.etapa = +ev.target.value);
+      le.appendChild(selEt);
+      le.appendChild(campo(t.pergunta || '', 'Pergunta ao aluno (ex.: Como você recebe a Amanda?)', v => t.pergunta = v));
+      bl.appendChild(le);
+      bl.appendChild(campo(t.cena || '', 'Didascália — o que acontece na cena (opcional)…', v => t.cena = v));
+      bl.appendChild(h('<label class="lms-label" style="margin-top:8px; display:block">Falas da cliente antes da decisão (uma por linha, opcional)</label>'));
+      bl.appendChild(campo(lista(t.falas).join('\n'), 'Ex.: Oi! Vim buscar uma base…', v => t.falas = v.split('\n').map(x => x.trim()).filter(Boolean), 'textarea'));
+      bl.appendChild(h('<label class="lms-label" style="margin-top:10px; display:block">Opções de resposta do aluno — <span class="lms-muted">{nome} vira o nome de quem joga</span></label>'));
+      t.opcoes.forEach((o, oi) => {
+        const op = h('<div style="border-top:1px dashed var(--lms-border); padding-top:8px; margin-top:8px"></div>');
+        const l = h('<div class="b-linha" style="flex-wrap:wrap"></div>');
+        l.appendChild(campo(o.texto || '', `Fala ${oi + 1} do aluno…`, v => o.texto = v, 'textarea'));
+        const chk = h(`<label class="b-corr"><input type="checkbox" ${o.correta ? 'checked' : ''}> correta</label>`);
+        chk.querySelector('input').addEventListener('change', ev => o.correta = ev.target.checked);
+        l.appendChild(chk);
+        if (t.opcoes.length > 2) l.appendChild(btnRm(() => { t.opcoes.splice(oi, 1); render(); }));
+        op.appendChild(l);
+        op.appendChild(campo(lista(o.reacao).join('\n'), 'Reação da cliente (uma fala por linha)…', v => o.reacao = v.split('\n').map(x => x.trim()).filter(Boolean), 'textarea'));
+        op.appendChild(campo(o.feedback || '', 'Coach — por que é (ou não é) por aí…', v => o.feedback = v, 'textarea'));
+        const l2 = h('<div class="b-linha" style="flex-wrap:wrap"></div>');
+        if (bandIds().length) {
+          const selB = h(`<select class="lms-select" multiple size="2" style="max-width:210px" title="Bandeiras que esta fala captura (Ctrl pra mais de uma)">${bandIds().map(id => `<option value="${esc(id)}" ${lista(o.bandeira).includes(id) ? 'selected' : ''}>🚩 ${esc(id)}</option>`).join('')}</select>`);
+          selB.addEventListener('change', () => o.bandeira = [...selB.selectedOptions].map(x => x.value));
+          l2.appendChild(selB);
+        }
+        l2.appendChild(campo(lista(o.oculto).join(', '), 'ids do checklist que esta fala cumpre (ex.: cpf, cpf_motivo)', v => o.oculto = v.split(',').map(x => x.trim()).filter(Boolean)));
+        const hu = campo(o.humor == null ? '' : String(o.humor), '± satisfação', v => { if (v === '') delete o.humor; else o.humor = +v; }); hu.style.maxWidth = '120px';
+        l2.appendChild(hu);
+        const selV = h(`<select class="lms-select" style="max-width:180px"><option value="">→ próximo turno</option><option value="fim" ${o.vai === null ? 'selected' : ''}>🏁 Encerra</option>${s.turnos.map((_, d) => d === ti ? '' : `<option value="${d}" ${o.vai === d ? 'selected' : ''}>→ Turno ${d + 1}</option>`).join('')}</select>`);
+        selV.addEventListener('change', ev => { const v = ev.target.value; if (v === '') delete o.vai; else o.vai = v === 'fim' ? null : +v; });
+        l2.appendChild(selV);
+        op.appendChild(l2);
+        op.appendChild(campo((o.sacola || []).map(x => `${x.item} | ${x.preco ?? 0}${x.brinde ? ' | brinde' : ''}`).join('\n'),
+          'Itens que entram na sacola — um por linha: Item | preço | brinde (opcional)', v => o.sacola = v.split('\n').map(x => x.trim()).filter(Boolean).map(x => {
+            const p = x.split('|').map(y => y.trim());
+            return { item: p[0], preco: +(p[1] || '0').replace(',', '.') || 0, brinde: /brinde/i.test(p[2] || '') };
+          }), 'textarea'));
+        bl.appendChild(op);
+      });
+      bl.appendChild(btnAdd('opção', () => { t.opcoes.push({ texto: '', correta: false, reacao: [], feedback: '' }); render(); }));
+      box.appendChild(bl);
+    });
+    box.appendChild(btnAdd('turno', () => { s.turnos.push({ etapa: 0, cena: '', falas: [], pergunta: '', opcoes: [{ texto: '', correta: true, reacao: [], feedback: '' }, { texto: '', correta: false, reacao: [], feedback: '' }] }); render(); }));
+
+    // relatório final
+    const blZ = h('<div class="b-bloco"><label class="lms-label">🏁 Relatório final</label></div>');
+    blZ.appendChild(campo(s.final.titulo || '', 'Título (ex.: Atendimento concluído)', v => s.final.titulo = v));
+    blZ.appendChild(campo(s.final.texto || '', 'Fechamento — o que o aluno leva desse atendimento…', v => s.final.texto = v, 'textarea'));
+    const lz = h('<div class="b-linha" style="flex-wrap:wrap"></div>');
+    const chkSV = h(`<label class="b-corr"><input type="checkbox" ${s.final.sem_venda ? 'checked' : ''}> termina sem venda</label>`);
+    chkSV.querySelector('input').addEventListener('change', ev => s.final.sem_venda = ev.target.checked);
+    lz.appendChild(chkSV);
+    lz.appendChild(campo(s.final.motivo_nao_compra || '', 'Motivo da não compra registrado (se terminar sem venda)', v => s.final.motivo_nao_compra = v));
+    blZ.appendChild(lz);
+    box.appendChild(blZ);
     return box;
   },
 };

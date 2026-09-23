@@ -519,6 +519,148 @@ document.head.appendChild(el(`<style>
   .jc-som:hover { transform:scale(1.12) }
 </style>`));
 
+/* ══ ATENDIMENTO (simulação em chat) ═══════════════════════════
+   Visual de conversa de celular dentro do card do player: HUD com
+   as 4 etapas do Botileza, as 3 bandeiras, a satisfação da cliente
+   e a sacola; balões da cliente à esquerda, os seus à direita;
+   didascálias centradas; coach em cartão âmbar. */
+document.head.appendChild(el(`<style>
+  .at-wrap { border:var(--lms-border-game); border-radius:var(--lms-radius-lg, 16px); overflow:hidden;
+    background:var(--lms-white, #fff); box-shadow:var(--lms-shadow-crisp) }
+
+  /* ── HUD ── */
+  .at-hud { padding:12px 16px 10px; background:linear-gradient(160deg, var(--lms-primary, #007A54), var(--lms-heading, #1F2A25)); color:#fff }
+  .at-hud-topo { display:flex; align-items:center; gap:12px; flex-wrap:wrap }
+  .at-cli-av { flex:none; width:46px; height:46px; border-radius:50%; background:#fff; color:var(--lms-heading);
+    display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow:0 2px 0 rgba(0,0,0,.25) }
+  .at-cli-nome { font-family:var(--lms-font-ui); font-weight:800; font-size:16px; line-height:1.15 }
+  .at-cli-sub { font-size:12px; opacity:.85; line-height:1.3 }
+  .at-hud-dir { margin-left:auto; display:flex; align-items:center; gap:8px; flex-wrap:wrap }
+  .at-chip { display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:999px;
+    background:rgba(255,255,255,.14); border:1.5px solid rgba(255,255,255,.35); font-family:var(--lms-font-ui);
+    font-weight:700; font-size:12.5px; color:#fff; white-space:nowrap; transition:transform .15s var(--lms-ease, ease) }
+  .at-chip.jc-pousa { background:rgba(252,202,91,.35); border-color:#FCCA5B }
+  .at-chip-btn { cursor:pointer; font:inherit; font-weight:700 }
+  .at-chip-btn:hover { background:rgba(255,255,255,.26) }
+  .at-chip-btn.is-on { background:#FCCA5B; color:var(--lms-heading); border-color:#FCCA5B }
+
+  .at-humor { display:flex; align-items:center; gap:8px; min-width:150px }
+  .at-humor-face { font-size:20px; line-height:1; transition:transform .25s var(--lms-ease, ease) }
+  .at-humor-bar { flex:1; height:9px; border-radius:999px; background:rgba(255,255,255,.22); overflow:hidden; border:1px solid rgba(255,255,255,.35) }
+  .at-humor-fill { height:100%; border-radius:999px; background:linear-gradient(90deg, #FCCA5B, #7CE0B0); transition:width .5s var(--lms-ease, ease) }
+  .at-humor-lbl { font-family:var(--lms-font-ui); font-weight:700; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; opacity:.8 }
+
+  .at-etapas { display:flex; gap:6px; margin-top:12px; flex-wrap:wrap }
+  .at-etapa { flex:1; min-width:104px; display:flex; align-items:center; gap:7px; padding:7px 10px; border-radius:10px;
+    background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.22); font-family:var(--lms-font-ui);
+    font-weight:700; font-size:12.5px; transition:background .25s ease, border-color .25s ease, transform .25s var(--lms-ease, ease) }
+  .at-etapa-n { flex:none; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,.2); font-size:11.5px }
+  .at-etapa.is-atual { background:#fff; color:var(--lms-heading); border-color:#fff; transform:translateY(-2px) }
+  .at-etapa.is-atual .at-etapa-n { background:var(--lms-primary, #007A54); color:#fff }
+  .at-etapa.is-feita { background:rgba(124,224,176,.25); border-color:#7CE0B0 }
+  .at-etapa.is-feita .at-etapa-n { background:#7CE0B0; color:var(--lms-heading) }
+
+  .at-bandeiras { display:flex; gap:6px }
+  .at-band { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:17px;
+    background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.28); filter:grayscale(1); opacity:.55; cursor:default;
+    transition:all .3s var(--lms-ease, ease); position:relative }
+  .at-band.is-ok { filter:none; opacity:1; background:#FCCA5B; border-color:#FCCA5B; box-shadow:0 0 0 3px rgba(252,202,91,.35) }
+  .at-band.is-ajuda { filter:none; opacity:1; background:repeating-linear-gradient(45deg, #FCCA5B 0 5px, #E8B24A 5px 10px); border-color:#FCCA5B }
+  .at-band.is-ajuda::after { content:'!'; position:absolute; right:-5px; top:-6px; width:15px; height:15px; border-radius:50%;
+    background:var(--lms-heading); color:#fff; font-family:var(--lms-font-ui); font-weight:900; font-size:10px; display:flex; align-items:center; justify-content:center }
+
+  /* ── chat ── */
+  .at-chat { min-height:220px; max-height:min(520px, 58vh); overflow-y:auto; padding:18px 16px; background:#EEF3EF;
+    background-image:radial-gradient(rgba(0,122,84,.07) 1px, transparent 1px); background-size:18px 18px;
+    display:flex; flex-direction:column; gap:8px; scroll-behavior:smooth }
+  .at-msg { max-width:82%; padding:10px 14px; border-radius:16px; font-size:15px; line-height:1.5; position:relative;
+    animation:at-entra .28s var(--lms-ease, ease) both; box-shadow:0 1px 2px rgba(31,42,37,.12) }
+  @keyframes at-entra { from { opacity:0; transform:translateY(8px) scale(.97) } to { opacity:1; transform:none } }
+  .at-msg.is-cli { align-self:flex-start; background:var(--lms-white, #fff); color:var(--lms-ink); border-bottom-left-radius:4px }
+  .at-msg.is-eu  { align-self:flex-end; background:var(--lms-primary, #007A54); color:#fff; border-bottom-right-radius:4px }
+  .at-msg.is-eu.is-errou { background:#B8B5AA; text-decoration:line-through; text-decoration-color:rgba(255,255,255,.55); opacity:.85 }
+  .at-msg-quem { display:block; font-family:var(--lms-font-ui); font-weight:800; font-size:10.5px; letter-spacing:.06em;
+    text-transform:uppercase; margin-bottom:3px; opacity:.7 }
+  .at-msg.is-eu .at-msg-quem { text-align:right }
+  .at-msg i, .at-msg em { opacity:.85 }
+  .at-cena { align-self:center; max-width:88%; text-align:center; font-size:13px; font-style:italic; color:var(--lms-ink-soft);
+    padding:6px 14px; border-radius:999px; background:rgba(255,255,255,.7); animation:at-entra .28s var(--lms-ease, ease) both }
+  .at-sep { align-self:stretch; display:flex; align-items:center; gap:10px; margin:8px 0 2px; font-family:var(--lms-font-ui);
+    font-weight:800; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--lms-primary, #007A54);
+    animation:at-entra .3s var(--lms-ease, ease) both }
+  .at-sep::before, .at-sep::after { content:''; flex:1; height:2px; background:rgba(0,122,84,.25); border-radius:2px }
+  .at-typing { align-self:flex-start; display:flex; gap:4px; padding:12px 16px; background:var(--lms-white, #fff);
+    border-radius:16px; border-bottom-left-radius:4px; box-shadow:0 1px 2px rgba(31,42,37,.12) }
+  .at-typing i { width:7px; height:7px; border-radius:50%; background:var(--lms-ink-faint, #9AA1A9); animation:at-dot 1s infinite }
+  .at-typing i:nth-child(2) { animation-delay:.15s } .at-typing i:nth-child(3) { animation-delay:.3s }
+  @keyframes at-dot { 0%, 60%, 100% { transform:translateY(0); opacity:.5 } 30% { transform:translateY(-5px); opacity:1 } }
+  .at-coach { align-self:stretch; display:flex; gap:10px; padding:11px 14px; border-radius:12px; font-size:13.5px; line-height:1.5;
+    background:var(--lms-warning-soft, #FBEFD9); border:1.5px solid var(--lms-warning, #E8A13C); color:#6B4A0C;
+    animation:at-entra .3s var(--lms-ease, ease) both }
+  .at-coach.is-ok { background:var(--lms-success-soft, #E6F4EE); border-color:var(--lms-success, #27A567); color:#1C7A4C }
+  .at-coach-ico { flex:none; font-size:18px; line-height:1.2 }
+  .at-coach-lbl { display:block; font-family:var(--lms-font-ui); font-weight:800; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; margin-bottom:2px }
+  .at-ganho { align-self:center; padding:6px 14px; border-radius:999px; background:#FCCA5B; color:var(--lms-heading);
+    font-family:var(--lms-font-ui); font-weight:800; font-size:12.5px; animation:jc-pop .4s var(--lms-ease, ease) both }
+
+  /* ── área de decisão ── */
+  .at-acoes { padding:14px 16px 16px; border-top:var(--lms-border-game); background:var(--lms-white, #fff) }
+  .at-perg { font-family:var(--lms-font-ui); font-weight:800; font-size:14px; color:var(--lms-heading); margin:0 0 10px; display:flex; gap:8px; align-items:center }
+  .at-perg-tag { flex:none; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; padding:3px 9px; border-radius:999px;
+    background:var(--lms-sky, #E4EFEA); color:var(--lms-primary, #007A54) }
+  .at-op { display:flex; gap:10px; align-items:flex-start; width:100%; text-align:left; font-family:inherit; font-size:14.5px; line-height:1.45;
+    color:var(--lms-ink); background:var(--lms-white, #fff); border:var(--lms-border-game); border-radius:12px; padding:11px 14px;
+    cursor:pointer; margin-top:8px; transition:transform .14s var(--lms-ease, ease), background .14s ease, border-color .14s ease }
+  .at-op:hover:not(:disabled) { transform:translateX(5px); border-color:var(--lms-primary, #007A54); background:var(--lms-sky, #E4EFEA) }
+  .at-op:disabled { cursor:default; opacity:.55 }
+  .at-op.is-wrong { background:var(--lms-error-soft); border-color:var(--lms-error); opacity:.7; text-decoration:line-through }
+  .at-op-badge { flex:none; width:28px; height:28px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    font-family:var(--lms-font-ui); font-weight:800; font-size:13px; background:var(--lms-surface-2, #E6E5DE); color:var(--lms-ink-soft) }
+  .at-op:hover:not(:disabled) .at-op-badge { background:var(--lms-primary, #007A54); color:#fff }
+  .at-espera { display:flex; align-items:center; gap:10px; color:var(--lms-ink-soft); font-size:13.5px; font-family:var(--lms-font-ui); font-weight:600; min-height:32px }
+  .at-espera .at-typing { padding:8px 12px; box-shadow:none; background:var(--lms-surface) }
+
+  /* ── briefing e relatório ── */
+  .at-brief { border:var(--lms-border-game); border-radius:var(--lms-radius-lg, 16px); overflow:hidden; box-shadow:var(--lms-shadow-crisp); background:var(--lms-white, #fff) }
+  .at-brief-topo { display:flex; gap:16px; align-items:center; padding:22px 24px; background:linear-gradient(160deg, var(--lms-primary, #007A54), var(--lms-heading, #1F2A25)); color:#fff }
+  .at-brief-av { flex:none; width:72px; height:72px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; font-size:40px; box-shadow:0 3px 0 rgba(0,0,0,.25) }
+  .at-brief-tag { font-family:var(--lms-font-ui); font-weight:800; font-size:11px; letter-spacing:.1em; text-transform:uppercase; opacity:.8 }
+  .at-brief-nome { font-family:var(--lms-font-ui); font-weight:800; font-size:24px; line-height:1.1; margin:2px 0 4px }
+  .at-brief-corpo { padding:20px 24px }
+  .at-brief-corpo p { font-size:15px; line-height:1.6 }
+  .at-brief-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px; margin-top:16px }
+  .at-brief-item { display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border-radius:12px; background:var(--lms-surface, #EFEEE8); font-size:13.5px; line-height:1.45 }
+  .at-brief-item b { display:block; font-family:var(--lms-font-ui); color:var(--lms-heading); margin-bottom:2px }
+  .at-brief-item span:first-child { font-size:20px; flex:none }
+
+  .at-rel-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px; margin:16px 0 }
+  .at-rel-stat { background:var(--lms-white, #fff); border:var(--lms-border-game); border-radius:12px; padding:14px 12px; text-align:center; box-shadow:var(--lms-shadow-crisp-sm) }
+  .at-rel-stat b { display:block; font-family:var(--lms-font-ui); font-size:26px; line-height:1.1; color:var(--lms-heading) }
+  .at-rel-stat span { display:block; font-size:11.5px; color:var(--lms-ink-soft); font-family:var(--lms-font-ui); font-weight:600; margin-top:4px }
+  .at-check { list-style:none; padding:0; margin:8px 0 0 }
+  .at-check li { display:flex; gap:10px; align-items:flex-start; padding:9px 0; border-top:1px solid var(--lms-border); font-size:14px; line-height:1.45 }
+  .at-check li:first-child { border-top:none }
+  .at-check li i { flex:none; font-style:normal; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px }
+  .at-check li.is-ok i { background:var(--lms-success-soft); color:var(--lms-success) }
+  .at-check li.is-ajuda i { background:var(--lms-warning-soft); color:#B57A20 }
+  .at-check li.is-nao i { background:var(--lms-error-soft); color:var(--lms-error) }
+  .at-sacola-lista { list-style:none; padding:0; margin:8px 0 0; font-size:14px }
+  .at-sacola-lista li { display:flex; justify-content:space-between; gap:12px; padding:6px 0; border-top:1px dashed var(--lms-border) }
+  .at-sacola-lista li:first-child { border-top:none }
+  .at-sacola-lista li.is-total { border-top:2px solid var(--lms-heading); font-family:var(--lms-font-ui); font-weight:800 }
+
+  @media (max-width: 640px) {
+    .at-chat { max-height:min(460px, 56vh); padding:14px 10px }
+    .at-msg { max-width:90%; font-size:14.5px }
+    .at-etapa { min-width:calc(50% - 3px); font-size:12px }
+    .at-hud-dir { margin-left:0; width:100%; gap:6px }
+    .at-humor { flex:1 1 100%; min-width:0; order:-1 }
+    .at-band { width:32px; height:32px; font-size:16px }
+    .at-chip { padding:5px 9px; font-size:12px }
+  }
+</style>`));
+
 const SFX = (() => {
   let ctx = null;
   const ligado = () => localStorage.getItem('lms-sfx') !== 'off';
@@ -647,6 +789,7 @@ const COMO_JOGAR = {
   caca_palavras: ['🔤', 'Ache as palavras da lista: clique na <strong>primeira</strong> e na <strong>última</strong> letra de cada uma. A 💡 dá dica.'],
   cruzadinha:    ['✏️', 'Digite as letras na grade seguindo as dicas. Há tempo no relógio — confira ao final.'],
   tabuleiro:     ['🎲', 'Jogue o dado, ande pelas casas e responda ao cair. Errou? Volta uma casa.'],
+  atendimento:   ['💬', 'A cliente fala, você escolhe a sua resposta. Errou? Ela reage, o coach explica e você tenta de novo — só a escolha de primeira conta.'],
 };
 
 /* ════════ MINIGAMES ════════ */
@@ -2242,6 +2385,315 @@ const Minigames = {
         });
       }, 620);
     });
+  },
+
+  /* M20 · Atendimento — simulação de atendimento em formato de chat.
+     A cliente "entra na loja" e conversa; a cada turno o aluno escolhe
+     a própria fala entre 2–4 opções. O HUD mostra as etapas fixas do
+     modelo de atendimento (Acolha → Personalize → Potencialize → Encante),
+     as bandeiras a capturar, a satisfação da cliente e a sacola.
+     Modo domínio (padrão): errou → a cliente reage, o coach explica e o
+     aluno escolhe de novo; só avança acertando. Conta como acerto (nota,
+     bandeira e checklist do Cliente Oculto) só a escolha de primeira —
+     a que um auditor teria visto. Modo "livre": errar segue o caminho.
+     Tudo vem do config (cliente, turnos, bandeiras, checklist, sacola);
+     "{nome}" nas falas vira o primeiro nome de quem está jogando. */
+  atendimento(cfg, host, done, revisao) {
+    const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const eu = typeof EU !== 'undefined' ? EU : (window.EU || null);   // fase.php declara `const EU` (não é window.EU)
+    const meuNome = esc(((eu && eu.nome) || 'Consultora').trim().split(/\s+/)[0]);
+    const T = s => String(s ?? '').replace(/\{nome\}/g, meuNome);
+    const lista = v => v == null || v === '' ? [] : (Array.isArray(v) ? v : [v]);
+    const brl = v => 'R$ ' + (+v || 0).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+    const cli = cfg.cliente || {};
+    const etapas = (cfg.etapas || []).length ? cfg.etapas : ['Acolha', 'Personalize', 'Potencialize', 'Encante'];
+    const bandeiras = cfg.bandeiras || [];
+    const checklist = cfg.checklist || [];
+    const turnos = cfg.turnos || [];
+    const dominio = (cfg.modo || 'dominio') !== 'livre';
+    const replay = !!revisao;                       // modo revisão: reproduz o que foi respondido, sem esperar
+    const gravado = replay ? (revisao.resposta || null) : null;
+
+    // estado da partida
+    let humor = Number.isFinite(+cfg.humor_inicial) ? +cfg.humor_inicial : 50;
+    let acertos = 0, total = 0, etapaAtual = -1, passos = 0;
+    const eventos = [];                              // {t, o, ok} na ordem em que aconteceu
+    const primeira = {};                             // turno → acertou de primeira?
+    const bandEstado = {};                           // id → 'ok' | 'ajuda'
+    const ocultoEstado = {};                         // id → 'ok' | 'ajuda'
+    const sacola = [];                               // {item, preco, brinde}
+    const rapido = { on: replay };
+
+    const esperar = ms => new Promise(r => setTimeout(r, rapido.on ? 0 : ms));
+    const tempoDigitando = txt => Math.min(1900, 450 + String(txt).replace(/<[^>]+>/g, '').length * 16);
+
+    /* ── briefing: ficha da cliente + a missão ── */
+    const briefing = () => {
+      const b = cfg.briefing || {};
+      const itens = [
+        ['🧭', 'As etapas', `Conduza a conversa nessa ordem:<br><b>${etapas.join(' → ')}</b>`],
+        bandeiras.length ? ['🚩', 'As bandeiras', `Faça aparecer, em algum momento:${bandeiras.map(x => `<span style="display:block; white-space:nowrap">${x.icone || '🚩'} <b>${x.nome}</b></span>`).join('')}`] : null,
+        ['💛', 'A satisfação', 'Cada resposta muda o humor da cliente. É ela que dá a nota no NPS.'],
+        checklist.length ? ['📋', 'O Cliente Oculto', 'No fim, o checklist da auditoria mostra o que você fez de primeira.'] : null,
+      ].filter(Boolean);
+      host.innerHTML = '';
+      host.appendChild(el(`
+        <div class="at-brief mg-slide">
+          <div class="at-brief-topo">
+            <div class="at-brief-av">${cli.avatar || '🙂'}</div>
+            <div>
+              <div class="at-brief-tag">${cli.persona ? 'Cliente · ' + cli.persona : 'Cliente'}</div>
+              <div class="at-brief-nome">${T(cli.nome || 'Cliente')}</div>
+              ${cli.descricao ? `<div style="font-size:13.5px; opacity:.9; line-height:1.45">${T(cli.descricao)}</div>` : ''}
+            </div>
+          </div>
+          <div class="at-brief-corpo">
+            ${b.titulo ? `<h3 style="margin-bottom:6px">${T(b.titulo)}</h3>` : ''}
+            <p>${T(b.texto || 'Uma cliente acabou de entrar. A partir de agora, cada fala é sua: leia o que ela diz e escolha como responder.')}</p>
+            <div class="at-brief-grid">${itens.map(([i, t, d]) => `<div class="at-brief-item"><span>${i}</span><div><b>${t}</b>${d}</div></div>`).join('')}</div>
+            <p class="lms-small lms-muted" style="margin-top:14px">${dominio
+              ? 'Errou? A cliente reage, o coach explica e você escolhe de novo. Só a escolha de primeira conta — é a que o Cliente Oculto teria visto.'
+              : 'Cada escolha segue o seu caminho: a conversa muda conforme o que você responde.'}</p>
+            <button type="button" class="lms-btn lms-btn-primary lms-btn-lg" style="width:100%; margin-top:16px">${b.botao || 'Começar o atendimento'} 💬</button>
+          </div>
+        </div>`));
+      host.querySelector('button').addEventListener('click', () => { SFX.ok(); montar(); jogar(); });
+    };
+
+    /* ── palco: HUD + chat + área de decisão ── */
+    let chat, acoes, hud = {};
+    const montar = () => {
+      host.innerHTML = '';
+      host.appendChild(el(`
+        <div class="at-wrap mg-slide">
+          <div class="at-hud">
+            <div class="at-hud-topo">
+              <div class="at-cli-av">${cli.avatar || '🙂'}</div>
+              <div><div class="at-cli-nome">${T(cli.nome || 'Cliente')}</div><div class="at-cli-sub">${cli.persona ? T(cli.persona) : (cfg.loja || 'Na loja')}</div></div>
+              <div class="at-hud-dir">
+                <div class="at-humor" title="Satisfação da cliente"><span class="at-humor-face" id="at-face">🙂</span>
+                  <div style="flex:1"><div class="at-humor-lbl">Satisfação</div><div class="at-humor-bar"><div class="at-humor-fill" id="at-humor" style="width:${humor}%"></div></div></div></div>
+                ${bandeiras.length ? `<div class="at-bandeiras" id="at-bands">${bandeiras.map(x => `<span class="at-band" data-id="${esc(x.id)}" title="${esc(x.nome)}">${x.icone || '🚩'}</span>`).join('')}</div>` : ''}
+                <span class="at-chip" id="at-sacola" title="Sacola da cliente">🛍️ <span>0</span></span>
+                <button type="button" class="at-chip at-chip-btn ${rapido.on ? 'is-on' : ''}" id="at-rapido" title="Mostrar as mensagens sem esperar a digitação">⏩</button>
+              </div>
+            </div>
+            <div class="at-etapas" id="at-etapas">${etapas.map((n, i) => `<span class="at-etapa" data-i="${i}"><span class="at-etapa-n">${i + 1}</span>${esc(n)}</span>`).join('')}</div>
+          </div>
+          <div class="at-chat" id="at-chat" aria-live="polite"></div>
+          <div class="at-acoes" id="at-acoes"></div>
+        </div>`));
+      chat = host.querySelector('#at-chat');
+      acoes = host.querySelector('#at-acoes');
+      hud = { face: host.querySelector('#at-face'), humor: host.querySelector('#at-humor'), sacola: host.querySelector('#at-sacola'), bands: host.querySelector('#at-bands') };
+      const btnRapido = host.querySelector('#at-rapido');
+      btnRapido.addEventListener('click', () => { rapido.on = !rapido.on; btnRapido.classList.toggle('is-on', rapido.on); SFX.flip(); });
+      pintaHumor(false);
+    };
+
+    const rola = () => { chat.scrollTop = chat.scrollHeight; };
+    const balao = (html, quem, extra = '') => {
+      const d = el(`<div class="at-msg ${quem === 'eu' ? 'is-eu' : 'is-cli'} ${extra}">
+        <span class="at-msg-quem">${quem === 'eu' ? meuNome : esc(T(cli.nome || 'Cliente'))}</span>${T(html)}</div>`);
+      chat.appendChild(d); rola(); return d;
+    };
+    const cena = txt => { chat.appendChild(el(`<div class="at-cena">${T(txt)}</div>`)); rola(); };
+    const coach = (txt, ok) => {
+      chat.appendChild(el(`<div class="at-coach ${ok ? 'is-ok' : ''}"><span class="at-coach-ico">${ok ? '✅' : '🧭'}</span>
+        <div><span class="at-coach-lbl">${ok ? 'Coach · boa!' : 'Coach · o que o modelo pede'}</span>${T(txt)}</div></div>`));
+      rola();
+    };
+    const ganho = txt => { chat.appendChild(el(`<div class="at-ganho">${txt}</div>`)); rola(); };
+
+    // a cliente "digita" antes de cada balão — é o que dá vida ao chat
+    const clienteFala = async (txt) => {
+      const tp = el('<div class="at-typing"><i></i><i></i><i></i></div>');
+      chat.appendChild(tp); rola();
+      await esperar(tempoDigitando(txt));
+      tp.remove();
+      balao(txt, 'cli');
+      if (!rapido.on) SFX.flip();
+      await esperar(260);
+    };
+
+    const pintaHumor = (anima = true) => {
+      humor = Math.max(0, Math.min(100, humor));
+      hud.humor.style.width = humor + '%';
+      hud.face.textContent = humor >= 75 ? '😍' : humor >= 50 ? '🙂' : humor >= 30 ? '😐' : '😕';
+      if (anima) { hud.face.classList.remove('jc-pousa'); void hud.face.offsetWidth; hud.face.classList.add('jc-pousa'); }
+    };
+    const pintaEtapa = (i) => {
+      host.querySelectorAll('.at-etapa').forEach(e2 => {
+        const k = +e2.dataset.i;
+        e2.classList.toggle('is-atual', k === i);
+        e2.classList.toggle('is-feita', k < i);
+      });
+    };
+    const pintaSacola = () => {
+      const totalR = sacola.reduce((s, x) => s + (+x.preco || 0), 0);
+      hud.sacola.innerHTML = `🛍️ <span>${sacola.length}${totalR ? ' · ' + brl(totalR) : ''}</span>`;
+      hud.sacola.title = sacola.length ? sacola.map(x => x.item + (x.brinde ? ' (brinde)' : '')).join(' · ') : 'Sacola vazia';
+      hud.sacola.classList.remove('jc-pousa'); void hud.sacola.offsetWidth; hud.sacola.classList.add('jc-pousa');
+    };
+    const marcaBandeira = (id, estado) => {
+      if (!id) return;
+      if (bandEstado[id] === 'ok') return;             // já capturada de primeira: não rebaixa
+      bandEstado[id] = estado;
+      const elB = hud.bands?.querySelector(`[data-id="${CSS.escape(id)}"]`);
+      if (elB) { elB.classList.remove('is-ok', 'is-ajuda'); elB.classList.add(estado === 'ok' ? 'is-ok' : 'is-ajuda'); elB.classList.add('jc-festa'); }
+    };
+
+    /* ── um turno: didascália → falas da cliente → decisão ── */
+    const turno = async (idx) => {
+      if (passos++ > 80) return fim();                 // trava anti-loop (config com ciclo)
+      const t = turnos[idx];
+      if (!t) return fim();
+      const et = Math.max(0, Math.min(etapas.length - 1, +t.etapa || 0));
+      if (et !== etapaAtual) {
+        etapaAtual = et;
+        pintaEtapa(et);
+        chat.appendChild(el(`<div class="at-sep"><span>${esc(etapas[et])}</span></div>`)); rola();
+        await esperar(350);
+      }
+      acoes.innerHTML = `<div class="at-espera"><div class="at-typing"><i></i><i></i><i></i></div>${esc(T(cli.nome || 'A cliente'))}…</div>`;
+      if (t.cena) { cena(t.cena); await esperar(600); }
+      for (const f of lista(t.falas)) await clienteFala(f);
+      if (!(t.opcoes || []).length) return turno(t.vai === null ? -1 : (t.vai ?? idx + 1));
+      decisao(idx, t);
+    };
+
+    const decisao = (idx, t, tentadas = new Set()) => {
+      acoes.innerHTML = '';
+      acoes.appendChild(el(`<p class="at-perg"><span class="at-perg-tag">${esc(etapas[etapaAtual] || 'Você')}</span>${T(t.pergunta || 'O que você diz?')}</p>`));
+      const letras = 'ABCDEFGH';
+      let travado = false;
+      t.opcoes.forEach((o, oi) => {
+        if (tentadas.has(oi)) return;
+        const b = el(`<button type="button" class="at-op"><span class="at-op-badge">${letras[oi]}</span><span>${T(o.texto)}</span></button>`);
+        b.addEventListener('click', () => { if (travado) return; travado = true; escolher(idx, t, oi, tentadas); });
+        acoes.appendChild(b);
+      });
+      if (replay) {
+        // revisão: a próxima escolha gravada deste turno dispara sozinha
+        const ev = gravado?.eventos?.find(e2 => e2.t === idx && !e2._usado);
+        if (ev) { ev._usado = true; travado = true; escolher(idx, t, ev.o, tentadas); }
+        else acoes.innerHTML = '<p class="lms-small lms-muted">Sem registro do que foi respondido aqui.</p>';
+      }
+    };
+
+    const escolher = async (idx, t, oi, tentadas) => {
+      const o = t.opcoes[oi];
+      const ok = !!o.correta;
+      const primeiraVez = !(idx in primeira);
+      if (primeiraVez) { total++; primeira[idx] = ok; if (ok) acertos++; }
+      eventos.push({ t: idx, o: oi, ok });
+      acoes.querySelectorAll('.at-op').forEach(b => { b.disabled = true; });
+      balao(o.texto, 'eu', ok ? '' : 'is-errou');
+      if (!rapido.on) (ok ? SFX.ok : SFX.err)();
+      await esperar(500);
+
+      // a cliente reage à sua fala (positiva ou não)
+      for (const r of lista(o.reacao)) await clienteFala(r);
+      humor += Number.isFinite(+o.humor) ? +o.humor : (ok ? 8 : -12);
+      pintaHumor();
+
+      if (ok) {
+        const estado = primeira[idx] ? 'ok' : 'ajuda';
+        lista(o.bandeira).forEach(id => marcaBandeira(id, estado));
+        lista(o.oculto).forEach(id => { if (ocultoEstado[id] !== 'ok') ocultoEstado[id] = estado; });
+        lista(o.sacola).forEach(x => { if (x && x.item) sacola.push({ item: T(x.item), preco: +x.preco || 0, brinde: !!x.brinde }); });
+        if (lista(o.sacola).length) { pintaSacola(); ganho(`🛍️ ${lista(o.sacola).map(x => T(x.item)).join(' + ')} na sacola`); }
+        if (lista(o.bandeira).length) {
+          const nomes = lista(o.bandeira).map(id => bandeiras.find(x => x.id === id)).filter(Boolean);
+          if (nomes.length) ganho(`${nomes.map(x => x.icone || '🚩').join('')} Bandeira: ${nomes.map(x => x.nome).join(' + ')}${estado === 'ajuda' ? ' (com ajuda do coach)' : ''}`);
+          if (!rapido.on && hud.bands) { const r = hud.bands.getBoundingClientRect(); confeteMini(r.left + r.width / 2, r.top + r.height / 2, 14); }
+        }
+        if (o.feedback) coach(o.feedback, true);
+        await esperar(o.feedback ? 1100 : 500);
+        return turno(o.vai === null ? -1 : (o.vai ?? idx + 1));
+      }
+
+      // errou
+      if (dominio) {
+        coach(o.feedback || 'Não é por aí. Lembre o que o modelo de atendimento pede nesta etapa e escolha de novo.', false);
+        tentadas.add(oi);
+        const restam = t.opcoes.filter((_, i) => !tentadas.has(i));
+        acoes.innerHTML = '';
+        const btn = el(`<button type="button" class="lms-btn lms-btn-primary" style="width:100%">${restam.length ? 'Tentar de novo ↩︎' : 'Continuar →'}</button>`);
+        btn.addEventListener('click', () => restam.length ? decisao(idx, t, tentadas) : turno(idx + 1));
+        acoes.appendChild(btn);
+        if (replay) { await esperar(0); btn.click(); }
+        return;
+      }
+      if (o.feedback) coach(o.feedback, false);
+      await esperar(o.feedback ? 1100 : 500);
+      return turno(o.vai === null ? -1 : (o.vai ?? idx + 1));
+    };
+
+    /* ── relatório do atendimento ── */
+    const fim = () => {
+      pintaEtapa(etapas.length);
+      const pct = total ? Math.round(acertos / total * 100) : 100;
+      const nps = humor >= 85 ? 10 : humor >= 70 ? 9 : humor >= 55 ? 8 : humor >= 40 ? 7 : humor >= 25 ? 5 : 3;
+      const nBandOk = bandeiras.filter(x => bandEstado[x.id] === 'ok').length;
+      const nBandAjuda = bandeiras.filter(x => bandEstado[x.id] === 'ajuda').length;
+      const totalR = sacola.reduce((s, x) => s + (+x.preco || 0), 0);
+      const f = cfg.final || {};
+      const semVenda = !!f.sem_venda || !sacola.length;
+      acoes.innerHTML = '';
+      const rel = el(`
+        <div class="lms-stack-4">
+          <div class="lms-card-pastel ${pct >= 70 ? 'is-mint' : 'is-sand'} lms-pop" style="padding:24px">
+            <div class="lms-row" style="gap:12px; align-items:center">
+              <span style="font-size:34px">${pct >= 90 ? '🏆' : pct >= 70 ? '🎉' : '📋'}</span>
+              <div><h3 style="margin:0">${T(f.titulo || 'Relatório do atendimento')}</h3>
+              <p class="lms-small lms-muted" style="margin:2px 0 0">${T(cli.nome || 'Cliente')}${cli.persona ? ' · ' + T(cli.persona) : ''}</p></div>
+            </div>
+            ${f.texto ? `<p style="margin-top:12px; font-size:15px; line-height:1.6">${T(f.texto)}</p>` : ''}
+            <div class="at-rel-stats">
+              <div class="at-rel-stat"><b style="color:var(--lms-success)">${pct}%</b><span>de primeira (${acertos} de ${total})</span></div>
+              ${bandeiras.length ? `<div class="at-rel-stat"><b>${nBandOk}<small style="font-size:14px; color:var(--lms-ink-soft)">/${bandeiras.length}</small></b><span>bandeiras${nBandAjuda ? ` · ${nBandAjuda} com ajuda` : ''}</span></div>` : ''}
+              <div class="at-rel-stat"><b>${nps}</b><span>nota provável no NPS</span></div>
+              <div class="at-rel-stat"><b style="font-size:${semVenda ? '18px' : '22px'}">${semVenda ? 'sem venda' : brl(totalR)}</b><span>${semVenda ? (f.motivo_nao_compra ? 'motivo registrado' : 'hoje') : 'na sacola · ' + sacola.length + (sacola.length === 1 ? ' item' : ' itens')}</span></div>
+            </div>
+          </div>
+          ${sacola.length ? `<div class="lms-card" style="padding:20px"><h4>🛍️ Sacola de ${T(cli.nome || 'cliente')}</h4>
+            <ul class="at-sacola-lista">${sacola.map(x => `<li><span>${x.item}</span><span>${x.brinde ? 'brinde' : brl(x.preco)}</span></li>`).join('')}
+            <li class="is-total"><span>Total</span><span>${brl(totalR)}</span></li></ul>
+            ${cfg.nota_precos ? `<p class="lms-small lms-muted" style="margin-top:8px">${T(cfg.nota_precos)}</p>` : ''}</div>` : ''}
+          ${semVenda && f.motivo_nao_compra ? `<div class="lms-alert is-info">📝 <div><strong>Motivo da não compra registrado:</strong> ${T(f.motivo_nao_compra)}. Sem venda também é resultado válido do atendimento — o dado alimenta o CRM e a próxima oferta.</div></div>` : ''}
+          ${checklist.length ? `<div class="lms-card" style="padding:20px"><h4>📋 Checklist do Cliente Oculto</h4>
+            <p class="lms-small lms-muted" style="margin:2px 0 6px">O que um auditor teria marcado vendo só as suas escolhas de primeira.</p>
+            <ul class="at-check">${checklist.map(c => {
+              const st = ocultoEstado[c.id] || 'nao';
+              return `<li class="is-${st}"><i>${st === 'ok' ? '✓' : st === 'ajuda' ? '!' : '✕'}</i><span>${T(c.texto)}${st === 'ajuda' ? ' <em class="lms-small lms-muted">(acertou depois do coach)</em>' : ''}</span></li>`;
+            }).join('')}</ul></div>` : ''}
+          ${replay ? '' : `<button type="button" class="lms-btn lms-btn-primary lms-btn-lg" style="width:100%">${f.botao || 'Concluir atendimento'} ✓</button>`}
+        </div>`);
+      acoes.appendChild(rel);
+      rel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (!replay) {
+        if (pct >= 70) confete(60);
+        rel.querySelector('button').addEventListener('click', () => done({
+          acertos, total: Math.max(1, total),
+          resposta: { eventos: eventos.map(e2 => ({ t: e2.t, o: e2.o, ok: e2.ok })), humor, sacola, bandeiras: bandEstado, oculto: ocultoEstado },
+        }));
+      }
+    };
+
+    const jogar = () => turno(0);
+
+    if (replay) {
+      if (!gravado?.eventos?.length) {
+        host.appendChild(el('<p class="lms-small lms-muted">Sem registro da conversa nesta etapa.</p>'));
+        return;
+      }
+      montar();
+      jogar();
+      return;
+    }
+    briefing();
   },
 };
 

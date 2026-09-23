@@ -68,6 +68,8 @@ $dinamicas = [
      'Quando o áudio ainda não existe: a transcrição com vozes já entrega o conteúdo.'],
     ['🎲', 'Tabuleiro', 'tabuleiro', 'Dado, casas e perguntas.',
      'Revisão geral divertida. Errou, volta uma casa — o grand finale de um treinamento.'],
+    ['💬', 'Simulação de atendimento', 'atendimento', 'Chat com a cliente: você escolhe cada fala.',
+     'Treinar o modelo de atendimento na prática: etapas, bandeiras e as perguntas do Cliente Oculto, com a cliente reagindo a cada escolha.'],
 ];
 
 lms_head('Manual · ' . $capaTit, $u);

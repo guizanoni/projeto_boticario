@@ -69,7 +69,7 @@ function lms_db(): PDO {
 // (o seed só roda em banco novo). Parte da 31 pra ficar alinhada ao
 // engine de origem (/atlantica): uma correção de schema feita lá pode
 // ser replicada aqui com o mesmo número.
-const LMS_SCHEMA_VERSAO = 34;
+const LMS_SCHEMA_VERSAO = 35;
 
 function lms_migrar(PDO $db): void {
     $v = (int) $db->query('PRAGMA user_version')->fetchColumn();
@@ -111,6 +111,15 @@ function lms_migrar(PDO $db): void {
             $st = $db->prepare('UPDATE fase SET pin_x = ?, pin_y = ? WHERE treinamento_id = ? AND ordem = ?');
             foreach ([1 => [22, 69], 2 => [40, 39], 3 => [57, 71.5], 4 => [75, 37.5], 5 => [85.5, 75.5]] as $ordem => [$x, $y]) $st->execute([$x, $y, $tid, $ordem]);
         }
+    }
+
+    if ($v < 35) {
+        // v35 · Fase "Simulação de atendimento" (dois atendimentos em chat —
+        // minigame `atendimento`) entra no fim do treinamento inaugural.
+        // Material novo do cliente (2026-09-23). Idempotente pelo nome da fase.
+        require_once __DIR__ . '/conteudo/simulacao-atendimento.php';
+        $cli = (int) $db->query("SELECT id FROM cliente WHERE slug = 'boticario'")->fetchColumn();
+        if ($cli) conteudo_sim_atendimento_inserir($db, $cli);
     }
 
     $db->exec('PRAGMA user_version = ' . LMS_SCHEMA_VERSAO);

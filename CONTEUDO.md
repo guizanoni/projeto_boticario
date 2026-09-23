@@ -101,3 +101,58 @@ engine. Fonte: `boticario/materiais/` (fora do repo).
 3. **Carga**: script `_lib/conteudo/servico-make.php` (mesmo padrão do SSMS no Atlântica) que cria trilha → treinamento → 5 fases → 11 etapas com os textos do HTML, idempotente, disparado uma vez pelo admin. Versionado e reproduzível — melhor que cadastrar 11 etapas à mão.
 4. **Mapa**: produzir a arte do cenário e posicionar os 5 pins em `admin/mapa`.
 5. **Revisão com o cliente** na visão de aluno → ajustes → abrir para os usuários.
+
+---
+
+# Simulação de atendimento (material de 2026-09-23)
+
+Fonte: `boticario/materiais/nova-dinamica/` (fora do repo; textos extraídos em
+`00-modelo-atendimento-slides.txt`, `01-roteiro-nao-linear.txt`,
+`02-roteiro-linear-amanda.txt`).
+
+## O que veio
+
+| Item | Detalhe |
+|---|---|
+| 00 · PPTX (43 slides, 25 MB) | "Modelo de Atendimento Botileza + Beautybox" pra lideranças e multiplicadores: as 4 etapas (Acolha · Personalize · Potencialize · Encante), as 3 bandeiras (identificação, rituais de experimentação, conexão com o Beautybox), **as perguntas do Cliente Oculto por etapa**, Boti Recicla, NPS, jornada em alto fluxo, dinâmicas de time. Paleta Botileza (magenta/âmbar/navy/teal) e Poppins. |
+| 01 · DOCX | "Roteiro não linear": espec. de chatbot híbrido — 7 personas de entrada, bandeiras obrigatórias, critérios de transição, motivo da não compra, diálogos de exemplo, tom impróprio do trainee. |
+| 02 · DOCX | "Roteiro linear · Amanda": compra de base que evolui pro Serviço Completo de Make, fala a fala, nas 4 etapas (+ realização do serviço). |
+
+## O que virou
+
+- **Minigame novo `atendimento`** (`assets/js/player.js` M20): chat de celular
+  dentro do player. A cliente "digita" e fala em balões; o aluno escolhe a própria
+  fala entre 2–4 opções por turno. HUD com as 4 etapas (acende conforme avança),
+  as 3 bandeiras (capturam com festa), barra de satisfação (humor da cliente) e
+  sacola com valor. Errou → a cliente reage, o coach explica o que o modelo pede,
+  e escolhe de novo (modo domínio; há modo "livre" ramificado). No fim, relatório:
+  % de primeira, bandeiras, nota provável no NPS, sacola itemizada e **checklist
+  do Cliente Oculto** marcado só pelo que foi feito de primeira ("!" = acertou
+  depois do coach). `{nome}` nas falas vira o primeiro nome de quem joga. Revisão
+  reproduz a conversa gravada (eventos por turno) sem esperas.
+- **Fase 6 "Simulação de atendimento"** no treinamento "Da Base ao Look Completo"
+  (migração v35, pin 40/80 no chão livre da loja, formativa, sem nota mínima):
+  1. *Amanda — da base ao Serviço Completo*: o roteiro 02 inteiro, 14 turnos, com
+     as falas da Jéssica como opção certa e os anti-padrões do material como
+     erradas (CPF "pra nota", pular biossegurança, validar o mito do hidratante,
+     desistir na objeção de preço, sacola sem fragrância, pedir nota 10…).
+  2. *Bia — "só dando uma olhada"*: persona 2 do roteiro 01 que vira objeção de
+     preço e sai sem comprar; 6 turnos; termina com motivo da não compra
+     registrado, lembrete no Beautybox, amostra e NPS. Mostra que sem venda
+     também é resultado válido.
+- **Admin**: tipo no catálogo, construtor visual completo (cliente, abertura,
+  bandeiras, checklist, turnos com falas/opções/reação/coach/sacola/destino,
+  relatório) e validação no servidor. Manual e massa de demonstração conhecem o
+  tipo.
+
+## Decisões tomadas (ajustar se o cliente pedir)
+
+- Preços da sacola são **ilustrativos** (só base R$ 99,90 e serviço R$ 139,90 vêm
+  do roteiro); o relatório avisa. Trocar por tabela real se o cliente mandar.
+- A opção certa do Acolha pergunta o nome da cliente ("Meu nome é X, e o seu?")
+  — o roteiro 02 não pergunta, mas o Cliente Oculto do PPTX cobra.
+- Emojis só do conjunto antigo (🆔 🧪 💚): 🪪 vira tofu no Windows 10.
+- Fase entrou como 6ª (depois do quiz), pra não reordenar progresso de quem já
+  jogou. Dá pra mover no admin de trilhas.
+- Não implementado do roteiro 01: tom impróprio do trainee (seção 7) e as outras
+  5 personas — o engine já aguenta (uma etapa `atendimento` por persona).

@@ -159,6 +159,8 @@ SQL);
     // ── Conteúdo real (Serviço Completo de Make) ────────────
     require_once __DIR__ . '/conteudo/servico-make.php';
     $trein = conteudo_servico_make_inserir($db, $cli);
+    require_once __DIR__ . '/conteudo/simulacao-atendimento.php';
+    conteudo_sim_atendimento_inserir($db, $cli);   // fase 6: simulação de atendimento em chat
 
     // ── Acesso inicial ──────────────────────────────────────
     // Um único admin, já no treinamento (pra Visão do aluno). Senha
